@@ -1,0 +1,230 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3780c87f966ecb2458ab176286a894c5, type: 3}
+  m_Name: DebugLogSettings
+  m_EditorClassIdentifier: Assembly_Template::Template.Features.Log.DebugLogSettings
+  _defaultStyle:
+    FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+    TextColor: {r: 1, g: 1, b: 1, a: 1}
+    TextSize: 12
+    Bold: 0
+    Italic: 0
+    Underline: 0
+  _featureStyles:
+  - _feature: LogFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: CheatFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: CommandLineFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: ClassFactoryFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: AppTimeFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: LocalConfigFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: DataStorageFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: LocalizationFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: VibrationFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: PingFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: RemoteConfigFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: HttpApiFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: WebSocketApiFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: ContainerFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: PopupFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: ScreenNavigatorFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: PushNotificationsFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: FakeNicknameFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: LoaderFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: FirebaseFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: AuthProviderFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: AuthFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: UserFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: PopupsFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: LayerUiFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0
+  - _feature: AuthFlowFeature
+    _style:
+      FeatureColor: {r: 0.65, g: 0.85, b: 1, a: 1}
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+      TextSize: 12
+      Bold: 0
+      Italic: 0
+      Underline: 0

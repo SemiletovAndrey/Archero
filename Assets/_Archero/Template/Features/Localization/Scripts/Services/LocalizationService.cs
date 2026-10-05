@@ -1,0 +1,107 @@
+﻿using System;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using Template.Features.DataStorage;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
+using UnityEngine.ResourceManagement.AsyncOperations;
+
+namespace Template.Features.Localization
+{
+    public class LocalizationService : ILocalizationService
+    {
+        private readonly IDataStorageService _storageService;
+
+        private LocalizationUserData userData;
+
+        public event Action LocaleChanged;
+
+        public LocalizationService(IDataStorageService storageService)
+        {
+            _storageService = storageService;
+        }
+
+        public async Task InitAsync()
+        {
+#if !UNITY_SERVER
+            await InitializeLocalization();
+
+            userData = _storageService.LoadOrCreate(() => new LocalizationUserData());
+
+            Locale locale = GetLocaleByCode(userData.SelectedLocaleCode);
+
+            if (locale != null)
+            {
+                LocalizationSettings.SelectedLocale = locale;
+            }
+#endif
+        }
+
+        public void SetLocale(Locale locale)
+        {
+#if UNITY_SERVER
+            return;
+#endif
+
+            if (locale == null)
+            {
+                return;
+            }
+
+            if (LocalizationSettings.SelectedLocale == locale)
+            {
+                return;
+            }
+
+            LocalizationSettings.SelectedLocale = locale;
+
+            SaveLocale(locale.Identifier.Code);
+
+            LocaleChanged?.Invoke();
+        }
+
+        public Locale GetSelectedLocale()
+        {
+#if UNITY_SERVER
+            return null;
+#else
+            return LocalizationSettings.SelectedLocale;
+#endif
+        }
+
+        private void SaveLocale(string localeCode)
+        {
+            if (userData == null)
+            {
+                userData = _storageService.LoadOrCreate(() => new LocalizationUserData());
+            }
+
+            userData.SelectedLocaleCode = localeCode;
+            _storageService.Save(userData);
+        }
+
+        private Locale GetLocaleByCode(string localeCode)
+        {
+            if (string.IsNullOrWhiteSpace(localeCode))
+            {
+                return null;
+            }
+
+            return LocalizationSettings.AvailableLocales.Locales.Find(
+                locale => locale.Identifier.Code == localeCode);
+        }
+
+        private async UniTask InitializeLocalization()
+        {
+            AsyncOperationHandle handle = LocalizationSettings.InitializationOperation;
+
+            if (!handle.IsDone)
+            {
+                await handle.Task;
+            }
+            
+            var tableHandle = LocalizationSettings.StringDatabase.GetTableAsync("Tutorial");
+            await tableHandle.Task;
+        }
+    }
+}
