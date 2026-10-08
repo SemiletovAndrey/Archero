@@ -10,7 +10,6 @@ namespace Template.Features.Config.Local
         
         public void Init()
         {
-            
         }
 
         public TConfig GetConfig<TConfig>() where TConfig : ILocalFeatureConfig

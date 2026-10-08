@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Template.Features.Log;
 using Template.Scripts.Helpers;
 using UnityEngine;
 
@@ -33,7 +32,7 @@ namespace Template.Features.Config.Remote
 
                 if (config is null)
                 {
-                    DebugLogger.LogError($"{key} can't be converted to type {typeof(TConfig)}");
+                    Debug.LogError($"{key} can't be converted to type {typeof(TConfig)}");
                     return false;
                 }
 

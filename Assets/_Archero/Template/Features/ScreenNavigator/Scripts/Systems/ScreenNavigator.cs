@@ -2,23 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Template.Features.Log;
-using UnityEngine;
 
 namespace Template.Features.ScreenNavigator
 {
     public class ScreenNavigator : IScreenNavigator
     {
         private readonly IMainNavigationItem _mainNavigationItem;
-        private readonly IDebugLogger _logger;
 
         private readonly Queue<INavigationCommand> _navigationCommands = new();
         private List<BaseNavigationItem> _lastPath;
         
-        public ScreenNavigator(IMainNavigationItem mainNavigationItem, IDebugLogger logger)
+        public ScreenNavigator(IMainNavigationItem mainNavigationItem)
         {
             _mainNavigationItem = mainNavigationItem;
-            _logger = logger;
         }
 
         public void Init()
@@ -81,8 +77,6 @@ namespace Template.Features.ScreenNavigator
                 
                 _lastPath = await OpenWithPath<TItem, TPayload>(payload);
             }
-            
-            _logger.LogMessage("Navigated to " + typeof(TItem).Name);
         }
         
         private async UniTask<List<BaseNavigationItem>> OpenWithPath<TItem, TData>(TData data)

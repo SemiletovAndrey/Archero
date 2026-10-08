@@ -1,25 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Template.Features.Log;
+using UnityEngine;
 
 namespace Template.Features.Ping
 {
     public class PingService : IPingService, IDisposable
     {
-        private readonly IDebugLogger _logger;
         private readonly List<IPingProvider> _providers = new();
 
         private ConnectionState _state = ConnectionState.Unknown;
         private CancellationTokenSource _cts;
         private bool _isChecking;
-
-        public PingService(IDebugLogger logger)
-        {
-            _logger = logger;
-        }
 
         public event Action OnInternetRestored;
         public event Action OnInternetLost;
@@ -105,7 +98,7 @@ namespace Template.Features.Ping
                 }
                 catch (Exception e)
                 {
-                    _logger.LogWarning($"PingService error: {e}");
+                    Debug.LogWarning($"PingService error: {e}");
                 }
                 finally
                 {

@@ -12,13 +12,6 @@ namespace Template.Features.ProjectInit
         [SerializeField] private List<BaseInitializableBehaviour> _initBeforeInitialization;
         [SerializeField] private List<BaseInitializableBehaviour> _initAfterInitialization;
         
-        [Inject]
-        private void Construct(IScreenNavigator screenNavigator)
-        {
-            ScreenNavigator = screenNavigator;
-        }
-        
-        protected IScreenNavigator ScreenNavigator { get; private set; }
         protected LinkedList<IInitializableFeature> Features { get; private set; }
 
         protected virtual BaseInstaller GetInstaller()

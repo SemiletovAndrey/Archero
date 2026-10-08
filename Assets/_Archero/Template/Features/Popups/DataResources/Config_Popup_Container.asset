@@ -12,6 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa5a168855ef467e9cb58f15995efcca, type: 3}
   m_Name: Config_Popup_Container
   m_EditorClassIdentifier: Assembly_Template::Template.Features.Popups.Scripts.PopupConfig
-  Entries:
-  - Type: 1
-    Prefab: {fileID: 4848395479313739050, guid: 5992899315b1388449f5c187d16a3ac9, type: 3}
+  Entries: []

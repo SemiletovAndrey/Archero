@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Template.Features.Cheat;
 using Template.Features.ClassFactory;
-using Template.Features.Log;
 using UnityEngine;
 using Zenject;
 
@@ -11,7 +9,6 @@ namespace Template.Features.ProjectInit
     public abstract class BaseMonoBehaviourFeature : MonoBehaviour, IInitializableFeature
     {
         private IClassFactory _classFactory;
-        private IDebugLogger _logger;
         
         [Inject]
         private void Construct(DiContainer container)
@@ -43,8 +40,6 @@ namespace Template.Features.ProjectInit
             await InitServices();
             await InitSystems();
             await AddTrackers();
-            
-            AddCheats();
         }
 
         protected virtual UniTask InitServices()
@@ -55,10 +50,6 @@ namespace Template.Features.ProjectInit
         protected virtual UniTask InitSystems()
         {
             return UniTask.CompletedTask;
-        }
-        
-        protected virtual void AddCheats()
-        {
         }
 
         protected virtual UniTask AddTrackers()
@@ -71,27 +62,14 @@ namespace Template.Features.ProjectInit
             
         }
 
-        protected virtual IDebugLogger CreateLogger()
-        {
-            return LoggerFactory.CreateFeatureLogger(FeatureName);
-        }
-
         protected ConcreteIdArgConditionCopyNonLazyBinder BindAsSingle<TParent, TChild>() where TChild : TParent
         {
-            AddLoggerFor<TChild>();
             return Container.BindInterfacesTo<TChild>().AsSingle();
         }
         
         protected ConcreteIdArgConditionCopyNonLazyBinder BindAsCashed<TParent, TChild>() where TChild : TParent
         {
-            AddLoggerFor<TChild>();
             return Container.BindInterfacesTo<TChild>().AsCached();
-        }
-        
-        private void AddLoggerFor<TTarget>()
-        {
-            _logger ??= CreateLogger();
-            Container.Bind<IDebugLogger>().FromInstance(_logger).AsCached().WhenInjectedInto<TTarget>();
         }
         
         protected TChild ResolveAs<TParent, TChild>() where TChild : class, TParent
@@ -99,20 +77,8 @@ namespace Template.Features.ProjectInit
             return Container.Resolve<TParent>() as TChild;
         }
         
-        protected TCheat CreateAndInitCheat<TCheat>() where TCheat : BaseCheatHandler
-        {
-            TCheat cheat = CreateInstance<TCheat>();
-            cheat.Init();
-            
-            Container.BindInterfacesTo<TCheat>().FromInstance(cheat).AsSingle();
-            
-            return cheat;
-        }
-        
         protected T CreateInstance<T>()
         {
-            AddLoggerFor<T>();
-            
             _classFactory ??= Container.Resolve<IClassFactory>();
             return _classFactory.Create<T>();
         }
