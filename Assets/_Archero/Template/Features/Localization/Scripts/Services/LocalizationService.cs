@@ -23,7 +23,6 @@ namespace Template.Features.Localization
 
         public async Task InitAsync()
         {
-#if !UNITY_SERVER
             await InitializeLocalization();
 
             userData = _storageService.LoadOrCreate(() => new LocalizationUserData());
@@ -34,15 +33,10 @@ namespace Template.Features.Localization
             {
                 LocalizationSettings.SelectedLocale = locale;
             }
-#endif
         }
 
         public void SetLocale(Locale locale)
         {
-#if UNITY_SERVER
-            return;
-#endif
-
             if (locale == null)
             {
                 return;
@@ -62,11 +56,7 @@ namespace Template.Features.Localization
 
         public Locale GetSelectedLocale()
         {
-#if UNITY_SERVER
-            return null;
-#else
             return LocalizationSettings.SelectedLocale;
-#endif
         }
 
         private void SaveLocale(string localeCode)
@@ -87,21 +77,12 @@ namespace Template.Features.Localization
                 return null;
             }
 
-            return LocalizationSettings.AvailableLocales.Locales.Find(
-                locale => locale.Identifier.Code == localeCode);
+            return LocalizationSettings.AvailableLocales.Locales.Find(locale => locale.Identifier.Code == localeCode);
         }
 
         private async UniTask InitializeLocalization()
         {
-            AsyncOperationHandle handle = LocalizationSettings.InitializationOperation;
-
-            if (!handle.IsDone)
-            {
-                await handle.Task;
-            }
-            
-            var tableHandle = LocalizationSettings.StringDatabase.GetTableAsync("Tutorial");
-            await tableHandle.Task;
+            await LocalizationSettings.InitializationOperation.ToUniTask();
         }
     }
 }

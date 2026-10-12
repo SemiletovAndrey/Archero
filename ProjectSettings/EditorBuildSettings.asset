@@ -12,5 +12,7 @@ EditorBuildSettings:
     path: Assets/_Archero/Contexts/Menu/DataResiurces/Scenes/Scene_Menu.unity
     guid: 8f6ee9e05d52e9d4d9b279160737df7b
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 5ed9166f74eef79458ae7f7d1ffeb82c, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    com.unity.localization.settings: {fileID: 11400000, guid: 4f6dabffa9796ac4fbda21c3e5a0496b, type: 2}
   m_UseUCBPForAssetBundles: 0

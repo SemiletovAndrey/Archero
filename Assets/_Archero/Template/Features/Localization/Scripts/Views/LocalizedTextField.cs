@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -81,38 +78,11 @@ namespace Template.Features.Localization
         private void ApplyText(string value)
         {
             _text.text = value;
-
-            if (LocalizationSettings.SelectedLocale != null &&
-                LocalizationSettings.SelectedLocale.Identifier.Code == "ar" &&
-                ContainsArabic(_text.text))
-            {
-                _text.text = ReorderArabicSymbols(_text.text);
-            }
         }
 
         private bool HasValidEntryReference(TableEntryReference entryReference)
         {
             return !string.IsNullOrWhiteSpace(entryReference.Key) || entryReference.KeyId != 0;
-        }
-
-        private string ReorderArabicSymbols(string input)
-        {
-            TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator(input);
-            List<string> elements = new();
-
-            while (enumerator.MoveNext())
-            {
-                elements.Add(enumerator.GetTextElement());
-            }
-
-            elements.Reverse();
-
-            return string.Concat(elements);
-        }
-
-        private bool ContainsArabic(string input)
-        {
-            return Regex.IsMatch(input, @"\p{IsArabic}");
         }
     }
 }

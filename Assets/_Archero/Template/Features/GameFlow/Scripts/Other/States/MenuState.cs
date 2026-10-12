@@ -24,7 +24,7 @@ namespace Template.Features.GameStateMachine
         
         public async UniTask Enter(CancellationToken lifetime)
         {
-            // Для сцены с данными: await _sceneLoader.Load(SceneName, new GameplayPayload(levelId), lifetime);
+            //await _sceneLoader.Load(SceneName, new GameplayPayload(levelId), lifetime);
             _scene = await _sceneLoader.Load(SceneName, lifetime);
             await _featureInitializer.InitAll(_scene.Features, lifetime);
         }

@@ -30,6 +30,8 @@ namespace Template.Scripts.Init
             AddFeature<PopupsFeature>();
             
             AddFeature<LayerUiFeature>();
+            
+            AddFeature<LocalizationFeature>();
         }
     }
 }

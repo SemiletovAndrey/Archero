@@ -1,5 +1,4 @@
 ﻿using Template.Features.ProjectInit;
-using Zenject;
 
 namespace DomainOfBattles.Contexts.Preloader
 {
