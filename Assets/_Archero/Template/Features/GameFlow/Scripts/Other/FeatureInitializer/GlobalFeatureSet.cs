@@ -3,9 +3,9 @@ using Template.Features.ProjectInit;
 
 namespace Template.Features.GameFlow.Scripts.Other.FeatureInitializer
 {
-    public class GlobalBaseFeatureSet : BaseFeatureSet
+    public class GlobalFeatureSet : BaseFeatureSet
     {
-        public GlobalBaseFeatureSet(IEnumerable<IInitializableFeature> features) : base(features)
+        public GlobalFeatureSet(IEnumerable<IInitializableFeature> features) : base(features)
         {
         }
     }

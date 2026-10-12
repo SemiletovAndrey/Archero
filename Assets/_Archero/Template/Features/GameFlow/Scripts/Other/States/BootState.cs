@@ -9,21 +9,21 @@ namespace Template.Features.GameStateMachine
     {
         private readonly IGameStateMachine _stateMachine;
         private readonly IFeatureInitializer _featureInitializer;
-        private readonly GlobalBaseFeatureSet _globalBaseFeatures;
+        private readonly GlobalFeatureSet _globalFeatures;
  
         public BootState(
-            IGameStateMachine stateMachine, IFeatureInitializer featureInitializer, GlobalBaseFeatureSet globalBaseFeatures)
+            IGameStateMachine stateMachine, IFeatureInitializer featureInitializer, GlobalFeatureSet globalFeatures)
         {
             _stateMachine = stateMachine;
             _featureInitializer = featureInitializer;
-            _globalBaseFeatures = globalBaseFeatures;
+            _globalFeatures = globalFeatures;
         }
  
         public async UniTask Enter(CancellationToken lifetime)
         {
             ApplyApplicationSettings();
             
-            await _featureInitializer.InitAll(_globalBaseFeatures, lifetime);
+            await _featureInitializer.InitAll(_globalFeatures, lifetime);
             
             _stateMachine.Enter<MenuState>();
         }

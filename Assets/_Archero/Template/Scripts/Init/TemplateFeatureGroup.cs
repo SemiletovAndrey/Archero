@@ -21,17 +21,15 @@ namespace Template.Scripts.Init
         {
             AddFeature<SceneLoaderFeature>();
             
-            AddFeature<AppTimeFeature>();
-            
             AddFeature<LocalConfigFeature>();
             AddFeature<DataStorageFeature>();
+            
+            AddFeature<LocalizationFeature>();
             
             AddFeature<ContainerFeature>();
             AddFeature<PopupsFeature>();
             
             AddFeature<LayerUiFeature>();
-            
-            AddFeature<LocalizationFeature>();
         }
     }
 }

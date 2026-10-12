@@ -15,8 +15,7 @@ namespace DomainOfBattles.Contexts.Preloader
             Container.Bind<IFeatureInitializer>().To<FeatureInitializer>().AsSingle();
             
             base.InstallBindings();
-            
-            Container.BindInstance(new GlobalBaseFeatureSet(GetFeatures())).AsSingle();
+            Container.BindInstance(new GlobalFeatureSet(GetFeatures()));
         }
 
         protected override void AddFeatures()

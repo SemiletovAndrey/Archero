@@ -62,7 +62,7 @@ namespace Template.Features.Popups
                 return existing as TPopup;
             }
 
-            var entry = _config.Entries.FirstOrDefault(e => e.Type == popupType);
+            PopupEntry entry = _config.Entries.FirstOrDefault(e => e.Type == popupType);
             if (entry == null || entry.Prefab == null)
                 throw new Exception($"No prefab configured for PopupType.{popupType}");
 
