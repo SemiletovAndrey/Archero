@@ -5,39 +5,34 @@ using UnityEngine;
 
 namespace Template.Features.Popups
 {
-    public class InstantiatePopupFactory : IPopupFactory
+    public class InstantiatePopupFactory : PopupFactoryBase
     {
-        private Transform _parent;
-        
-        private readonly IClassFactory  _classFactory;
-        private readonly IUILayersService _layersService;
-
         public InstantiatePopupFactory(IClassFactory classFactory, IUILayersService layersService)
+            : base(classFactory, layersService)
         {
-            _classFactory = classFactory;
-            _layersService = layersService;
         }
 
-        public void Init(Transform parent)
+        public override bool Supports(PopupEntryBase entry)
         {
-            _parent = parent;
+            return entry is PopupEntry;
         }
 
-        public UniTask<T> Create<T>(GameObject prefab) where T : BasePopup
+        public override UniTask<T> Create<T>(PopupEntryBase entry)
         {
-            GameObject instance = Object.Instantiate(prefab, _parent);
-            Canvas canvas = instance.GetComponent<Canvas>();
-            if (canvas != null)
-            {
-                canvas.overrideSorting = true;
-                canvas.sortingOrder = _layersService.GetNextSortingOrder(UILayerType.Popup);
-            }
-            return UniTask.FromResult(instance.GetComponent<T>());
+            EnsureReady(entry);
+
+            if (entry is not PopupEntry direct)
+                throw new System.NotSupportedException(
+                    $"{nameof(InstantiatePopupFactory)} supports only {nameof(PopupEntry)}, got {entry.GetType().Name}.");
+
+            return UniTask.FromResult(InstantiatePopup<T>(direct.Prefab, entry));
         }
 
-        public void Destroy(BasePopup popup)
+        public override void Destroy(BasePopup popup)
         {
-            Object.Destroy(popup.gameObject);
+            if (popup != null)
+                Object.Destroy(popup.gameObject);
         }
+
     }
 }

@@ -8,6 +8,8 @@ namespace Template.Features.Popups
     {
         [field: SerializeField] public PopupType PopupType { get; set; }
 
+        internal virtual Type PayloadType => typeof(EmptyPopupPayload);
+        
         private Action<PopupType> _closeExternalHandler;
         
         public abstract UniTask Deactivate();

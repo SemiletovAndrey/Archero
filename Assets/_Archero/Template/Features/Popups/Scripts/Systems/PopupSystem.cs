@@ -1,34 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Cysharp.Threading.Tasks;
 using Template.Features.Config.Local;
+using UnityEngine;
 
 namespace Template.Features.Popups
 {
     public class PopupSystem : IPopupSystem
     {
+        private enum PopupState
+        {
+            Opening,
+            Opened,
+            Closing
+        }
+
+        private sealed class PopupSlot
+        {
+            public readonly PopupType Type;
+            public PopupState State = PopupState.Opening;
+            public BasePopup Popup;
+
+            public readonly UniTaskCompletionSource<BasePopup> Opened = new();
+
+            public readonly UniTaskCompletionSource Closed = new();
+
+            public PopupSlot(PopupType type)
+            {
+                Type = type;
+            }
+        }
+
         private readonly IPopupFactory _factory;
         private readonly ILocalConfigService _localConfigService;
 
-        private Dictionary<Type, PopupType> _typeToPopupType = new();
-        private Dictionary<PopupType, BasePopup> _activePopups = new();
+        private readonly Dictionary<PopupType, PopupEntryBase> _entries = new();
+        private readonly Dictionary<PopupType, PopupSlot> _slots = new();
 
-        private PopupConfig _config;
+        private bool _initialized;
 
         public PopupSystem(ILocalConfigService localConfigService, IPopupFactory factory)
         {
             _localConfigService = localConfigService;
             _factory = factory;
-
-            BuildTypeMap();
         }
 
         public void Init()
         {
-            _config = GetConfig();
+            _entries.Clear();
+
+            PopupConfig config = _localConfigService.GetConfig<PopupConfig>();
+            foreach (var entry in config.Entries)
+            {
+                RegisterEntry(entry);
+            }
+
+            _initialized = true;
         }
+
+        #region Open
 
         public UniTask Open(PopupType popupType)
         {
@@ -37,115 +67,235 @@ namespace Template.Features.Popups
 
         public UniTask<TPopup> Open<TPopup>() where TPopup : BasePopup<EmptyPopupPayload>
         {
-            if (!_typeToPopupType.TryGetValue(typeof(TPopup), out var popupType))
-                throw new Exception($"No PopupType registered for {typeof(TPopup).Name}");
-            return OpenInternal<TPopup, EmptyPopupPayload>(popupType, default);
+            return OpenInternal<TPopup, EmptyPopupPayload>(ResolvePopupType<TPopup>(), default);
         }
 
         public UniTask<TPopup> Open<TPopup, TPayload>(TPayload payload)
             where TPopup : BasePopup<TPayload>
             where TPayload : IPopupPayload
         {
-            if (!_typeToPopupType.TryGetValue(typeof(TPopup), out var popupType))
-                throw new Exception($"No PopupType registered for {typeof(TPopup).Name}");
-            return OpenInternal<TPopup, TPayload>(popupType, payload);
+            return OpenInternal<TPopup, TPayload>(ResolvePopupType<TPopup>(), payload);
         }
 
         private async UniTask<TPopup> OpenInternal<TPopup, TPayload>(PopupType popupType, TPayload payload)
             where TPopup : BasePopup
             where TPayload : IPopupPayload
         {
-            if (_activePopups.TryGetValue(popupType, out var existing))
+            EnsureInitialized();
+
+            if (!_entries.TryGetValue(popupType, out var entry))
+                throw new InvalidOperationException($"No prefab configured for PopupType.{popupType}");
+
+            while (true)
             {
-                if (existing is BasePopup<TPayload> typed && typeof(TPayload) != typeof(EmptyPopupPayload))
-                    typed.Activate(payload);
-                return existing as TPopup;
+                if (!_slots.TryGetValue(popupType, out var slot))
+                    return await CreateAndOpen<TPopup, TPayload>(popupType, entry, payload);
+
+                switch (slot.State)
+                {
+                    case PopupState.Opening:
+                        await slot.Opened.Task;
+                        break;
+
+                    case PopupState.Opened:
+                        var popup = Cast<TPopup>(slot.Popup);
+                        await ActivateAsync(popup, payload);
+                        return popup;
+
+                    case PopupState.Closing:
+                        await slot.Closed.Task;
+                        break;
+                }
             }
-
-            PopupEntry entry = _config.Entries.FirstOrDefault(e => e.Type == popupType);
-            if (entry == null || entry.Prefab == null)
-                throw new Exception($"No prefab configured for PopupType.{popupType}");
-
-            TPopup popup = await _factory.Create<TPopup>(entry.Prefab);
-            popup.PopupType = popupType;
-            popup.SetCloseHandler(HandleCloseExternal);
-
-            if (popup is BasePopup<TPayload> typedPopup && typeof(TPayload) != typeof(EmptyPopupPayload))
-                await typedPopup.Activate(payload);
-
-            _activePopups[popupType] = popup;
-
-            await popup.Show();
-            return popup;
         }
 
-        public UniTask Close(PopupType popupType)
+        private async UniTask<TPopup> CreateAndOpen<TPopup, TPayload>(PopupType popupType, PopupEntryBase entry,
+            TPayload payload)
+            where TPopup : BasePopup
+            where TPayload : IPopupPayload
         {
-            if (!_activePopups.TryGetValue(popupType, out var popup))
-                return UniTask.CompletedTask;
+            PopupSlot slot = new PopupSlot(popupType);
+            _slots[popupType] = slot;
 
-            return ClosePopupInstance(popupType, popup);
+            TPopup popup = null;
+            try
+            {
+                popup = await _factory.Create<TPopup>(entry);
+                slot.Popup = popup;
+
+                popup.PopupType = popupType;
+                popup.SetCloseHandler(HandleCloseExternal);
+
+                await ActivateAsync(popup, payload);
+                await popup.Show();
+
+                slot.State = PopupState.Opened;
+                slot.Opened.TrySetResult(popup);
+                return popup;
+            }
+            catch
+            {
+                _slots.Remove(popupType);
+                if (popup != null)
+                    _factory.Destroy(popup);
+
+                slot.Opened.TrySetResult(null);
+                throw;
+            }
+        }
+
+        private static UniTask ActivateAsync<TPayload>(BasePopup popup, TPayload payload)
+            where TPayload : IPopupPayload
+        {
+            if (popup.PayloadType != typeof(TPayload))
+                throw new InvalidOperationException(
+                    $"Popup '{popup.GetType().Name}' expects payload '{popup.PayloadType.Name}', " +
+                    $"but '{typeof(TPayload).Name}' was passed.");
+
+            return popup is BasePopup<TPayload> typed
+                ? typed.Activate(payload)
+                : UniTask.CompletedTask;
+        }
+
+        #endregion
+
+        #region Close
+
+        public async UniTask Close(PopupType popupType)
+        {
+            while (_slots.TryGetValue(popupType, out var slot))
+            {
+                switch (slot.State)
+                {
+                    case PopupState.Opening:
+                        await slot.Opened.Task;
+                        break;
+
+                    case PopupState.Opened:
+                        await CloseSlot(slot);
+                        return;
+
+                    case PopupState.Closing:
+                        await slot.Closed.Task;
+                        return;
+                }
+            }
         }
 
         public UniTask Close<TPopup>() where TPopup : BasePopup
         {
-            if (!_typeToPopupType.TryGetValue(typeof(TPopup), out var popupType))
-                return UniTask.CompletedTask;
+            PopupType popupType = PopupTypeResolver.Get<TPopup>();
 
-            return Close(popupType);
+            return popupType != PopupType.None
+                ? Close(popupType)
+                : UniTask.CompletedTask;
+
         }
 
-        private async UniTask ClosePopupInstance(PopupType popupType, BasePopup popup)
+        private async UniTask CloseSlot(PopupSlot slot)
         {
-            _activePopups.Remove(popupType);
-            await popup.Deactivate();
-            await popup.Hide();
-            _factory.Destroy(popup);
+            slot.State = PopupState.Closing;
+
+            try
+            {
+                await slot.Popup.Deactivate();
+                await slot.Popup.Hide();
+            }
+            finally
+            {
+                _slots.Remove(slot.Type);
+                _factory.Destroy(slot.Popup);
+                slot.Closed.TrySetResult();
+            }
         }
-        
+
         private void HandleCloseExternal(PopupType popupType)
         {
             Close(popupType).Forget();
         }
 
-        private void BuildTypeMap()
+        #endregion
+
+        #region Preload
+
+        public UniTask Preload(PopupType popupType)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
+            EnsureInitialized();
+
+            if (!_entries.TryGetValue(popupType, out var entry))
+                throw new InvalidOperationException($"No prefab configured for PopupType.{popupType}");
+
+            return _factory.Preload(entry);
+        }
+
+        public void Unload(PopupType popupType)
+        {
+            EnsureInitialized();
+
+            if (_entries.TryGetValue(popupType, out var entry))
+                _factory.Unload(entry);
+        }
+
+        #endregion
+
+        #region Registry
+        
+        private void RegisterEntry(PopupEntryBase entry)
+        {
+            if (entry == null)
+                return;
+
+            if (!PopupEntryValidator.TryValidate(entry, out string error))
             {
-                if (assembly.FullName.StartsWith("System") ||
-                    assembly.FullName.StartsWith("Unity") ||
-                    assembly.FullName.StartsWith("Mono.") ||
-                    assembly.FullName.StartsWith("mscorlib"))
-                    continue;
-
-                Type[] types;
-                try
-                {
-                    types = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException)
-                {
-                    continue;
-                }
-
-                foreach (var type in types)
-                {
-                    if (!typeof(BasePopup).IsAssignableFrom(type) || type.IsAbstract)
-                        continue;
-
-                    var attr = type.GetCustomAttribute<PopupTypeAttribute>();
-                    if (attr != null)
-                    {
-                        _typeToPopupType[type] = attr.Type;
-                    }
-                }
+                Debug.LogError($"[{nameof(PopupSystem)}] {error}");
+                return;
             }
+
+            if (!entry.HasSource)
+            {
+                Debug.LogError($"[{nameof(PopupSystem)}] PopupType.{entry.Type} doesn't have a prefab assigned.");
+                return;
+            }
+
+            if (_entries.ContainsKey(entry.Type))
+            {
+                Debug.LogError($"[{nameof(PopupSystem)}] PopupType.{entry.Type} appears several times in the configuration.");
+                return;
+            }
+
+            _entries[entry.Type] = entry;
         }
 
-        private PopupConfig GetConfig()
+        private PopupType ResolvePopupType<TPopup>() where TPopup : BasePopup
         {
-            return _config ??= _localConfigService.GetConfig<PopupConfig>();
+            EnsureInitialized();
+
+            PopupType popupType = PopupTypeResolver.Get<TPopup>();
+            if (popupType == PopupType.None)
+                throw new InvalidOperationException(
+                    $"{typeof(TPopup).Name} has no [{nameof(PopupTypeAttribute)}] (or it is PopupType.None).");
+
+            if (!_entries.ContainsKey(popupType))
+                throw new InvalidOperationException(
+                    $"No prefab configured for PopupType.{popupType} ({typeof(TPopup).Name}).");
+
+            return popupType;
+
         }
+
+        private void EnsureInitialized()
+        {
+            if (!_initialized)
+                throw new InvalidOperationException($"{nameof(PopupSystem)} is not initialized. Call Init() first.");
+        }
+
+        private static TPopup Cast<TPopup>(BasePopup popup) where TPopup : BasePopup
+        {
+            return popup as TPopup ??
+                   throw new InvalidOperationException(
+                       $"Popup '{popup.GetType().Name}' is not a {typeof(TPopup).Name}.");
+        }
+
+        #endregion
     }
 }

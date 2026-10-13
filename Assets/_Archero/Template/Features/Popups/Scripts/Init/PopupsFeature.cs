@@ -10,13 +10,13 @@ namespace Template.Features.Popups
         protected override void InstallBindings()
         {
             BindAsSingle<IPopupSystem, PopupSystem>();
-            BindAsSingle<IPopupFactory, InstantiatePopupFactory>();
+            BindAsSingle<IPopupFactory, AddressablesPopupFactory>();
         }
 
         protected override UniTask InitSystems()
         {
             ResolveAs<IPopupSystem, PopupSystem>().Init();
-            ResolveAs<IPopupFactory, InstantiatePopupFactory>().Init(_uiContainer);
+            ResolveAs<IPopupFactory, AddressablesPopupFactory>().Init(_uiContainer);
             return UniTask.CompletedTask;
         }
     }

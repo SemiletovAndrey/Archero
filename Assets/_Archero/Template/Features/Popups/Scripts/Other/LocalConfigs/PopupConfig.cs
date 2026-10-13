@@ -7,6 +7,8 @@ namespace Template.Features.Popups
     [CreateAssetMenu(fileName = "Config_Popup_Settings", menuName = "SO/Template/Popup/Container")]
     public class PopupConfig : BaseLocalFeatureConfig
     {
-        [field: SerializeField] public List<PopupEntry> Entries = new();
+        [SerializeField] private List<AddressablePopupEntry> _entries = new();
+        
+        public List<AddressablePopupEntry> Entries => _entries;
     }
 }
