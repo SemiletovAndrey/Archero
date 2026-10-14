@@ -12,26 +12,18 @@ namespace Template.Features.Popups
         {
         }
 
-        public override bool Supports(PopupEntryBase entry)
+        protected override UniTask<GameObject> AcquirePrefab(PopupEntryBase entry)
         {
-            return entry is PopupEntry;
-        }
-
-        public override UniTask<T> Create<T>(PopupEntryBase entry)
-        {
-            EnsureReady(entry);
-
             if (entry is not PopupEntry direct)
                 throw new System.NotSupportedException(
                     $"{nameof(InstantiatePopupFactory)} supports only {nameof(PopupEntry)}, got {entry.GetType().Name}.");
 
-            return UniTask.FromResult(InstantiatePopup<T>(direct.Prefab, entry));
+            return UniTask.FromResult(direct.Prefab);
         }
 
-        public override void Destroy(BasePopup popup)
+        protected override void ReleasePrefab(PopupEntryBase entry)
         {
-            if (popup != null)
-                Object.Destroy(popup.gameObject);
+            
         }
 
     }

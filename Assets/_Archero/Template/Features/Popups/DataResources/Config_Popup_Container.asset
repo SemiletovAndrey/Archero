@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly_Template::Template.Features.Popups.Scripts.PopupConfig
   _entries:
   - Type: 2
+    Pooled: 1
     Prefab:
       m_AssetGUID: 3fe9be69d44d0ec46985af420a989cc7
       m_SubObjectName: 
@@ -21,4 +22,3 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_EditorAssetChanged: 0
     KeepLoaded: 1
-    _popupClassName: Test

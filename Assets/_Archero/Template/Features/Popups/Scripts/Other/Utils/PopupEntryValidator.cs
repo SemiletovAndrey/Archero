@@ -18,31 +18,22 @@ namespace Template.Features.Popups
                 return false;
             }
 
-            Type popupClass = entry.TryGetPopupClass();
-            if (popupClass == null)
+            System.Type popupClass = entry.TryGetPopupClass();
+            if (popupClass != null)
             {
-                if (entry is PopupEntry)
+                PopupType declared = PopupTypeResolver.Get(popupClass);
+                if (declared == PopupType.None)
                 {
-                    error = $"The prefab of PopupType.{entry.Type} has no {nameof(BasePopup)} component.";
+                    error = $"{popupClass.Name} (PopupType.{entry.Type}) has no [{nameof(PopupTypeAttribute)}].";
                     return false;
                 }
-                
-                error = null;
-                return true;
-            }
 
-            PopupType declared = PopupTypeResolver.Get(popupClass);
-            if (declared == PopupType.None)
-            {
-                error = $"{popupClass.Name} (PopupType.{entry.Type}) has no [{nameof(PopupTypeAttribute)}].";
-                return false;
-            }
-
-            if (declared != entry.Type)
-            {
-                error = $"{popupClass.Name} declares PopupType.{declared} via [{nameof(PopupTypeAttribute)}], " +
-                        $"but the entry is PopupType.{entry.Type}.";
-                return false;
+                if (declared != entry.Type)
+                {
+                    error = $"{popupClass.Name} declares PopupType.{declared} via [{nameof(PopupTypeAttribute)}], " +
+                            $"but the entry is PopupType.{entry.Type}.";
+                    return false;
+                }
             }
 
             error = null;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Template.Features.LayerUI
 {
@@ -7,25 +8,65 @@ namespace Template.Features.LayerUI
         private readonly Dictionary<UILayerType, (int min, int max)> _ranges = new()
         {
             { UILayerType.Screen, (0, 99) },
-            { UILayerType.Popup,  (100, 199) },
+            { UILayerType.Popup, (100, 199) },
             { UILayerType.System, (200, 299) }
         };
+        
+        private readonly Dictionary<UILayerType, List<int>> _used = new();
 
-        private readonly Dictionary<UILayerType, int> _currentMax = new();
+        private readonly HashSet<UILayerType> _overflowReported = new();
 
         public int GetNextSortingOrder(UILayerType type)
         {
-            if (!_currentMax.ContainsKey(type))
-                _currentMax[type] = _ranges[type].min;
+            (int min, int max) = GetRange(type);
+            List<int> used = GetUsed(type);
 
-            int next = _currentMax[type];
-            if (next > _ranges[type].max)
+            // Новый элемент должен быть выше всех открытых: максимум занятых + 1, а в пустом слое - начало диапазона.
+            int next = min;
+            for (int i = 0; i < used.Count; i++)
             {
-                next = _ranges[type].min;
-                _currentMax[type] = next;
+                if (used[i] >= next)
+                    next = used[i] + 1;
             }
-            _currentMax[type] = next + 1;
+
+            if (next > max)
+            {
+                // Больше элементов, чем значений в диапазоне. Порядок совпадет с верхним элементом, а при равенстве
+                // выигрывает последний в иерархии - то есть самый новый. Поэтому просто фиксируем максимум.
+                if (_overflowReported.Add(type))
+                    Debug.LogWarning($"[{nameof(UILayersService)}] Layer {type} is out of sorting orders " +
+                                     $"({min}-{max}). Make sure every GetNextSortingOrder has a matching ReleaseSortingOrder.");
+
+                next = max;
+            }
+
+            used.Add(next);
             return next;
+        }
+
+        public void ReleaseSortingOrder(UILayerType type, int order)
+        {
+            if (_used.TryGetValue(type, out List<int> used))
+                used.Remove(order);
+        }
+
+        private (int min, int max) GetRange(UILayerType type)
+        {
+            if (!_ranges.TryGetValue(type, out (int min, int max) range))
+                throw new System.ArgumentOutOfRangeException(nameof(type), type, "Layer has no sorting range.");
+
+            return range;
+        }
+
+        private List<int> GetUsed(UILayerType type)
+        {
+            if (!_used.TryGetValue(type, out List<int> used))
+            {
+                used = new List<int>();
+                _used[type] = used;
+            }
+
+            return used;
         }
     }
 }

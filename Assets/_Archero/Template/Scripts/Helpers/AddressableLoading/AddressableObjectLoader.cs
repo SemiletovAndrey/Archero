@@ -9,35 +9,48 @@ namespace RivalDom.Scripts.Domain.AddressableLoading
 {
     public static class AddressableObjectLoader
     {
-        public static async UniTask<AddressableLoadResult> LoadAsset(AssetLabelReference assetReference)
+        public static UniTask<AddressableLoadResult> LoadAsset(AssetLabelReference assetReference)
         {
-            var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
-            await handle.Task;
-
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                return new AddressableLoadResult(handle.Result, handle);
-            }
-
-            throw new Exception($"Failed to load asset with reference '{assetReference}'");
+            return LoadInternal(Addressables.LoadAssetAsync<GameObject>(assetReference),
+                $"reference '{assetReference}'");
         }
-        
-        public static async UniTask<AddressableLoadResult> LoadAsset(string path)
+
+        public static UniTask<AddressableLoadResult> LoadAsset(string path)
         {
-            var handle = Addressables.LoadAssetAsync<GameObject>(path);
-            await handle.Task;
-
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                return new AddressableLoadResult(handle.Result, handle);
-            }
-
-            throw new Exception($"Failed to load asset with path: '{path}'");
+            return LoadInternal(Addressables.LoadAssetAsync<GameObject>(path), $"path '{path}'");
         }
 
         public static void Release(AddressableLoadResult result)
         {
-            Addressables.Release(result.Handle);
+            if (result.Handle.IsValid())
+                Addressables.Release(result.Handle);
         }
+
+        private static async UniTask<AddressableLoadResult> LoadInternal(AsyncOperationHandle<GameObject> handle,
+            string description)
+        {
+            try
+            {
+                await handle.ToUniTask();
+            }
+            catch
+            {
+                ReleaseHandle(handle);
+                throw;
+            }
+
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+                return new AddressableLoadResult(handle.Result, handle);
+            
+            ReleaseHandle(handle);
+            throw new Exception($"Failed to load asset with {description}");
+        }
+
+        private static void ReleaseHandle(AsyncOperationHandle<GameObject> handle)
+        {
+            if (handle.IsValid())
+                Addressables.Release(handle);
+        }
+
     }
 }

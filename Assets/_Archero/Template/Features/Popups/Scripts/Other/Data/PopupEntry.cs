@@ -9,7 +9,7 @@ namespace Template.Features.Popups
         public GameObject Prefab;
 
         public override bool HasSource => Prefab != null;
-        
+
         public override System.Type TryGetPopupClass()
         {
             if (Prefab == null)
@@ -18,6 +18,5 @@ namespace Template.Features.Popups
             BasePopup popup = Prefab.GetComponent<BasePopup>();
             return popup != null ? popup.GetType() : null;
         }
-
     }
 }

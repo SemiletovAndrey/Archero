@@ -4,17 +4,16 @@ using Cysharp.Threading.Tasks;
 using RivalDom.Scripts.Domain.AddressableLoading;
 using Template.Features.ClassFactory;
 using Template.Features.LayerUI;
-using Object = UnityEngine.Object;
+using UnityEngine;
 
 namespace Template.Features.Popups
 {
     public class AddressablesPopupFactory : PopupFactoryBase
     {
-                private sealed class LoadedAsset
+        private sealed class LoadedAsset
         {
             public readonly string Key;
 
-            // Preserve позволяет нескольким вызывающим ждать одну и ту же загрузку.
             public UniTask LoadTask;
             public AddressableLoadResult Result;
             public bool IsLoaded;
@@ -27,78 +26,46 @@ namespace Template.Features.Popups
                 Key = key;
             }
         }
-
-        // Ключ - AssetGUID.
+        
         private readonly Dictionary<string, LoadedAsset> _assets = new();
-
-        // Какой ассет использует каждый созданный экземпляр.
-        private readonly Dictionary<BasePopup, LoadedAsset> _instanceAssets = new();
 
         public AddressablesPopupFactory(IClassFactory classFactory, IUILayersService layersService)
             : base(classFactory, layersService)
         {
         }
 
-        public override bool Supports(PopupEntryBase entry)
+        protected override async UniTask<GameObject> AcquirePrefab(PopupEntryBase entry)
         {
-            return entry is AddressablePopupEntry;
-        }
-
-        public override async UniTask<T> Create<T>(PopupEntryBase entry)
-        {
-            EnsureReady(entry);
-
-            if (entry is not AddressablePopupEntry addressable)
-                throw new NotSupportedException(
-                    $"{nameof(AddressablesPopupFactory)} supports only {nameof(AddressablePopupEntry)}, got {entry.GetType().Name}.");
+            AddressablePopupEntry addressable = AsAddressable(entry);
 
             LoadedAsset asset = await AcquireAsset(addressable, addressable.KeepLoaded);
-
-            try
-            {
-                T popup = InstantiatePopup<T>(asset.Result.Prefab, entry);
-                _instanceAssets[popup] = asset;
-                return popup;
-            }
-            catch
-            {
-                ReleaseUser(asset);
-                throw;
-            }
+            return asset.Result.Prefab;
         }
 
-        public override void Destroy(BasePopup popup)
+        protected override void ReleasePrefab(PopupEntryBase entry)
         {
-            if (ReferenceEquals(popup, null))
-                return;
+            AddressablePopupEntry addressable = AsAddressable(entry);
 
-            // Сначала уничтожаем экземпляр, потом отпускаем ассет.
-            if (popup != null)
-                Object.Destroy(popup.gameObject);
-
-            if (_instanceAssets.TryGetValue(popup, out LoadedAsset asset))
-            {
-                _instanceAssets.Remove(popup);
+            if (_assets.TryGetValue(addressable.Prefab.AssetGUID, out LoadedAsset asset))
                 ReleaseUser(asset);
-            }
         }
 
         public override async UniTask Preload(PopupEntryBase entry)
         {
-            if (entry is not AddressablePopupEntry addressable)
-                return;
-
+            AddressablePopupEntry addressable = AsAddressable(entry);
             EnsureSource(addressable);
 
             LoadedAsset asset = await AcquireAsset(addressable, pin: true);
 
-            // Preload'у собственная ссылка не нужна: ассет удерживается через Pinned.
             asset.Users--;
         }
 
         public override void Unload(PopupEntryBase entry)
         {
-            if (entry is not AddressablePopupEntry addressable || !addressable.HasSource)
+            base.Unload(entry);
+
+            AddressablePopupEntry addressable = entry as AddressablePopupEntry;
+            if (addressable == null || !addressable.HasSource)
                 return;
 
             if (_assets.TryGetValue(addressable.Prefab.AssetGUID, out LoadedAsset asset))
@@ -107,15 +74,9 @@ namespace Template.Features.Popups
                 TryRelease(asset);
             }
         }
-
-        /// <summary>
-        /// Загружает ассет (одна загрузка на все параллельные запросы) и увеличивает Users.
-        /// Users и Pinned выставляются до первого await, поэтому Unload или закрытие другого экземпляра
-        /// не освободят ассет, пока мы ждем загрузку.
-        /// </summary>
+        
         private async UniTask<LoadedAsset> AcquireAsset(AddressablePopupEntry entry, bool pin)
         {
-            // GUID ассета - валидный ключ Addressables, поэтому подходит перегрузка LoadAsset(string).
             string key = entry.Prefab.AssetGUID;
 
             if (!_assets.TryGetValue(key, out LoadedAsset asset))
@@ -136,7 +97,6 @@ namespace Template.Features.Popups
             }
             catch
             {
-                // Упавшая загрузка не должна оставаться в кэше - следующая попытка загрузит ассет заново.
                 asset.Users--;
                 Discard(asset);
                 throw;
@@ -175,5 +135,12 @@ namespace Template.Features.Popups
             }
         }
 
+        private static AddressablePopupEntry AsAddressable(PopupEntryBase entry)
+        {
+            return entry as AddressablePopupEntry ??
+                   throw new NotSupportedException(
+                       $"{nameof(AddressablesPopupFactory)} supports only {nameof(AddressablePopupEntry)}, " +
+                       $"got {(entry == null ? "null" : entry.GetType().Name)}.");
+        }
     }
 }

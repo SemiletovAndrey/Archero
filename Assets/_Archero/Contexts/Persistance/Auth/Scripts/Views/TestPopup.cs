@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Contexts.Persistance.Auth
 {
     [PopupType(PopupType.Test)]
-    public class TestPopup : BasePopup<TestPopupPayload>
+    public class TestPopup : BasePopupT<TestPopupPayload>
     {
         public override UniTask Deactivate()
         {
@@ -14,7 +14,7 @@ namespace Contexts.Persistance.Auth
 
         public override UniTask Show()
         {
-            
+            Debug.Log($"TestPopup Show");
             return UniTask.CompletedTask;
         }
 
