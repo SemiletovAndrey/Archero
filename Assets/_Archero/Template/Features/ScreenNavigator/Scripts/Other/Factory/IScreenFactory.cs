@@ -1,13 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using Template.Features.UIViewFactory;
 
 namespace Template.Features.ScreenNavigator
 {
-    public interface IScreenFactory
+    public interface IScreenFactory : IUIViewFactory<BaseScreen, ScreenEntryBase>
     {
-        public void Init(Transform parent);
         
-        public UniTask<T> Create<T>(ScreenType screenType, GameObject prefab, Transform parent = null) where T : Component;
-        public void Destroy<T>(T instance, ScreenType screenType) where T : Component;
     }
 }

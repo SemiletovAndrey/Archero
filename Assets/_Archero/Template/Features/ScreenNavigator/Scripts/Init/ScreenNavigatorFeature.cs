@@ -11,13 +11,13 @@ namespace Template.Features.ScreenNavigator
         protected override void InstallBindings()
         {
             BindAsSingle<IScreenNavigator, ScreenNavigator>();
-            BindAsSingle<IScreenFactory, InstantiateScreenFactory>();
+            BindAsSingle<IScreenFactory, AddressablesScreenFactory>();
         }
 
         protected override UniTask InitServices()
         {
             ResolveAs<IScreenNavigator, ScreenNavigator>().Init();
-            ResolveAs<IScreenFactory, InstantiateScreenFactory>().Init(_screenParent);
+            ResolveAs<IScreenFactory, AddressablesScreenFactory>().Init(_screenParent);
             return UniTask.CompletedTask;
         }
     }

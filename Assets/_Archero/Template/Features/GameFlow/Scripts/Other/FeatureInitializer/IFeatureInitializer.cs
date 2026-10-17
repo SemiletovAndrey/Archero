@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Template.Features.ProjectInit;
 
-namespace Template.Features.GameFlow.Scripts.Other.FeatureInitializer
+namespace Template.Features.GameFlow.Scripts
 {
     public interface IFeatureInitializer
     {

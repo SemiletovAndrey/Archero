@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 
-namespace Template.Features.GameFlow.Scripts.Other.FeatureInitializer
+namespace Template.Features.GameFlow.Scripts
 {
     public interface IDeinitializableFeature
     {

@@ -6,7 +6,16 @@ namespace Template.Features.ScreenNavigator
     public abstract class BaseNavigationItem
     {
         protected List<BaseNavigationItem> InnerItems { get; set; } = new();
-        
+
+        /// <summary>Дочерние элементы дерева.</summary>
+        public IReadOnlyList<BaseNavigationItem> Children => InnerItems;
+
+        /// <summary>
+        /// Элемент сейчас открыт (MoveTo начался и Deactivate еще не завершился).
+        /// По этому признаку навигатор откатывает полуоткрытые элементы после ошибки.
+        /// </summary>
+        public bool IsActive { get; protected set; }
+
         public virtual void Init()
         {
         }
@@ -37,7 +46,7 @@ namespace Template.Features.ScreenNavigator
 
             return null;
         }
-        
+
         public TItem GetItem<TItem>() where TItem : BaseNavigationItem
         {
             if (GetType() == typeof(TItem))
@@ -62,7 +71,7 @@ namespace Template.Features.ScreenNavigator
 
             return null;
         }
-        
+
         public virtual async UniTask MoveTo<TItem, TItemData>(TItemData data, NavigationItemOpenPayload payload)
             where TItem : BaseNavigationItem<TItemData>
             where TItemData : BaseNavigationItemPayload
@@ -71,9 +80,9 @@ namespace Template.Features.ScreenNavigator
             {
                 return;
             }
-            
+
             foreach (BaseNavigationItem innerItem in InnerItems)
-            {            
+            {
                 if (innerItem.HasItem<TItem>())
                 {
                     await innerItem.MoveTo<TItem, TItemData>(data, payload);
@@ -81,19 +90,28 @@ namespace Template.Features.ScreenNavigator
                 }
             }
         }
-        
+
         public virtual UniTask Deactivate(NavigationItemClosePayload payload)
         {
             return UniTask.CompletedTask;
         }
-        
+
+        /// <summary>
+        /// Элемент уже открыт и снова выбран целью навигации (тот же элемент или его предок):
+        /// обновляем его новыми данными, не открывая заново.
+        /// </summary>
+        internal virtual UniTask Refresh(BaseNavigationItemPayload data)
+        {
+            return UniTask.CompletedTask;
+        }
+
         private bool HasItem<TItem>() where TItem : BaseNavigationItem
         {
             if (GetType() == typeof(TItem))
             {
                 return true;
             }
-            
+
             foreach (var item in InnerItems)
             {
                 if (item.HasItem<TItem>())

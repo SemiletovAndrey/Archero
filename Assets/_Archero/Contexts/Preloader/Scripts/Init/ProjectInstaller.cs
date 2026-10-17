@@ -1,5 +1,5 @@
 using Template.Features.ClassFactory;
-using Template.Features.GameFlow.Scripts.Other.FeatureInitializer;
+using Template.Features.GameFlow.Scripts;
 using Template.Features.GameStateMachine;
 using Template.Features.ProjectInit;
 using Template.Scripts.Init;

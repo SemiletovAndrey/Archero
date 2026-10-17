@@ -1,4 +1,4 @@
-﻿using Template.Features.GameFlow.Scripts.Other.FeatureInitializer;
+﻿using Template.Features.GameFlow.Scripts;
 using Template.Features.ProjectInit;
 
 namespace _Archero.Contexts.Menu.Scripts.Init

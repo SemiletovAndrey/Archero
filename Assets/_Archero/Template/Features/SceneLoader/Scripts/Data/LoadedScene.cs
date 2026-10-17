@@ -1,5 +1,5 @@
 ﻿using Template.Features.ClassFactory;
-using Template.Features.GameFlow.Scripts.Other.FeatureInitializer;
+using Template.Features.GameFlow.Scripts;
 using UnityEngine.SceneManagement;
 using Zenject;
 

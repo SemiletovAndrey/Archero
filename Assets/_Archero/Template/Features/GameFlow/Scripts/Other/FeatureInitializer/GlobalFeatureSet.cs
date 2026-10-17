@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Template.Features.ProjectInit;
 
-namespace Template.Features.GameFlow.Scripts.Other.FeatureInitializer
+namespace Template.Features.GameFlow.Scripts
 {
     public class GlobalFeatureSet : BaseFeatureSet
     {

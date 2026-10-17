@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Contexts.Persistance.Auth;
 using Cysharp.Threading.Tasks;
-using Template.Features.GameFlow.Scripts.Other.FeatureInitializer;
+using Template.Features.GameFlow.Scripts;
 using Template.Features.Popups;
 using Template.Features.SceneLoader;
 using UnityEngine;

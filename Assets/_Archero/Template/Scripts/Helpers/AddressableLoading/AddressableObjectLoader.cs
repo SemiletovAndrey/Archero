@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace RivalDom.Scripts.Domain.AddressableLoading
+namespace Domain.AddressableLoading
 {
     public static class AddressableObjectLoader
     {
@@ -22,6 +21,7 @@ namespace RivalDom.Scripts.Domain.AddressableLoading
 
         public static void Release(AddressableLoadResult result)
         {
+            // IsValid защищает от двойного Release.
             if (result.Handle.IsValid())
                 Addressables.Release(result.Handle);
         }
@@ -31,6 +31,7 @@ namespace RivalDom.Scripts.Domain.AddressableLoading
         {
             try
             {
+                // ToUniTask вместо handle.Task: без лишнего Task и с нормальной передачей исключений.
                 await handle.ToUniTask();
             }
             catch
@@ -41,7 +42,8 @@ namespace RivalDom.Scripts.Domain.AddressableLoading
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
                 return new AddressableLoadResult(handle.Result, handle);
-            
+
+            // Раньше при неудаче handle оставался неосвобожденным (утечка).
             ReleaseHandle(handle);
             throw new Exception($"Failed to load asset with {description}");
         }
@@ -51,6 +53,5 @@ namespace RivalDom.Scripts.Domain.AddressableLoading
             if (handle.IsValid())
                 Addressables.Release(handle);
         }
-
     }
 }

@@ -12,58 +12,96 @@ namespace Template.Features.ScreenNavigator
         where TItem : BaseNavigationItem<TData>
         where TData : BaseNavigationItemPayload
     {
-        private IScreenFactory _screenFactory;
-        private ILocalConfigService _configService;
-        
+                private IScreenFactory _screenFactory;
         private ScreenConfig _config;
 
         private ActivatableScreen<TData> _screen;
-        private ScreenType _screenType;
-        private GameObject _prefab;
+
+        // Запись конфига ищем один раз, а не при каждой активации.
+        private ScreenEntryBase _entry;
 
         [Inject]
         private void Construct(IScreenFactory screenFactory, ILocalConfigService configService)
         {
             _screenFactory = screenFactory;
-            _configService = configService;
-            
-            _config = _configService.GetConfig<ScreenConfig>();
+            _config = configService.GetConfig<ScreenConfig>();
         }
 
         protected override async UniTask Activate(TData data)
         {
             if (_screen == null)
             {
-                var entry = _config.Entries.First(e => e.Type == GetScreenTypeForItem(typeof(TItem)));
-                _screenType = entry.Type;
-                _prefab = entry.Prefab;
+                _entry ??= ResolveEntry();
 
-                _screen = await _screenFactory.Create<ActivatableScreen<TData>>(_screenType, _prefab, transform);
+                // Экран создается под этим объектом: так он попадает в иерархию текущей сцены.
+                _screen = await _screenFactory.Create<ActivatableScreen<TData>>(_entry, transform);
             }
+
             await _screen.Activate(data);
         }
 
         protected override async UniTask Open(NavigationItemOpenPayload payload)
         {
-            if (_screen != null)
-                await _screen.Open(payload);
+            if (_screen == null)
+                return;
+
+            _screen.SetVisible(true);
+            await _screen.Open(payload);
         }
 
         protected override async UniTask Close(NavigationItemClosePayload payload)
         {
-            if (_screen != null)
+            if (_screen == null)
+                return;
+
+            // Обнуляем сразу: повторный Close или Activate не должен работать с освобождаемым экраном.
+            ActivatableScreen<TData> screen = _screen;
+            _screen = null;
+
+            try
             {
-                await _screen.Close(payload);
-                _screenFactory.Destroy(_screen, _screenType);
-                _screen = null;
+                await screen.Close(payload);
+            }
+            finally
+            {
+                // Даже если анимация закрытия упала, экран должен вернуться в фабрику.
+                screen.SetVisible(false);
+                _screenFactory.Release(screen);
             }
         }
         
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            // Объект уничтожается (например, при выгрузке сцены): возвращаем экран, чтобы не потерять ассет.
+            // Если экран создан под этим объектом, лучше не включать для него Pooled.
+            if (_screen != null)
+            {
+                _screenFactory.Release(_screen);
+                _screen = null;
+            }
+        }
+
         protected virtual ScreenType GetScreenTypeForItem(Type itemType)
         {
-            var attr = itemType.GetCustomAttribute<ScreenTypeAttribute>();
-            if (attr != null) return attr.Type;
-            throw new Exception($"No ScreenType defined for {itemType.Name}");
+            ScreenTypeAttribute attribute = itemType.GetCustomAttribute<ScreenTypeAttribute>();
+            if (attribute != null)
+                return attribute.Type;
+
+            throw new InvalidOperationException($"No ScreenType defined for {itemType.Name}");
         }
+
+        private ScreenEntryBase ResolveEntry()
+        {
+            ScreenType screenType = GetScreenTypeForItem(typeof(TItem));
+
+            if (!_config.TryGetEntry(screenType, out ScreenEntryBase entry))
+                throw new InvalidOperationException(
+                    $"No screen configured for ScreenType.{screenType} (item {typeof(TItem).Name}).");
+
+            return entry;
+        }
+
     }
 }

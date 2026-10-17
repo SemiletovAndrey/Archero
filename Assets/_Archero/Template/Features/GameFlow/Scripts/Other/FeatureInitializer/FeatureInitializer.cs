@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using Template.Features.ProjectInit;
 using UnityEngine;
 
-namespace Template.Features.GameFlow.Scripts.Other.FeatureInitializer
+namespace Template.Features.GameFlow.Scripts
 {
     public class FeatureInitializer : IFeatureInitializer
     {

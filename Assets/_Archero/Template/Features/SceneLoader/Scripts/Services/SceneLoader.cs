@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Template.Features.GameFlow.Scripts.Other.FeatureInitializer;
+using Template.Features.GameFlow.Scripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;

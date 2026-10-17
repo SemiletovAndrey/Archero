@@ -10,25 +10,25 @@ namespace Template.Features.ScreenNavigator
         where TData : BaseNavigationItemPayload
     {
         private TItem _navigationItem;
-        
+
         [Inject]
         private void Construct(TItem item)
         {
             _navigationItem = item;
         }
-        
+
         protected virtual void Awake()
         {
             _navigationItem.Opened += Open;
             _navigationItem.Closed += Close;
-            _navigationItem.Initialized += Activate;
+            _navigationItem.Activated += Activate;
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             _navigationItem.Opened -= Open;
             _navigationItem.Closed -= Close;
-            _navigationItem.Initialized -= Activate;
+            _navigationItem.Activated -= Activate;
         }
 
         protected abstract UniTask Activate(TData data);

@@ -1,18 +1,8 @@
-﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using Template.Features.UIViewFactory;
 
 namespace Template.Features.Popups
 {
-    public interface IPopupFactory
+    public interface IPopupFactory : IUIViewFactory<BasePopup, PopupEntryBase>
     {
-        public void Init(Transform parent);
-        
-        public UniTask<T> Create<T>(PopupEntryBase entry) where T : BasePopup;
-        
-        public void Release(BasePopup popup);
-        
-        public UniTask Preload(PopupEntryBase entry);
-        
-        public void Unload(PopupEntryBase entry);
     }
 }
