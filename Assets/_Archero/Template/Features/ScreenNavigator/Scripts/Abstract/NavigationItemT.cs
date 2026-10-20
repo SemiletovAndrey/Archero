@@ -11,23 +11,12 @@ namespace Template.Features.ScreenNavigator
     {
         private IClassFactory _classFactory;
 
-        /// <summary>Элемент получил данные (целевой элемент при переходе или повторный выбор уже открытого).</summary>
         public event Func<TPayload, UniTask> Activated;
 
-        /// <summary>Элемент открыт (срабатывает для каждого элемента пути, не только для целевого).</summary>
         public event Func<NavigationItemOpenPayload, UniTask> Opened;
 
-        /// <summary>Элемент закрывается.</summary>
         public event Func<NavigationItemClosePayload, UniTask> Closed;
-
-        /// <summary>Прежнее имя события Activated.</summary>
-        [Obsolete("Use Activated")]
-        public event Func<TPayload, UniTask> Initialized
-        {
-            add => Activated += value;
-            remove => Activated -= value;
-        }
-
+        
         [Inject]
         private void Construct(IClassFactory classFactory)
         {
@@ -47,7 +36,6 @@ namespace Template.Features.ScreenNavigator
 
         public override async UniTask MoveTo<TItem, TItemData>(TItemData data, NavigationItemOpenPayload payload)
         {
-            // Помечаем элемент открытым сразу: если Activate или обработчик упадет, навигатор вызовет Deactivate.
             IsActive = true;
 
             if (GetType() == typeof(TItem))
@@ -56,6 +44,7 @@ namespace Template.Features.ScreenNavigator
                 await Activate(openPayload);
             }
 
+            await OnOpen(payload);
             await Opened.InvokeAllAsync(payload);
 
             await base.MoveTo<TItem, TItemData>(data, payload);
@@ -65,6 +54,7 @@ namespace Template.Features.ScreenNavigator
         {
             try
             {
+                await OnClose(payload);
                 await Closed.InvokeAllAsync(payload);
                 await base.Deactivate(payload);
             }
@@ -77,6 +67,16 @@ namespace Template.Features.ScreenNavigator
         public virtual async UniTask Activate(TPayload data)
         {
             await Activated.InvokeAllAsync(data);
+        }
+
+        protected virtual UniTask OnOpen(NavigationItemOpenPayload payload)
+        {
+            return UniTask.CompletedTask;
+        }
+        
+        protected virtual UniTask OnClose(NavigationItemClosePayload payload)
+        {
+            return UniTask.CompletedTask;
         }
 
         internal override UniTask Refresh(BaseNavigationItemPayload data)

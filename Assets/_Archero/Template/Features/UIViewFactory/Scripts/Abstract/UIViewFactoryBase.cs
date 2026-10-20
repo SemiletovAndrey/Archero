@@ -28,11 +28,9 @@ namespace Template.Features.UIViewFactory
 
         private readonly IClassFactory _classFactory;
         private readonly IUILayersService _layersService;
-
-        // Все живые экземпляры, включая спрятанные в пуле.
+        
         private readonly Dictionary<TView, ViewInstance> _instances = new();
 
-        // По одному спрятанному экземпляру на ключ: сейчас оба потребителя держат не больше одного экземпляра на тип.
         private readonly Dictionary<int, TView> _pool = new();
 
         protected UIViewFactoryBase(IClassFactory classFactory, IUILayersService layersService)
@@ -41,37 +39,31 @@ namespace Template.Features.UIViewFactory
             _layersService = layersService;
         }
 
-        #region Что задает наследник
+        #region Implemented by
 
-        /// <summary>Слой, из диапазона которого выдается Sort Order.</summary>
         protected abstract UILayerType Layer { get; }
 
-        /// <summary>Ключ пула. Фабрика хранит свой пул, поэтому достаточно уникальности внутри нее (обычно (int)Type).</summary>
         protected abstract int GetKey(TEntry entry);
 
         protected abstract bool IsPooled(TEntry entry);
 
         protected abstract bool HasSource(TEntry entry);
 
-        /// <summary>Короткое описание записи для сообщений об ошибках, например PopupType.Loader.</summary>
         protected abstract string Describe(TEntry entry);
-
-        /// <summary>
-        /// Возвращает префаб и берет на него использование, которое держится до ReleasePrefab.
-        /// Если метод бросил исключение, наследник сам ничего не удерживает.
-        /// </summary>
+        
         protected abstract UniTask<GameObject> AcquirePrefab(TEntry entry);
 
-        /// <summary>Экземпляр уничтожен: снимаем использование, взятое в AcquirePrefab.</summary>
         protected abstract void ReleasePrefab(TEntry entry);
 
-        /// <summary>Вызывается после создания нового экземпляра (Sort Order уже выдан).</summary>
         protected virtual void OnViewCreated(TView view, TEntry entry)
         {
         }
 
-        /// <summary>Вызывается, когда экземпляр взят из пула (Sort Order уже выдан).</summary>
         protected virtual void OnViewReused(TView view, TEntry entry)
+        {
+        }
+
+        protected virtual void OnDispose()
         {
         }
 
@@ -80,6 +72,25 @@ namespace Template.Features.UIViewFactory
         public void Init(Transform parent)
         {
             _parent = parent;
+        }
+
+        public void Dispose()
+        {
+            _pool.Clear();
+
+            foreach (KeyValuePair<TView, ViewInstance> pair in new List<KeyValuePair<TView, ViewInstance>>(_instances))
+            {
+                ReleaseSortingOrder(pair.Value);
+
+                if (!IsDestroyed(pair.Key))
+                    Object.Destroy(pair.Key.gameObject);
+
+                ReleasePrefab(pair.Value.Entry);
+            }
+
+            _instances.Clear();
+
+            OnDispose();
         }
 
         public virtual UniTask Preload(TEntry entry)
@@ -98,11 +109,6 @@ namespace Template.Features.UIViewFactory
                 DisposeInstance(pooled, info);
             else if (!IsDestroyed(pooled))
                 Object.Destroy(pooled.gameObject);
-        }
-
-        public void Init(RuleTile.TilingRuleOutput.Transform parent)
-        {
-            throw new System.NotImplementedException();
         }
 
         public async UniTask<T> Create<T>(TEntry entry, Transform parent = null) where T : TView
@@ -153,7 +159,6 @@ namespace Template.Features.UIViewFactory
 
             if (!_instances.TryGetValue(view, out ViewInstance info))
             {
-                // Экземпляр создан не этой фабрикой.
                 if (!IsDestroyed(view))
                     Object.Destroy(view.gameObject);
 
@@ -165,7 +170,6 @@ namespace Template.Features.UIViewFactory
             int key = GetKey(info.Entry);
             if (IsPooled(info.Entry) && !IsDestroyed(view) && !_pool.ContainsKey(key))
             {
-                // В пул: объект выключен, а использование префаба остается занятым.
                 view.gameObject.SetActive(false);
                 _pool[key] = view;
                 return;
@@ -215,8 +219,6 @@ namespace Template.Features.UIViewFactory
                 return false;
             }
 
-            // Экземпляр мог быть уничтожен снаружи (например, вместе со сценой) или не подойти по типу:
-            // тогда освобождаем его запись и создаем новый.
             if (IsDestroyed(pooled) || pooled is not T typed)
             {
                 DisposeInstance(pooled, info);
@@ -239,8 +241,7 @@ namespace Template.Features.UIViewFactory
         private void DisposeInstance(TView view, ViewInstance info)
         {
             _instances.Remove(view);
-
-            // Сначала уничтожаем экземпляр, потом отпускаем ресурсы.
+            
             if (!IsDestroyed(view))
                 Object.Destroy(view.gameObject);
 
@@ -291,12 +292,10 @@ namespace Template.Features.UIViewFactory
 
             return target;
         }
-
-        // Явное приведение к UnityEngine.Object гарантирует проверку "уничтожен ли объект" в generic-коде.
+        
         protected static bool IsDestroyed(Object unityObject)
         {
             return unityObject == null;
         }
-
     }
 }

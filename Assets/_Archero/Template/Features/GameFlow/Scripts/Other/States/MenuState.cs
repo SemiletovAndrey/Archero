@@ -14,17 +14,15 @@ namespace Template.Features.GameStateMachine
 
         private readonly ISceneLoader _sceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
-        private readonly IPopupSystem _popupSystem;
 
         private LoadedScene _scene;
 
         public MenuState(
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer, IPopupSystem popupSystem)
+            IFeatureInitializer featureInitializer)
         {
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
-            _popupSystem = popupSystem;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
@@ -32,18 +30,10 @@ namespace Template.Features.GameStateMachine
             //await _sceneLoader.Load(SceneName, new GameplayPayload(levelId), lifetime);
             _scene = await _sceneLoader.Load(SceneName, lifetime);
             await _featureInitializer.InitAll(_scene.Features, lifetime);
-
-            await _popupSystem.Open<TestPopup, TestPopupPayload>(new TestPopupPayload(1));
-            Debug.Log("Open");
-            await UniTask.WaitForSeconds(5);
-
-            await _popupSystem.Close<TestPopup>();
-            Debug.Log("Hide");
-
-            await UniTask.WaitForSeconds(5);
-
-            await _popupSystem.Open<TestPopup, TestPopupPayload>(new TestPopupPayload(1));
-            Debug.Log("Open");
+            
+            ISceneEntryPoint entry = _scene.Container.TryResolve<ISceneEntryPoint>();
+            if (entry != null)
+                await entry.Enter(lifetime);
         }
 
         public async UniTask Exit()

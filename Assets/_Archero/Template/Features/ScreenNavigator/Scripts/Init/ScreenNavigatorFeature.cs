@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace Template.Features.ScreenNavigator
 {
-    public class ScreenNavigatorFeature : BaseMonoBehaviourFeature
+    public abstract class ScreenNavigatorFeature<TRoot> : BaseMonoBehaviourFeature where TRoot : NavigationRoot
     {
         [SerializeField] private Transform _screenParent;
         
         protected override void InstallBindings()
         {
+            BindAsSingle<IMainNavigationItem, TRoot>();
+
             BindAsSingle<IScreenNavigator, ScreenNavigator>();
             BindAsSingle<IScreenFactory, AddressablesScreenFactory>();
         }

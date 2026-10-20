@@ -11,14 +11,11 @@ namespace Template.Features.ScreenNavigator
     {
         private readonly IMainNavigationItem _mainNavigationItem;
 
-        // Дерево строится в Init и дальше не меняется, поэтому путь к каждому элементу считаем один раз.
         private readonly Dictionary<Type, List<BaseNavigationItem>> _pathCache = new();
 
-        // Активный путь. Меняется на месте по ходу перехода и всегда отражает реально открытые элементы.
         private readonly List<BaseNavigationItem> _currentPath = new();
         private readonly ReadOnlyCollection<BaseNavigationItem> _currentPathView;
 
-        // Переходы выполняются строго по очереди.
         private UniTaskCompletionSource _lastOperation;
         private int _pendingOperations;
 
@@ -63,7 +60,6 @@ namespace Template.Features.ScreenNavigator
 
             int common = CommonPrefixLength(_currentPath, target);
 
-            // Закрываем от листа к корню, открываем от корня к листу.
             List<BaseNavigationItem> closing = new(_currentPath.Count - common);
             for (int i = _currentPath.Count - 1; i >= common; i--)
                 closing.Add(_currentPath[i]);
@@ -81,7 +77,6 @@ namespace Template.Features.ScreenNavigator
                     }
                     finally
                     {
-                        // Элемент считается закрытым, даже если обработчик упал: так путь не расходится с IsActive.
                         _currentPath.RemoveAt(_currentPath.Count - 1);
                     }
                 }
@@ -94,13 +89,11 @@ namespace Template.Features.ScreenNavigator
                 }
                 else
                 {
-                    // Цель уже открыта (тот же элемент или его предок): обновляем ее данными.
                     await target[target.Count - 1].Refresh(payload);
                 }
             }
             catch
             {
-                // После сбоя остаемся на общем предке: откатываем элементы, которые успели открыться.
                 if (openingStarted)
                     await RollbackOpened(opening);
 
@@ -125,7 +118,6 @@ namespace Template.Features.ScreenNavigator
                 }
                 catch (Exception e)
                 {
-                    // Откат по возможности: ошибка здесь не должна скрыть исходную.
                     Debug.LogException(e);
                 }
             }
@@ -156,7 +148,6 @@ namespace Template.Features.ScreenNavigator
             return i;
         }
 
-        // Поиск пути и MoveTo различают элементы по типу, поэтому два элемента одного типа в дереве недопустимы.
         private static void ValidateTree(BaseNavigationItem item, HashSet<Type> seen)
         {
             if (!seen.Add(item.GetType()))
@@ -193,7 +184,6 @@ namespace Template.Features.ScreenNavigator
             }
         }
 
-        // Ошибка в подписчике не должна ломать навигацию.
         private void RaisePathChanged()
         {
             try

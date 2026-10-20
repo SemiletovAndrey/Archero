@@ -33,7 +33,6 @@ namespace Template.Features.ScreenNavigator
             }
             finally
             {
-                // Лоадер не должен остаться на экране, если загрузка сцены упала.
                 await CloseLoaderSafe();
             }
 
@@ -67,7 +66,6 @@ namespace Template.Features.ScreenNavigator
             }
             catch (Exception e)
             {
-                // Ошибка закрытия лоадера не должна скрыть исходную причину сбоя.
                 Debug.LogException(e);
             }
         }

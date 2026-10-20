@@ -23,7 +23,7 @@ namespace Template.Features.ScreenNavigator
 
         protected override void ReleasePrefab(ScreenEntryBase entry)
         {
-            // Префаб - прямая ссылка, освобождать нечего.
+            
         }
     }
 }

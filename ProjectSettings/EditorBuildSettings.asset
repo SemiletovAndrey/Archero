@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/_Archero/Contexts/Preloader/GraphicResources/Scenes/Scene_Preloader.unity
     guid: f5453c5462ceea54e91e84a8a0eb53ab
   - enabled: 1
-    path: Assets/_Archero/Contexts/Menu/DataResiurces/Scenes/Scene_Menu.unity
+    path: Assets/_Archero/Contexts/Menu/DataResources/Scenes/Scene_Menu.unity
     guid: 8f6ee9e05d52e9d4d9b279160737df7b
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 5ed9166f74eef79458ae7f7d1ffeb82c, type: 2}

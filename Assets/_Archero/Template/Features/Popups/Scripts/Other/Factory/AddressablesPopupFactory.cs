@@ -47,6 +47,11 @@ namespace Template.Features.Popups
             _prefabs.Unpin(addressable.Prefab.AssetGUID);
         }
 
+        protected override void OnDispose()
+        {
+            _prefabs.ReleaseAll();
+        }
+
         private static AddressablePopupEntry AsAddressable(PopupEntryBase entry)
         {
             return entry as AddressablePopupEntry ??

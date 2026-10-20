@@ -36,7 +36,6 @@ namespace Template.Features.ScreenNavigator
 
         public override void Unload(ScreenEntryBase entry)
         {
-            // Сначала уничтожаем спрятанный в пуле экземпляр (он держит использование ассета).
             base.Unload(entry);
 
             AddressableScreenEntry addressable = entry as AddressableScreenEntry;
@@ -44,6 +43,11 @@ namespace Template.Features.ScreenNavigator
                 return;
 
             _prefabs.Unpin(addressable.Prefab.AssetGUID);
+        }
+
+        protected override void OnDispose()
+        {
+            _prefabs.ReleaseAll();
         }
 
         private static AddressableScreenEntry AsAddressable(ScreenEntryBase entry)

@@ -9,10 +9,7 @@ namespace Template.Features.ScreenNavigator
         where TData : BaseNavigationItemPayload
     {
         private IScreenNavigator _screenNavigator;
-
-        /// <summary>
-        /// Пока идет переход, повторные нажатия игнорируются: иначе они встали бы в очередь и повторили навигацию.
-        /// </summary>
+        
         protected virtual bool IgnoreWhileNavigating => true;
 
         [Inject]
@@ -26,7 +23,6 @@ namespace Template.Features.ScreenNavigator
             if (IgnoreWhileNavigating && _screenNavigator.IsNavigating)
                 return;
 
-            // Forget: ошибка навигации попадет в лог UniTask, а не потеряется.
             _screenNavigator.NavigateTo<TItem, TData>(GetData()).Forget();
         }
 

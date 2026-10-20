@@ -38,7 +38,6 @@ namespace Template.Features.ScreenNavigator
         {
             view.Init(entry.Type);
 
-            // Экран невидим, пока ему не передали данные: видимым его делает активатор перед Open.
             view.SetVisible(false);
         }
 

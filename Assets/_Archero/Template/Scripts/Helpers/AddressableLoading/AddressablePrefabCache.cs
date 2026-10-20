@@ -15,6 +15,9 @@ namespace Domain.AddressableLoading
             public AddressableLoadResult Result;
             public bool IsLoaded;
 
+            // Запись уже освобождена: если загрузка завершится позже, результат нужно сразу отпустить.
+            public bool Discarded;
+
             // Число держателей (экземпляры, текущие загрузки). Закрепление (Pinned) учитывается отдельно.
             public int Users;
             public bool Pinned;
@@ -64,6 +67,18 @@ namespace Domain.AddressableLoading
         }
 
         /// <summary>
+        /// Освобождает все ассеты, включая закрепленные (кэш уничтожается, например, вместе со сценой).
+        /// Загрузки, которые еще идут, будут освобождены сразу после завершения.
+        /// </summary>
+        public void ReleaseAll()
+        {
+            foreach (CacheEntry entry in new List<CacheEntry>(_entries.Values))
+                Discard(entry);
+
+            _entries.Clear();
+        }
+
+        /// <summary>
         /// Users и Pinned выставляются до первого await, поэтому Unpin или Release другого держателя
         /// не освободят ассет, пока мы ждем загрузку.
         /// </summary>
@@ -98,6 +113,13 @@ namespace Domain.AddressableLoading
         {
             entry.Result = await AddressableObjectLoader.LoadAsset(entry.Key);
             entry.IsLoaded = true;
+
+            // Запись освободили, пока шла загрузка: отпускаем результат сразу, иначе ассет утечет.
+            if (entry.Discarded)
+            {
+                entry.IsLoaded = false;
+                AddressableObjectLoader.Release(entry.Result);
+            }
         }
 
         private void TryDiscard(CacheEntry entry)
@@ -110,6 +132,8 @@ namespace Domain.AddressableLoading
 
         private void Discard(CacheEntry entry)
         {
+            entry.Discarded = true;
+
             // Не трогаем запись, если под этим ключом уже лежит новая загрузка.
             if (_entries.TryGetValue(entry.Key, out CacheEntry current) && ReferenceEquals(current, entry))
                 _entries.Remove(entry.Key);
@@ -120,6 +144,5 @@ namespace Domain.AddressableLoading
                 AddressableObjectLoader.Release(entry.Result);
             }
         }
-
     }
 }

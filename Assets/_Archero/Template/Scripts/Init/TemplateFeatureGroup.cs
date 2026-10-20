@@ -28,6 +28,7 @@ namespace Template.Scripts.Init
             
             AddFeature<ContainerFeature>();
             AddFeature<PopupsFeature>();
+            //AddFeature<ScreenNavigatorFeature>();
             
             AddFeature<LayerUiFeature>();
         }
