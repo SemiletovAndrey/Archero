@@ -1,7 +1,8 @@
-﻿using Template.Features.NewInputFeature;
+﻿using System;
 using UnityEngine;
+using Zenject;
 
-namespace _Archero.Template.Features.NewInputFeature.Scripts.Example
+namespace Template.Features.NewInputFeature.Scripts.Example
 {
     public class PlayerMovementFeature : MonoBehaviour
     {
@@ -10,9 +11,14 @@ namespace _Archero.Template.Features.NewInputFeature.Scripts.Example
         private IInputBus _bus;
         private Vector2 _currentInput;
 
-        /*public void Initialize(IInputBus bus)
+        [Inject]
+        private void Construct(IInputBus bus)
         {
             _bus = bus;
+        }
+
+        private void Start()
+        {
             _bus.Subscribe<MovementSignal>(OnMovementReceived);
         }
 
@@ -24,6 +30,7 @@ namespace _Archero.Template.Features.NewInputFeature.Scripts.Example
         private void OnMovementReceived(MovementSignal signal)
         {
             _currentInput = signal.Value;
+            Debug.Log("Movement Received: " + signal.Value);
         }
 
         private void Update()
@@ -32,6 +39,6 @@ namespace _Archero.Template.Features.NewInputFeature.Scripts.Example
 
             Vector3 direction = new Vector3(_currentInput.x, 0f, _currentInput.y);
             transform.Translate(direction * (_moveSpeed * Time.deltaTime), Space.World);
-        }*/
+        }
     }
 }

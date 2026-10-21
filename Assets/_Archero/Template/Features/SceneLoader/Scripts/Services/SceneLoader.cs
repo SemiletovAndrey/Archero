@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Template.Features.GameFlow.Scripts;
+using Template.Features.NewInputFeature;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -12,11 +13,13 @@ namespace Template.Features.SceneLoader
     {
         private readonly ZenjectSceneLoader _zenjectSceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
+        private readonly IInputProviderManager _inputProviderManager;
 
-        public SceneLoader(ZenjectSceneLoader zenjectSceneLoader, IFeatureInitializer featureInitializer)
+        public SceneLoader(ZenjectSceneLoader zenjectSceneLoader, IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager)
         {
             _zenjectSceneLoader = zenjectSceneLoader;
             _featureInitializer = featureInitializer;
+            _inputProviderManager = inputProviderManager;
         }
         
         public void Dispose()
@@ -43,6 +46,8 @@ namespace Template.Features.SceneLoader
         private async UniTask<LoadedScene> LoadInternal(
             string sceneName, Action<DiContainer> extraBindings, CancellationToken ct)
         {
+            _inputProviderManager.ClearSceneProviders();
+            
             AsyncOperation operation =
                 _zenjectSceneLoader.LoadSceneAsync(sceneName, LoadSceneMode.Single, extraBindings);
             

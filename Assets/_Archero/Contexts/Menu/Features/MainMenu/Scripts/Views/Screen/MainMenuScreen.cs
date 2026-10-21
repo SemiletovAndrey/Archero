@@ -8,7 +8,6 @@ namespace Menu.Features.MainMenu.Scripts
     {
         public override UniTask Activate(MainMenuPayload data)
         {
-            Debug.Log("Activating Main Menu");
             return UniTask.CompletedTask;
         }
     }

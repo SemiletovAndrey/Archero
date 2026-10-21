@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Template.Features.ClassFactory;
+using Template.Features.UILoader;
 using UnityEngine;
 
 namespace Template.Features.GameStateMachine

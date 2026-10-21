@@ -1,10 +1,9 @@
 ﻿using System.Threading;
-using Contexts.Persistance.Auth;
 using Cysharp.Threading.Tasks;
 using Template.Features.GameFlow.Scripts;
-using Template.Features.Popups;
+using Template.Features.NewInputFeature;
+using Template.Features.NewInputFeature.Scripts.Example;
 using Template.Features.SceneLoader;
-using UnityEngine;
 
 namespace Template.Features.GameStateMachine
 {
@@ -14,20 +13,33 @@ namespace Template.Features.GameStateMachine
 
         private readonly ISceneLoader _sceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
+        private readonly IInputProviderManager _inputProviderManager;
 
         private LoadedScene _scene;
 
         public MenuState(
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer)
+            IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager)
         {
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
+            _inputProviderManager = inputProviderManager;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
         {
-            //await _sceneLoader.Load(SceneName, new GameplayPayload(levelId), lifetime);
+            await LoadScene(lifetime);
+
+            HandleInputProvider();
+        }
+
+        private void HandleInputProvider()
+        {
+            _inputProviderManager.CreateProvider<ArcheroInputProvider>();
+        }
+
+        private async UniTask LoadScene(CancellationToken lifetime)
+        {
             _scene = await _sceneLoader.Load(SceneName, lifetime);
             await _featureInitializer.InitAll(_scene.Features, lifetime);
             

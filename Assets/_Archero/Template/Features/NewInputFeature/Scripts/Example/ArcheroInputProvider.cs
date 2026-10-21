@@ -1,37 +1,30 @@
 ﻿using System;
-using Template.Features.NewInputFeature;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace _Archero.Template.Features.NewInputFeature.Scripts.Example
+namespace Template.Features.NewInputFeature.Scripts.Example
 {
-    public class ArcheroInputProvider //: IInputProvider, IDisposable
+    public class ArcheroInputProvider : IInputProvider, IDisposable
     {
-        /*private readonly IInputBus _bus;
-        private readonly InputAction _moveAction;
-        private readonly InputAction _attackAction;
+        private readonly IInputBus _bus;
+        private readonly GameInputActions _actions;
 
-        public ArcheroInputProvider(IInputBus bus, InputActionAsset actionsAsset)
+        public ArcheroInputProvider(IInputBus bus)
         {
+            Debug.Log("ArcheroInputProvider");
             _bus = bus;
-
-            // Находим нужные Actions в контроллере
-            var map = actionsAsset.FindActionMap("Player");
-            _moveAction = map.FindAction("Move");
-            _attackAction = map.FindAction("Attack");
+            
+            _actions = new GameInputActions();
 
             BindEvents();
+            
+            Enable();
         }
 
         private void BindEvents()
         {
-            // Слушаем изменение оси джойстика
-            _moveAction.performed += OnMoveChanged;
-            _moveAction.canceled += OnMoveCanceled;
-
-            // Слушаем кнопки
-            _attackAction.started += _ => _bus.Publish(new PrimaryActionSignal(true));
-            _attackAction.canceled += _ => _bus.Publish(new PrimaryActionSignal(false));
+            _actions.Player.Move.performed += OnMoveChanged;
+            _actions.Player.Move.canceled += OnMoveCanceled;
         }
 
         private void OnMoveChanged(InputAction.CallbackContext ctx)
@@ -47,21 +40,22 @@ namespace _Archero.Template.Features.NewInputFeature.Scripts.Example
 
         public void Enable()
         {
-            _moveAction.Enable();
-            _attackAction.Enable();
+            _actions.Player.Enable();
         }
 
         public void Disable()
         {
-            _moveAction.Disable();
-            _attackAction.Disable();
+            _actions.Player.Disable();
         }
 
         public void Dispose()
         {
-            _moveAction.performed -= OnMoveChanged;
-            _moveAction.canceled -= OnMoveCanceled;
+            _actions.Player.Move.performed -= OnMoveChanged;
+            _actions.Player.Move.canceled -= OnMoveCanceled;
+            
             Disable();
-        }*/
+            
+            _actions.Dispose();
+        }
     }
 }
