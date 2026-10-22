@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Template.Features.ScreenNavigator;
-using UnityEngine;
 
 namespace Menu.Features.MainMenu.Scripts
 {

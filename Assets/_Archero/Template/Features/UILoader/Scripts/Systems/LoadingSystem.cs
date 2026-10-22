@@ -8,17 +8,17 @@ namespace Template.Features.UILoader
     {
         private readonly ILoaderView _view;
 
-        // Сколько запросов держат загрузку сейчас.
         private int _users;
 
-        // Вью показана (анимация появления закончилась) и еще не скрыта.
+        private bool _globalRequested;
+
+        private int _epoch;
+
         private bool _isShown;
         private float _shownAt;
 
-        // Завершается, когда вью показана.
         private UniTaskCompletionSource _shownSignal = new();
 
-        // Пока идет приведение вью к нужному состоянию, здесь лежит сигнал его завершения.
         private UniTaskCompletionSource _settled;
 
         public LoadingSystem(ILoaderView view)
@@ -28,26 +28,62 @@ namespace Template.Features.UILoader
 
         public bool IsVisible => _isShown;
 
-        public async UniTask<ILoadingHandle> Show(string message = null)
+        public UniTask Show(string message = null)
         {
-            _users++;
-            Handle handle = new Handle(this);
+            if (!_globalRequested)
+            {
+                _globalRequested = true;
+                _users++;
+            }
 
             if (message != null)
                 _view.SetMessage(message);
 
-            if (!_isShown)
-            {
-                EnsureReconciling().Forget();
-                await _shownSignal.Task;
-            }
+            return AwaitShown();
+        }
 
+        public UniTask Hide()
+        {
+            if (!_globalRequested)
+                return UniTask.CompletedTask;
+
+            _globalRequested = false;
+            return ReleaseUser();
+        }
+
+        public UniTask HideAll()
+        {
+            _epoch++;
+            _globalRequested = false;
+            _users = 0;
+
+            return EnsureReconciling();
+        }
+
+        public async UniTask<ILoadingHandle> Acquire(string message = null)
+        {
+            _users++;
+            Handle handle = new Handle(this, _epoch);
+
+            if (message != null)
+                _view.SetMessage(message);
+
+            await AwaitShown();
             return handle;
+        }
+
+        private UniTask AwaitShown()
+        {
+            if (_isShown)
+                return UniTask.CompletedTask;
+
+            EnsureReconciling().Forget();
+            return _shownSignal.Task;
         }
 
         public async UniTask Run(Func<UniTask> work, string message = null)
         {
-            ILoadingHandle handle = await Show(message);
+            ILoadingHandle handle = await Acquire(message);
             try
             {
                 await work();
@@ -60,7 +96,7 @@ namespace Template.Features.UILoader
 
         public async UniTask<T> Run<T>(Func<UniTask<T>> work, string message = null)
         {
-            ILoadingHandle handle = await Show(message);
+            ILoadingHandle handle = await Acquire(message);
             try
             {
                 return await work();
@@ -79,13 +115,8 @@ namespace Template.Features.UILoader
             return EnsureReconciling();
         }
 
-        /// <summary>
-        /// Приведение вью к нужному состоянию выполняется одним циклом, поэтому анимации не накладываются друг на друга:
-        /// пока идет одна, новые запросы только меняют счетчик, а цикл после нее смотрит на актуальное значение.
-        /// </summary>
         private UniTask EnsureReconciling()
         {
-            // Цикл может закончиться синхронно, поэтому возвращаем локальный сигнал, а не поле.
             if (_settled != null)
                 return _settled.Task;
 
@@ -112,12 +143,10 @@ namespace Template.Features.UILoader
                     }
                     else
                     {
-                        // Не скрываем раньше минимального времени: загрузка не должна мигать.
                         float remaining = _view.MinVisibleTime - (Time.unscaledTime - _shownAt);
                         if (remaining > 0f)
                             await UniTask.Delay(TimeSpan.FromSeconds(remaining), ignoreTimeScale: true);
 
-                        // За время ожидания загрузку запросили снова: остаемся показанными.
                         if (_users > 0)
                             continue;
 
@@ -136,7 +165,6 @@ namespace Template.Features.UILoader
             }
         }
 
-        // Ошибка во вью не должна навсегда оставить загрузку на экране или повесить вызывающих.
         private async UniTask SafeShow()
         {
             try
@@ -164,22 +192,26 @@ namespace Template.Features.UILoader
         private sealed class Handle : ILoadingHandle
         {
             private readonly LoadingSystem _loadingSystem;
+            private readonly int _epoch;
             private bool _released;
 
-            public Handle(LoadingSystem loadingSystem)
+            public Handle(LoadingSystem loadingSystem, int epoch)
             {
                 _loadingSystem = loadingSystem;
+                _epoch = epoch;
             }
+
+            private bool IsActive => !_released && _epoch == _loadingSystem._epoch;
 
             public void SetProgress(float progress)
             {
-                if (!_released)
+                if (IsActive)
                     _loadingSystem._view.SetProgress(progress);
             }
 
             public void SetMessage(string message)
             {
-                if (!_released)
+                if (IsActive)
                     _loadingSystem._view.SetMessage(message);
             }
 
@@ -188,8 +220,10 @@ namespace Template.Features.UILoader
                 if (_released)
                     return UniTask.CompletedTask;
 
+                bool wasActive = IsActive;
                 _released = true;
-                return _loadingSystem.ReleaseUser();
+
+                return wasActive ? _loadingSystem.ReleaseUser() : UniTask.CompletedTask;
             }
 
             public void Dispose()

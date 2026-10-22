@@ -11,7 +11,6 @@ namespace Template.Features.NewInputFeature.Scripts.Example
 
         public ArcheroInputProvider(IInputBus bus)
         {
-            Debug.Log("ArcheroInputProvider");
             _bus = bus;
             
             _actions = new GameInputActions();

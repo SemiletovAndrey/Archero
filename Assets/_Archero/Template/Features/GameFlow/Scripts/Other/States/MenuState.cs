@@ -4,6 +4,7 @@ using Template.Features.GameFlow.Scripts;
 using Template.Features.NewInputFeature;
 using Template.Features.NewInputFeature.Scripts.Example;
 using Template.Features.SceneLoader;
+using Template.Features.UILoader;
 
 namespace Template.Features.GameStateMachine
 {
@@ -14,23 +15,29 @@ namespace Template.Features.GameStateMachine
         private readonly ISceneLoader _sceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
         private readonly IInputProviderManager _inputProviderManager;
+        private readonly ILoadingSystem _loadingSystem;
 
         private LoadedScene _scene;
 
         public MenuState(
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager)
+            IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager, ILoadingSystem loadingSystem)
         {
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
             _inputProviderManager = inputProviderManager;
+            _loadingSystem = loadingSystem;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
         {
+            await _loadingSystem.Show();
+            
             await LoadScene(lifetime);
 
             HandleInputProvider();
+            
+            await _loadingSystem.Hide();
         }
 
         private void HandleInputProvider()

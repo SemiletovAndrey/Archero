@@ -11,17 +11,20 @@ namespace Template.Features.GameStateMachine
         private readonly IGameStateMachine _stateMachine;
         private readonly IFeatureInitializer _featureInitializer;
         private readonly GlobalFeatureSet _globalFeatures;
+        private readonly ILoadingSystem _loadingSystem;
  
         public BootState(
-            IGameStateMachine stateMachine, IFeatureInitializer featureInitializer, GlobalFeatureSet globalFeatures)
+            IGameStateMachine stateMachine, IFeatureInitializer featureInitializer, GlobalFeatureSet globalFeatures, ILoadingSystem loadingSystem)
         {
             _stateMachine = stateMachine;
             _featureInitializer = featureInitializer;
             _globalFeatures = globalFeatures;
+            _loadingSystem = loadingSystem;
         }
  
         public async UniTask Enter(CancellationToken lifetime)
         {
+            await _loadingSystem.Show();
             ApplyApplicationSettings();
             
             await _featureInitializer.InitAll(_globalFeatures, lifetime);
