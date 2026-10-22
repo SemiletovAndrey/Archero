@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "815541258347",
+    "project_id": "domain-of-battles",
+    "storage_bucket": "domain-of-battles.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815541258347:android:831c6b76e0fb791cda092e",
+        "android_client_info": {
+          "package_name": "com.badabip.domainofbattles"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2NZrwu7LT3K3ye-R2QwQ9NHD9FOU7NEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

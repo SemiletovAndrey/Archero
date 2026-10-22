@@ -1,4 +1,5 @@
 ﻿using Menu.Features.MainMenu.Scripts;
+using Persistence.Features.Auth;
 using Template.Features.ScreenNavigator;
 
 namespace Menu.Scripts.Navigation
@@ -8,7 +9,7 @@ namespace Menu.Scripts.Navigation
         protected override NavigationItemList AddInnerItems()
         {
             return new NavigationItemList()
-            .Add<MainMenuItem>();
+                .Add<MainMenuItem>();
         }
 
     }

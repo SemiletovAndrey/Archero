@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Template.Features.Config.Local.ContextLocalConfigProvider
   _configs:
   - {fileID: 11400000, guid: 75b4e1c7774301b4bbd469a7c782c05e, type: 2}
+  - {fileID: 11400000, guid: 048d85def30c5c54aad5edaa5ed3c9c2, type: 2}

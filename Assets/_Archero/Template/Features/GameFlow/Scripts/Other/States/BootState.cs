@@ -29,7 +29,7 @@ namespace Template.Features.GameStateMachine
             
             await _featureInitializer.InitAll(_globalFeatures, lifetime);
             
-            _stateMachine.Enter<MenuState>();
+            _stateMachine.Enter<AuthState>();
         }
  
         public UniTask Exit()

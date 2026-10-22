@@ -1,3 +1,4 @@
+using _Archero.Contexts.Persistance.Scripts.Init;
 using Template.Features.ClassFactory;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.GameStateMachine;
@@ -29,6 +30,7 @@ namespace DomainOfBattles.Contexts.Preloader
         protected override void AddFeatures()
         {
             AddFeature<TemplateFeatureGroup>();
+            AddFeature<PersistanceFeatureGroup>();
         }
     }
 }

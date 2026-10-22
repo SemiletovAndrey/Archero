@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id">
+  <string name="gcm_defaultSenderId" translatable="false">815541258347</string>
+  <string name="google_storage_bucket" translatable="false">domain-of-battles.firebasestorage.app</string>
+  <string name="project_id" translatable="false">domain-of-battles</string>
+  <string name="google_api_key" translatable="false">AIzaSyD2NZrwu7LT3K3ye-R2QwQ9NHD9FOU7NEQ</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD2NZrwu7LT3K3ye-R2QwQ9NHD9FOU7NEQ</string>
+  <string name="google_app_id" translatable="false">1:815541258347:android:831c6b76e0fb791cda092e</string>
+</resources>

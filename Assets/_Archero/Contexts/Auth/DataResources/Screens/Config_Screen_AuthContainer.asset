@@ -10,10 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 504a4c0e6d504c04b76b01fa2a6dff82, type: 3}
-  m_Name: Config_Screen_Container
-  m_EditorClassIdentifier: Assembly_Template::Template.Features.ScreenNavigator.ScreenConfig
-  Entries:
+  m_Name: Config_Screen_AuthContainer
+  m_EditorClassIdentifier: Assembly-CSharp::Template.Features.ScreenNavigator.ScreenConfig
+  AddressableEntries:
   - Type: 1
-    Prefab: {fileID: 4848395479313739050, guid: f8715b340bcb9b045bf5d8ab42125233, type: 3}
-  - Type: 2
-    Prefab: {fileID: 4848395479313739050, guid: 49c58e34ed3533644a1de29a7dcf1b18, type: 3}
+    Pooled: 0
+    Prefab:
+      m_AssetGUID: f8715b340bcb9b045bf5d8ab42125233
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+    KeepLoaded: 0

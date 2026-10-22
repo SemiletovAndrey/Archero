@@ -13,18 +13,16 @@ namespace Persistence.Features.Auth
     {
         private readonly IAuthProvider _authProvider;
         private readonly IDataStorageService _storageService;
-        private readonly IUserService _userService;
         
         public event Action<UserData> LoggedIn;
         public event Action LogOutUser;
 
         public IModifierCollection<UserData> UserLoggedIn { get; }
         
-        public AuthService(IAuthProvider authProvider, IDataStorageService storageService, IUserService userService)
+        public AuthService(IAuthProvider authProvider, IDataStorageService storageService)
         {
             _authProvider = authProvider;
             _storageService = storageService;
-            _userService = userService;
         }
 
         public async UniTask InitAsync()
@@ -45,7 +43,7 @@ namespace Persistence.Features.Auth
                 return Result.Failure(new Error("Auth.NoUser", "Не удалось получить идентификатор пользователя после входа"));
             }
 
-            Result<bool> existsResult = await _userService.UserExistsOnServer(userId);
+            /*Result<bool> existsResult = await _userService.UserExistsOnServer(userId);
             if (existsResult.IsFailure)
                 return Result.Failure(existsResult.Error);
 
@@ -59,7 +57,7 @@ namespace Persistence.Features.Auth
             if (userResult.IsFailure)
                 return Result.Failure(userResult.Error);
 
-            LoggedIn?.Invoke(userResult.Value);
+            LoggedIn?.Invoke(userResult.Value);*/
             return Result.Success();
         }
 
@@ -84,7 +82,7 @@ namespace Persistence.Features.Auth
                 .WithAge(age)
                 .Bake();
 
-            Result registerOnServerResult = await _userService.RegisterNewUserAsync(userData);
+            /*Result registerOnServerResult = await _userService.RegisterNewUserAsync(userData);
 
             if (registerOnServerResult.IsFailure)
             {
@@ -92,7 +90,7 @@ namespace Persistence.Features.Auth
                 return Result.Failure(registerOnServerResult.Error);
             }
 
-            LoggedIn?.Invoke(userData);
+            LoggedIn?.Invoke(userData);*/
             return Result.Success();
         }
 
@@ -105,8 +103,7 @@ namespace Persistence.Features.Auth
             }
 
             LogOutUser?.Invoke();
-
-            _userService.ClearUserData();
+            
             Debug.LogWarning("Logging out");
         }
         
