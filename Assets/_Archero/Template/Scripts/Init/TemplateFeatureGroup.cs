@@ -1,19 +1,13 @@
-﻿using Template.Features.AppTime;
-using Template.Features.ClassFactory;
-using Template.Features.Config.Local;
-using Template.Features.Config.Remote;
+﻿using Template.Features.Config.Local;
 using Template.Features.Container;
 using Template.Features.DataStorage;
+using Template.Features.Firebase.Init;
 using Template.Features.LayerUI;
 using Template.Features.Localization;
 using Template.Features.NewInputFeature;
-using Template.Features.Ping;
 using Template.Features.Popups;
 using Template.Features.ProjectInit;
 using Template.Features.SceneLoader;
-using Template.Features.ScreenNavigator;
-using Template.Features.UILoader;
-using Template.Features.Vibration;
 
 namespace Template.Scripts.Init
 {
@@ -34,6 +28,8 @@ namespace Template.Scripts.Init
             AddFeature<PopupsFeature>();
             
             AddFeature<LayerUiFeature>();
+            
+            AddFeature<FirebaseFeature>();
         }
     }
 }
