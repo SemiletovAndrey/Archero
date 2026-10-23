@@ -14,7 +14,8 @@ namespace Menu.Scripts.Init
             base.InstallBindings();
             
             Container.BindInstance(new SceneFeatureSet(GetFeatures())).AsSingle();
-            
+
+            Container.BindInterfacesAndSelfTo<MenuFlow>().AsSingle();
             Container.BindInterfacesAndSelfTo<MenuSceneEntryPoint>().AsSingle().NonLazy();
         }
 

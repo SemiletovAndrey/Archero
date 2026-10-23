@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 3107620962511631426}
   - component: {fileID: 8371254916788414544}
   m_Layer: 5
-  m_Name: MainMenuScreen
+  m_Name: Prefab_Screen_MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

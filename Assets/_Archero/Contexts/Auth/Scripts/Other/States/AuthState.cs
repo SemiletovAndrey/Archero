@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Contexts.Persistence.Features.AuthProvider;
 using Cysharp.Threading.Tasks;
+using Persistence.Features.Auth;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.SceneLoader;
 using Template.Features.UILoader;
@@ -14,6 +15,7 @@ namespace Template.Features.GameStateMachine
 
         private readonly IGameStateMachine _stateMachine;
         private readonly IAuthProvider _authProvider;
+        private readonly IAuthService _authService;
         private readonly ILoadingSystem _loadingSystem;
         private readonly ISceneLoader _sceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
@@ -25,28 +27,23 @@ namespace Template.Features.GameStateMachine
             IAuthProvider authProvider,
             ILoadingSystem loadingSystem,
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer)
+            IFeatureInitializer featureInitializer, IAuthService authService)
         {
             _stateMachine = stateMachine;
             _authProvider = authProvider;
             _loadingSystem = loadingSystem;
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
+            _authService = authService;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
         {
-            Debug.Log("Entering AuthState");
             if (!_authProvider.IsFirebaseInitialized)
                 await _authProvider.InitAsync().AttachExternalCancellation(lifetime);
 
-            bool hasUser = _authProvider.TryGetUser(out string userId);
-            Debug.Log($"[Auth] hasUser={hasUser}, userId={userId}, isGuest={_authProvider.IsGuest}");
-            
             if (!_authProvider.TryGetUser(out _))
             {
-                Debug.Log("RUN AUTH AuthState");
-
                 await RunSignIn(lifetime);
             }
 
@@ -58,13 +55,9 @@ namespace Template.Features.GameStateMachine
             _scene = await _sceneLoader.Load(SceneName, lifetime);
             await _featureInitializer.InitAll(_scene.Features, lifetime);
 
-            await _loadingSystem.Hide();
-
             ISceneEntryPoint entry = _scene.Container.TryResolve<ISceneEntryPoint>();
             if (entry != null)
                 await entry.Enter(lifetime);
-
-            await _loadingSystem.Show();
         }
 
         public async UniTask Exit()
@@ -73,6 +66,7 @@ namespace Template.Features.GameStateMachine
                 return;
 
             LoadedScene scene = _scene;
+            await _featureInitializer.DeinitAll(scene.Features);
             _scene = null;
             await _sceneLoader.Release(scene);
         }

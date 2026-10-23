@@ -22,8 +22,6 @@ namespace Template.Features.GameFlow.Scripts
 
                 try
                 {
-                    // У InitFeature() нет токена, поэтому AttachExternalCancellation лишь перестаёт ЖДАТЬ
-                    // при отмене; сама инициализация фичи продолжит работу.
                     await feature.InitFeature().AttachExternalCancellation(ct);
                 }
                 catch (OperationCanceledException)

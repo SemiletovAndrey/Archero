@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba2873c675a5924b950610dd7613348, type: 3}
   m_Name: Config_Local_Provider_AuthContext
   m_EditorClassIdentifier: Assembly-CSharp::Template.Features.Config.Local.ContextLocalConfigProvider
-  _configs:
-  - {fileID: 11400000, guid: 7d9111610bbdc384d8515c365e1be9e9, type: 2}
+  _configs: []

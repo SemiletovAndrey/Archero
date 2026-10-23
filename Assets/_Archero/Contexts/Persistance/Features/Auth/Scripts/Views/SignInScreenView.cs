@@ -214,7 +214,7 @@ namespace Persistence.Features.Auth
                 else
                 {
                     Debug.Log("Login successful");
-                    //TODO: Sign in successful
+                    
                 }
             }
             catch (Exception e)

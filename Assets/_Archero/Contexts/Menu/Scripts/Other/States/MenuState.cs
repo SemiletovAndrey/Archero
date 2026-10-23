@@ -67,6 +67,7 @@ namespace Template.Features.GameStateMachine
 
             try
             {
+                await _featureInitializer.DeinitAll(scene.Features);
             }
             finally
             {

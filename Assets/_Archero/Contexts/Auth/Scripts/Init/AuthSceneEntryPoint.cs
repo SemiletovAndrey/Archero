@@ -1,33 +1,44 @@
-﻿using System;
-using System.Threading;
-using Contexts.Persistence.Features.AuthProvider;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Persistence.Features.Auth;
 using Template.Features.GameStateMachine;
 using Template.Features.ScreenNavigator;
+using Template.Features.UILoader;
 
 namespace Auth.Scripts.Init
 {
     public class AuthSceneEntryPoint : ISceneEntryPoint
     {
         private readonly IScreenNavigator _screenNavigator;
-        private readonly IAuthProvider _authProvider;
+        private readonly IAuthService _authService;
+        private readonly ILoadingSystem _loadingSystem;
 
-        public AuthSceneEntryPoint(IScreenNavigator screenNavigator, IAuthProvider authProvider)
+        public AuthSceneEntryPoint(IScreenNavigator screenNavigator, IAuthService authService, ILoadingSystem loadingSystem)
         {
             _screenNavigator = screenNavigator;
-            _authProvider = authProvider;
+            _authService = authService;
+            _loadingSystem = loadingSystem;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
         {
-            await _screenNavigator
-                .NavigateTo<SignInScreenItem, SignInScreenPayload>(new SignInScreenPayload())
-                .AttachExternalCancellation(lifetime);
+            var completion = new UniTaskCompletionSource();
+            void OnLoggedIn(UserData _) => completion.TrySetResult();
 
-            bool signedIn = await _authProvider.WaitForUserAsync().AttachExternalCancellation(lifetime);
-            if (!signedIn)
-                throw new InvalidOperationException("Sign-in was not completed.");
+            _authService.LoggedIn += OnLoggedIn;
+            try
+            {
+                await _screenNavigator
+                    .NavigateTo<SignInScreenItem, SignInScreenPayload>(new SignInScreenPayload())
+                    .AttachExternalCancellation(lifetime);
+
+                await _loadingSystem.Hide();
+                await completion.Task.AttachExternalCancellation(lifetime);
+            }
+            finally
+            {
+                _authService.LoggedIn -= OnLoggedIn;
+            }
         }
     }
 }

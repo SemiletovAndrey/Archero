@@ -7,6 +7,7 @@ namespace Persistence.Features.Auth
 {
     public interface IAuthService
     {
+        public event Action<UserData> LoggedIn;
         public event Action LogOutUser;
         
         public IModifierCollection<UserData> UserLoggedIn { get; }
@@ -17,6 +18,5 @@ namespace Persistence.Features.Auth
         public UniTask<Result> RegisterEmailAsync(Email email, UserName userName, Password password, int age);
 
         public void LogOut();
-        public event Action<UserData> LoggedIn;
     }
 }

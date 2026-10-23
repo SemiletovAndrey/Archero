@@ -51,13 +51,13 @@ namespace Persistence.Features.Auth
             {
                 return Result.Failure(new Error("Auth.ProfileMissing",
                     "Profile is not found."));
-            }
+            }*/
 
-            Result<UserData> userResult = await _userService.GetUser(userId, true);
+            Result<UserData> userResult = null;//await _userService.GetUser(userId, true);
             if (userResult.IsFailure)
                 return Result.Failure(userResult.Error);
 
-            LoggedIn?.Invoke(userResult.Value);*/
+            LoggedIn?.Invoke(userResult.Value);
             return Result.Success();
         }
 
@@ -82,15 +82,15 @@ namespace Persistence.Features.Auth
                 .WithAge(age)
                 .Bake();
 
-            /*Result registerOnServerResult = await _userService.RegisterNewUserAsync(userData);
+            Result registerOnServerResult = null;//await _userService.RegisterNewUserAsync(userData);
 
-            if (registerOnServerResult.IsFailure)
+            /*if (registerOnServerResult.IsFailure)
             {
                 await TryRollbackFirebaseUser();
                 return Result.Failure(registerOnServerResult.Error);
-            }
+            }*/
 
-            LoggedIn?.Invoke(userData);*/
+            LoggedIn?.Invoke(userData);
             return Result.Success();
         }
 

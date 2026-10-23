@@ -7,7 +7,7 @@ using Zenject;
 namespace Template.Features.ScreenNavigator
 {
     public abstract class ScreenNavigationItem<TPayload> : BaseNavigationItem<TPayload>
-        where TPayload : BaseNavigationItemPayload, new()
+        where TPayload : BaseNavigationItemPayload
     {
         private IScreenFactory _screenFactory;
         private ILocalConfigService _configService;
@@ -17,6 +17,8 @@ namespace Template.Features.ScreenNavigator
 
         private ActivatableScreen<TPayload> _screen;
         private bool _screenActivated;
+        
+        private TPayload _payload;
 
         [Inject]
         private void Construct(IScreenFactory screenFactory, ILocalConfigService configService)
@@ -35,6 +37,8 @@ namespace Template.Features.ScreenNavigator
 
         public override async UniTask Activate(TPayload data)
         {
+            _payload = data;
+            
             if (await EnsureScreen())
             {
                 _screenActivated = true;
@@ -51,8 +55,12 @@ namespace Template.Features.ScreenNavigator
 
             if (!_screenActivated)
             {
+                if (_payload == null)
+                    throw new InvalidOperationException(
+                        $"{GetType().Name} was opened before Activate: no payload to activate the screen with.");
+
                 _screenActivated = true;
-                await _screen.Activate(new TPayload());
+                await _screen.Activate(_payload);
             }
 
             _screen.SetVisible(true);
@@ -104,8 +112,8 @@ namespace Template.Features.ScreenNavigator
                 return null;
             }
 
-            ScreenConfig config = _configService.GetConfig<ScreenConfig>();
-            if (!config.TryGetEntry(screenType, out ScreenEntryBase entry))
+            GeneralScreenConfigs config = _configService.GetConfig<GeneralScreenConfigs>();
+            if (!config.TryGetScreenConfig(screenType, out ScreenEntryBase entry))
                 throw new InvalidOperationException(
                     $"No screen configured for ScreenType.{screenType} (item {GetType().Name}).");
 
