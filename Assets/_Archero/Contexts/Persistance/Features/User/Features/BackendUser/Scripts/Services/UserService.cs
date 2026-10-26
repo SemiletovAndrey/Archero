@@ -11,16 +11,16 @@ namespace Persistence.Features.User.Scripts
     {
         private readonly IUserRepository _userRepository;
         private readonly IAuthProvider _authProvider;
-        private readonly IDataStorageService _storageService;
-        
+        private readonly ISaveLoadService _saveLoadService;
+
         private UserData _userData;
 
         public UserService(IUserRepository userRepository, IAuthProvider authProvider,
-            IDataStorageService storageService)
+            ISaveLoadService saveLoadService)
         {
             _userRepository = userRepository;
             _authProvider = authProvider;
-            _storageService = storageService;
+            _saveLoadService = saveLoadService;
         }
 
         public async UniTask InitAsync()
@@ -39,17 +39,17 @@ namespace Persistence.Features.User.Scripts
         public UserData GetCachedUser()
         {
             return _userData;
-        } 
-        
+        }
+
         public async UniTask<Result> RegisterNewUserAsync(UserData userData)
         {
             var result = await CreateUser(userData);
-    
+
             if (result.IsFailure)
                 return result;
 
             _userData = userData;
-            _storageService.Save(_userData);
+            await _saveLoadService.Save(_userData);
 
             return Result.Success();
         }
@@ -57,7 +57,7 @@ namespace Persistence.Features.User.Scripts
         public async UniTask<Result<UserData>> GetUser(string id, bool forceRefresh = false)
         {
             bool isCurrentUser = _authProvider.TryGetUser(out string currentUserId) && currentUserId == id;
-        
+
             if (!forceRefresh && isCurrentUser && _userData != null)
             {
                 return Result.Success(_userData);
@@ -74,7 +74,7 @@ namespace Persistence.Features.User.Scripts
             if (isCurrentUser)
             {
                 _userData = userData;
-                _storageService.Save(_userData);
+                _saveLoadService.Save(_userData);
             }
 
             return Result.Success(userData);
@@ -104,9 +104,9 @@ namespace Persistence.Features.User.Scripts
         public void ClearUserData()
         {
             _userData = new UserData();
-            _storageService.Save(_userData);
+            _saveLoadService.Save(_userData);
         }
-        
+
         public UniTask<Result<bool>> UserExistsOnServer(string userId)
         {
             return _userRepository.UserExists(userId);
@@ -122,7 +122,7 @@ namespace Persistence.Features.User.Scripts
                 Age = dto.Age
             };
         }
-        
+
         private async UniTask UpdateUserOnServer()
         {
             if (!_authProvider.TryGetUser(out string userId))
@@ -130,11 +130,12 @@ namespace Persistence.Features.User.Scripts
                 return;
             }
 
-            if (!_storageService.TryLoad(out _userData))
+            var (success, userData) = await _saveLoadService.TryLoad<UserData>();
+            if (success)
             {
-                _userData = UserData.Builder.FromEmpty(userId).Bake();
+                _userData = userData;
             }
-            else if (_userData.FirebaseUid == "")
+            else
             {
                 _userData = UserData.Builder.FromEmpty(userId).Bake();
             }
@@ -148,7 +149,7 @@ namespace Persistence.Features.User.Scripts
             if (userExistsResult.Value == false)
             {
                 await CreateUser(_userData);
-                
+
                 return;
             }
 
@@ -160,7 +161,7 @@ namespace Persistence.Features.User.Scripts
             }
 
             _userData = userResult.Value;
-            _storageService.Save(_userData);
+            _saveLoadService.Save(_userData);
         }
     }
 }

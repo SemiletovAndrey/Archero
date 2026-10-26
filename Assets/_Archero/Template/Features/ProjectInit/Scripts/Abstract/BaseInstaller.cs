@@ -61,11 +61,10 @@ namespace Template.Features.ProjectInit
                 feature = _monoBehaviourFeatures.OfType<T>().FirstOrDefault();
 
                 if (feature is null)
-                {
                     throw new Exception($"There is no monoBehaviour feature of type {typeof(T)}");
-                }
 
-                Container.Inject(feature);
+                if ((object)feature is BaseMonoBehaviourFeature monoFeature)
+                    monoFeature.SetContainer(Container);
             }
             else
             {

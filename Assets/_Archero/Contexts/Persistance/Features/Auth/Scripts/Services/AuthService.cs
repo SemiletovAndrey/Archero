@@ -12,17 +12,15 @@ namespace Persistence.Features.Auth
     public class AuthService : IAuthService
     {
         private readonly IAuthProvider _authProvider;
-        private readonly IDataStorageService _storageService;
         
         public event Action<UserData> LoggedIn;
         public event Action LogOutUser;
 
         public IModifierCollection<UserData> UserLoggedIn { get; }
         
-        public AuthService(IAuthProvider authProvider, IDataStorageService storageService)
+        public AuthService(IAuthProvider authProvider)
         {
             _authProvider = authProvider;
-            _storageService = storageService;
         }
 
         public async UniTask InitAsync()

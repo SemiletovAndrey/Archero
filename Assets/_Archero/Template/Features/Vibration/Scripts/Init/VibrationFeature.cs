@@ -11,10 +11,9 @@ namespace Template.Features.Vibration
             BindAsSingle<IVibrationSystem, VibrationSystem>();
         }
 
-        protected override UniTask InitServices()
+        protected override async UniTask InitServices()
         {
-            ResolveAs<IVibrationService, VibrationService>().Init();
-            return UniTask.CompletedTask;
+            await ResolveAs<IVibrationService, VibrationService>().InitAsync();
         }
 
         protected override UniTask InitSystems()

@@ -6,7 +6,7 @@ using UnityEngine.Localization.Settings;
 namespace Template.Features.Localization
 {
     [FormerName("Data-LocalizationUserModel")]
-    public class LocalizationUserData: BaseUserData
+    public class LocalizationUserData: ISaveData
     {
         public string SelectedLocaleCode { get; set; }
         

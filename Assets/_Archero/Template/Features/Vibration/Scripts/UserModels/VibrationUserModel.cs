@@ -2,7 +2,7 @@
 
 namespace Template.Features.Vibration
 {
-    public class VibrationUserModel : BaseUserData
+    public class VibrationUserModel : ISaveData
     {
         public bool Enabled { get; set; } = true;
     }

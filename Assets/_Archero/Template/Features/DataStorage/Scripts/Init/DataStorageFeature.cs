@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using Template.Features.ProjectInit;
+﻿using Template.Features.ProjectInit;
 
 namespace Template.Features.DataStorage
 {
@@ -7,13 +6,11 @@ namespace Template.Features.DataStorage
     {
         protected override void InstallBindings()
         {
-            BindAsSingle<IDataStorageService, DataStorageService>();
-        }
-        
-        protected override UniTask InitServices()
-        { 
-            ResolveAs<IDataStorageService, DataStorageService>().Init();
-            return UniTask.CompletedTask;
+            BindAsSingle<IDataKeyStorage, MapDataKeyStorage>();
+            BindAsSingle<IDataSerializer, JsonSerializer>();
+            BindAsSingle<IDataRepository, LocalFileDataRepository>().WithArguments(DataStorageConstants.FolderPath,
+                DataStorageConstants.SaveFileExtension);
+            BindAsSingle<ISaveLoadService, SaveLoadService>();
         }
     }
 }

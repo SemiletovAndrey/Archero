@@ -9,12 +9,6 @@ namespace Template.Features.ProjectInit
     public abstract class BaseMonoBehaviourFeature : MonoBehaviour, IInitializableFeature
     {
         private IClassFactory _classFactory;
-        
-        [Inject]
-        private void Construct(DiContainer container)
-        {
-            Container = container;
-        }
 
         protected DiContainer Container { get; private set; }
         public virtual string FeatureName => GetType().Name;
@@ -27,6 +21,11 @@ namespace Template.Features.ProjectInit
             features.AddLast(this);
             
             return features;
+        }
+        
+        public void SetContainer(DiContainer container)
+        {
+            Container = container;
         }
 
         public void Install()

@@ -2,6 +2,7 @@ using System;
 
 namespace Template.Features.DataStorage
 {
+    [Obsolete("Use ISaveLoadService instead.")]
     public interface IDataStorageService
     {
         public void Save(BaseUserData userData);

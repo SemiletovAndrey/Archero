@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine.Localization;
 
 namespace Template.Features.Localization
@@ -11,6 +12,6 @@ namespace Template.Features.Localization
         public event Action LocaleChanged;
 
         public Locale GetSelectedLocale();
-        public void SetLocale(Locale locale);
+        public UniTask SetLocale(Locale locale);
     }
 }

@@ -4,28 +4,27 @@ using Cysharp.Threading.Tasks;
 using Template.Features.DataStorage;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Template.Features.Localization
 {
     public class LocalizationService : ILocalizationService
     {
-        private readonly IDataStorageService _storageService;
+        private readonly ISaveLoadService _saveLoadService;
 
         private LocalizationUserData userData;
 
         public event Action LocaleChanged;
 
-        public LocalizationService(IDataStorageService storageService)
+        public LocalizationService(ISaveLoadService saveLoadService)
         {
-            _storageService = storageService;
+            _saveLoadService = saveLoadService;
         }
 
         public async Task InitAsync()
         {
             await InitializeLocalization();
 
-            userData = _storageService.LoadOrCreate(() => new LocalizationUserData());
+            await LoadOrCreateLocalizationUserData();
 
             Locale locale = GetLocaleByCode(userData.SelectedLocaleCode);
 
@@ -35,7 +34,7 @@ namespace Template.Features.Localization
             }
         }
 
-        public void SetLocale(Locale locale)
+        public async UniTask SetLocale(Locale locale)
         {
             if (locale == null)
             {
@@ -49,7 +48,7 @@ namespace Template.Features.Localization
 
             LocalizationSettings.SelectedLocale = locale;
 
-            SaveLocale(locale.Identifier.Code);
+            await SaveLocale(locale.Identifier.Code);
 
             LocaleChanged?.Invoke();
         }
@@ -59,15 +58,28 @@ namespace Template.Features.Localization
             return LocalizationSettings.SelectedLocale;
         }
 
-        private void SaveLocale(string localeCode)
+        private async UniTask SaveLocale(string localeCode)
         {
             if (userData == null)
             {
-                userData = _storageService.LoadOrCreate(() => new LocalizationUserData());
+                await LoadOrCreateLocalizationUserData();
             }
 
             userData.SelectedLocaleCode = localeCode;
-            _storageService.Save(userData);
+            _saveLoadService.Save(userData);
+        }
+        
+        private async UniTask LoadOrCreateLocalizationUserData()
+        {
+            var (sucess, data) = await _saveLoadService.TryLoad<LocalizationUserData>();
+            if (sucess)
+            {
+                userData = data;
+            }
+            else
+            {
+                userData = new LocalizationUserData();
+            }
         }
 
         private Locale GetLocaleByCode(string localeCode)

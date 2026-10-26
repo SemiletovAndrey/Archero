@@ -18,7 +18,7 @@ namespace Template.PlatformUtils
         private Texture2D sceneIcon;
         private Texture2D playIcon;
 
-        [MenuItem("BG Games Platform/Scene Switcher")]
+        [MenuItem("Tools/Scene Switcher")]
         public static void ShowWindow()
         {
             GetWindow<SceneSwitcher>("Scene Switcher");

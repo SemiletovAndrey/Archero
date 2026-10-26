@@ -2,7 +2,7 @@
 
 namespace Persistence.Features.Auth
 {
-    public class UserData : BaseUserData
+    public class UserData : ISaveData
     {
         public string FirebaseUid { get; set; }
         public string Username { get; set; }

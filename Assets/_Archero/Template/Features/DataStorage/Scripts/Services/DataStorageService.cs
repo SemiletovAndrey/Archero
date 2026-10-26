@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Template.Features.DataStorage
 {
+    [Obsolete("Use SaveLoadService instead.")]
     public class DataStorageService : IDataStorageService
     {
         public void Init()

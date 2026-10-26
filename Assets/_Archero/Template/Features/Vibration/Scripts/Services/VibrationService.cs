@@ -1,20 +1,21 @@
-﻿using Template.Features.DataStorage;
+﻿using Cysharp.Threading.Tasks;
+using Template.Features.DataStorage;
 
 namespace Template.Features.Vibration
 {
     public class VibrationService : IVibrationService
     {
-        private IDataStorageService _dataStorageService;
+        private ISaveLoadService _saveLoadService;
         private VibrationUserModel _userModel;
         
-        public VibrationService(IDataStorageService dataStorageService)
+        public VibrationService(ISaveLoadService saveLoadService)
         {
-            _dataStorageService = dataStorageService;
+            _saveLoadService = saveLoadService;
         }
 
-        public void Init()
+        public async UniTask InitAsync()
         {
-            _userModel = _dataStorageService.LoadOrDefault<VibrationUserModel>();
+            _userModel = await _saveLoadService.LoadOrDefault<VibrationUserModel>();
         }
 
         public bool Enabled()
@@ -25,7 +26,7 @@ namespace Template.Features.Vibration
         public void SetEnable(bool enable)
         {
             _userModel.Enabled = enable;
-            _dataStorageService.Save(_userModel);
+            _saveLoadService.Save(_userModel);
         }
     }
 }

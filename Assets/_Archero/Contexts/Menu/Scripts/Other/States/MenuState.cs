@@ -1,10 +1,14 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
+using Persistance.Features.User.Features.JsonUser;
+using Persistance.Features.Wallet;
+using Template.Features.DataStorage;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.NewInputFeature;
 using Template.Features.NewInputFeature.Scripts.Example;
 using Template.Features.SceneLoader;
 using Template.Features.UILoader;
+using UnityEngine;
 
 namespace Template.Features.GameStateMachine
 {
@@ -16,17 +20,19 @@ namespace Template.Features.GameStateMachine
         private readonly IFeatureInitializer _featureInitializer;
         private readonly IInputProviderManager _inputProviderManager;
         private readonly ILoadingSystem _loadingSystem;
+        private readonly IDataProvider<PlayerData> _playerDataProvider;
 
         private LoadedScene _scene;
 
         public MenuState(
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager, ILoadingSystem loadingSystem)
+            IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager, ILoadingSystem loadingSystem, IDataProvider<PlayerData> playerDataProvider)
         {
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
             _inputProviderManager = inputProviderManager;
             _loadingSystem = loadingSystem;
+            _playerDataProvider = playerDataProvider;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
@@ -36,6 +42,18 @@ namespace Template.Features.GameStateMachine
             await LoadScene(lifetime);
 
             HandleInputProvider();
+
+            bool isPlayerDataSaveExists = await _playerDataProvider.Exists();
+
+            if (isPlayerDataSaveExists)
+            {
+                await _playerDataProvider.TryLoad();
+                Debug.Log($"Player data already used {_playerDataProvider.Data.WalletData[CurrencyTypes.Diamond]}");
+            }
+            else
+            {
+                _playerDataProvider.Reset();
+            }
             
             await _loadingSystem.Hide();
         }
