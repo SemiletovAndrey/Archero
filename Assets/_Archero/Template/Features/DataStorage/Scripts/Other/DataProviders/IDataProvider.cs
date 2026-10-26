@@ -8,10 +8,14 @@ namespace Template.Features.DataStorage
         public UniTask Save();
         public UniTask Reset();
         public UniTask<bool> Exists();
+        
     }
 
-    public interface IDataProvider<out TData> : IDataProvider where TData : ISaveData
+    public interface IDataProvider<TData> : IDataProvider where TData : ISaveData
     {
         public TData Data { get; }
+        
+        public void RegisterWriter(IDataWriter<TData> writer);
+        public void RegisterReader(IDataReader<TData> reader);
     }
 }

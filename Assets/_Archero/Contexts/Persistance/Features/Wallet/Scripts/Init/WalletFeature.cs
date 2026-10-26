@@ -7,7 +7,7 @@ namespace Persistance.Features.Wallet
     {
         protected override void InstallBindings()
         {
-            BindAsSingle<IWalletService, WalletService>();
+            BindAsSingle<IWalletService, WalletService>().NonLazy();
         }
     }
 }

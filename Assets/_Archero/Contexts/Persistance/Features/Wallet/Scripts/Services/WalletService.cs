@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Contexts.Scripts.Utilities.Reactive;
+using Persistance.Features.User.Features.JsonUser;
+using Template.Features.DataStorage;
 
 namespace Persistance.Features.Wallet
 {
@@ -9,9 +11,10 @@ namespace Persistance.Features.Wallet
     {
         private readonly Dictionary<CurrencyTypes, ReactiveVariable<int>> _currencies;
 
-        public WalletService()
+        public WalletService(IDataProvider<PlayerData> playerDataProvider)
         {
-            Dictionary<CurrencyTypes, ReactiveVariable<int>>  currencies = new Dictionary<CurrencyTypes, ReactiveVariable<int>>();
+            Dictionary<CurrencyTypes, ReactiveVariable<int>> currencies =
+                new Dictionary<CurrencyTypes, ReactiveVariable<int>>();
 
             foreach (CurrencyTypes currencyTypes in Enum.GetValues(typeof(CurrencyTypes)))
             {
@@ -19,17 +22,20 @@ namespace Persistance.Features.Wallet
             }
 
             _currencies = currencies;
+
+            playerDataProvider.RegisterWriter(this);
+            playerDataProvider.RegisterReader(this);
         }
 
         public List<CurrencyTypes> AvailableCurrencies => _currencies.Keys.ToList();
-        
+
         public IReadOnlyVariable<int> GetCurrency(CurrencyTypes type) => _currencies[type];
 
         public bool EnoughCurrency(CurrencyTypes type, int amount)
         {
-            if(amount < 0)
+            if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            
+
             return _currencies[type].Value >= amount;
         }
 
@@ -37,19 +43,49 @@ namespace Persistance.Features.Wallet
         {
             if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            
+
             _currencies[type].Value += amount;
         }
-        
+
         public void SpendCurrency(CurrencyTypes type, int amount)
         {
             if (EnoughCurrency(type, amount))
                 throw new InvalidOperationException($"Not enough: {type.ToString()}");
-            
-            if(amount < 0)
+
+            if (amount < 0)
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            
+
             _currencies[type].Value -= amount;
+        }
+
+        public void ReadFrom(PlayerData data)
+        {
+            foreach (var currency in data.WalletData)
+            {
+                if (_currencies.ContainsKey(currency.Key))
+                {
+                    _currencies[currency.Key].Value = currency.Value;
+                }
+                else
+                {
+                    _currencies.Add(currency.Key, new ReactiveVariable<int>(currency.Value));
+                }
+            }
+        }
+
+        public void WriteTo(PlayerData data)
+        {
+            foreach (var currency in _currencies)
+            {
+                if (_currencies.ContainsKey(currency.Key))
+                {
+                    data.WalletData[currency.Key] = currency.Value.Value;
+                }
+                else
+                {
+                    data.WalletData.Add(currency.Key, currency.Value.Value);
+                }
+            }
         }
     }
 }

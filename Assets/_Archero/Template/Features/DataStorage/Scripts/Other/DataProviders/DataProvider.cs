@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using UnityEditor.Localization.Plugins.XLIFF.V20;
 
 namespace Template.Features.DataStorage
 {

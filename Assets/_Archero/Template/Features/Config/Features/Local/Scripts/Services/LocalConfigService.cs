@@ -32,7 +32,6 @@ namespace Template.Features.Config.Local
         
         public void RemoveProvider(ILocalConfigProvider provider)
         {
-            
             _sources.Remove(provider);
         }
     }
