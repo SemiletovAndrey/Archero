@@ -1,11 +1,10 @@
 ﻿using System.Threading;
-using Contexts.Persistence.Features.AuthProvider;
+using Persistence.Features.AuthProvider;
 using Cysharp.Threading.Tasks;
 using Persistence.Features.Auth;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.SceneLoader;
 using Template.Features.UILoader;
-using UnityEngine;
 
 namespace Template.Features.GameStateMachine
 {
@@ -39,6 +38,7 @@ namespace Template.Features.GameStateMachine
 
         public async UniTask Enter(CancellationToken lifetime)
         {
+            _authService.LogOut();
             if (!_authProvider.IsFirebaseInitialized)
                 await _authProvider.InitAsync().AttachExternalCancellation(lifetime);
 

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Template.Scripts.Views
+namespace Template.Features.UIExtensions
 {
     public class UIButton : MonoBehaviour
     {

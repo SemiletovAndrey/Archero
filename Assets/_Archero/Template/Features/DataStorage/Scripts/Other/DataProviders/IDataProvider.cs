@@ -17,5 +17,7 @@ namespace Template.Features.DataStorage
         
         public void RegisterWriter(IDataWriter<TData> writer);
         public void RegisterReader(IDataReader<TData> reader);
+        public void UnRegisterWriter(IDataWriter<TData> writer);
+        public void UnRegisterReader(IDataReader<TData> reader);
     }
 }

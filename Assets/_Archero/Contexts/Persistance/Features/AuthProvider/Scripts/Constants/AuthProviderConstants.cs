@@ -1,4 +1,4 @@
-﻿namespace Contexts.Persistence.Features.AuthProvider
+﻿namespace Persistence.Features.AuthProvider
 {
     public static class AuthProviderConstants
     {

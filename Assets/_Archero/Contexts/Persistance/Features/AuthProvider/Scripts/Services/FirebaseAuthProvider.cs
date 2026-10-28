@@ -10,7 +10,7 @@ using Template.Features.Firebase.Services;
 using Template.Scripts.DataHolders;
 using UnityEngine;
 
-namespace Contexts.Persistence.Features.AuthProvider
+namespace Persistence.Features.AuthProvider
 {
     public class FirebaseAuthProvider : IAuthProvider
     {

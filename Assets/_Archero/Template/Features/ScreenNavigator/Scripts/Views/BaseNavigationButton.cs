@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using Template.Scripts.Views;
+using Template.Features.UIExtensions;
 using Zenject;
 
 namespace Template.Features.ScreenNavigator

@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Net.Mail;
 using Cysharp.Threading.Tasks;
+using Persistance.Features.Auth;
 using Template.Features.ScreenNavigator;
-using Template.Scripts.DataHolders;
-using Template.Scripts.Views;
-using Template.Utilities.Primitives;
+using Template.Features.UIExtensions;
 using TMPro;
 using UnityEngine;
-using Zenject;
 
 namespace Persistence.Features.Auth
 {
-    public class SignInScreenView : ActivatableScreen<SignInScreenPayload>
+    public class SignInScreenView : ActivatableScreen<SignInScreenPayload>, ISignInView
     {
         [Header("Sign In Container")] [SerializeField]
         private GameObject _signInContainer;
@@ -33,51 +30,83 @@ namespace Persistence.Features.Auth
         [SerializeField] private GameObject _errorRegisterContainer;
         [SerializeField] private TextMeshProUGUI _errorRegisterText;
 
-        private IAuthService _authService;
+        public event Action<LoginForm> LoginSubmitted;
+        public event Action<RegisterForm> RegisterSubmitted;
 
-        [Inject]
-        private void Construct(IAuthService authService)
+        public override UniTask Activate(SignInScreenPayload data)
         {
-            _authService = authService;
+            _loginButton.AssignAction(OnLoginClicked);
+            _registerButton.AssignAction(OnRegisterClicked);
+            return UniTask.CompletedTask;
         }
-
-        public override async UniTask Activate(SignInScreenPayload data)
-        {
-            ClearAllFields();
-            ClearAllErrors();
-            ShowLoginContainer();
-            SubscribeButtons();
-            await UniTask.CompletedTask;
-        }
-
-        public override async UniTask Open(NavigationItemOpenPayload payload)
-        {
-            await UniTask.CompletedTask;
-        }
-
-        public override async UniTask Close(NavigationItemClosePayload payload)
-        {
-            await UniTask.CompletedTask;
-        }
-
+        
         public void OnSwitchToRegisterClicked()
         {
             ClearAllFields();
-            ClearAllErrors();
+            ClearErrors();
             ShowRegistrationContainer();
         }
 
         public void OnBackToLoginClicked()
         {
             ClearAllFields();
-            ClearAllErrors();
+            ClearErrors();
             ShowLoginContainer();
         }
 
-        private void SubscribeButtons()
+        #region ISignInView
+
+        public void Reset()
         {
-            _loginButton.AssignAction(OnLoginClicked);
-            _registerButton.AssignAction(OnRegisterClicked);
+            ClearAllFields();
+            ClearErrors();
+            ShowLoginContainer();
+        }
+
+        public void ClearErrors()
+        {
+            _errorLoginContainer.SetActive(false);
+            _errorRegisterContainer.SetActive(false);
+            _errorLoginText.text = "";
+            _errorRegisterText.text = "";
+        }
+
+        public void ShowError(AuthForm form, string message)
+        {
+            if (form == AuthForm.Login)
+            {
+                _errorLoginContainer.SetActive(true);
+                _errorLoginText.text = message;
+            }
+            else
+            {
+                _errorRegisterContainer.SetActive(true);
+                _errorRegisterText.text = message;
+            }
+        }
+
+        public void SetBusy(AuthForm form, bool busy)
+        {
+            UIButton button = form == AuthForm.Login ? _loginButton : _registerButton;
+            button.SetAvailability(!busy);
+        }
+
+        #endregion
+
+        private void OnLoginClicked()
+        {
+            LoginSubmitted?.Invoke(new LoginForm(
+                _loginEmailInputField.text.Trim(),
+                _loginPasswordInputField.text));
+        }
+
+        private void OnRegisterClicked()
+        {
+            RegisterSubmitted?.Invoke(new RegisterForm(
+                _registerEmailInputField.text.Trim(),
+                _registerPasswordInputField.text,
+                _registerConfirmPasswordInputField.text,
+                _registerAgeInputField.text));
         }
 
         private void ShowLoginContainer()
@@ -99,234 +128,7 @@ namespace Persistence.Features.Auth
             _registerEmailInputField.text = "";
             _registerPasswordInputField.text = "";
             _registerConfirmPasswordInputField.text = "";
-        }
-
-        private void ClearAllErrors()
-        {
-            _errorLoginContainer.SetActive(false);
-            _errorRegisterContainer.SetActive(false);
-            _errorLoginText.text = "";
-            _errorRegisterText.text = "";
-        }
-
-        #region Validation
-
-        private bool ValidateEmail(string email, out string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                errorMessage = "Enter email";
-                return false;
-            }
-
-            try
-            {
-                var addr = new MailAddress(email);
-                if (addr.Address == email)
-                {
-                    errorMessage = null;
-                    return true;
-                }
-            }
-            catch
-            {
-                /* fall through */
-            }
-
-            errorMessage = "Incorrect email";
-            return false;
-        }
-
-        private bool ValidatePassword(string password, out string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                errorMessage = "Enter password";
-                return false;
-            }
-
-
-            if (password.Length < Password.MinLength)
-            {
-                errorMessage = "Password must contain at least 6 characters";
-                return false;
-            }
-
-            errorMessage = null;
-            return true;
-        }
-
-        private bool ValidateConfirmPassword(string password, string confirmPassword, out string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(confirmPassword))
-            {
-                errorMessage = "Confirm password";
-                return false;
-            }
-
-            if (password != confirmPassword)
-            {
-                errorMessage = "Differently password";
-                return false;
-            }
-
-            errorMessage = null;
-            return true;
-        }
-
-        #endregion
-
-        #region Button Handlers
-
-        private async void OnLoginClicked()
-        {
-            ClearAllErrors();
-
-            string email = _loginEmailInputField.text.Trim();
-            string password = _loginPasswordInputField.text;
-
-            if (!ValidateEmail(email, out string emailError))
-            {
-                _errorLoginContainer.SetActive(true);
-                _errorLoginText.text = emailError;
-                return;
-            }
-
-            if (!ValidatePassword(password, out string passwordError))
-            {
-                _errorLoginContainer.SetActive(true);
-                _errorLoginText.text = passwordError;
-                return;
-            }
-
-            SetLoginInteractable(false);
-
-            try
-            {
-                Result loginResult =
-                    await _authService.SignInEmailAsync(Email.Create(email).Value, Password.Create(password).Value);
-                if (loginResult.IsFailure)
-                {
-                    _errorLoginContainer.SetActive(true);
-                    Debug.LogError(loginResult.Error);
-                    _errorLoginText.text = loginResult.Error.Message;
-                }
-                else
-                {
-                    Debug.Log("Login successful");
-                    
-                }
-            }
-            catch (Exception e)
-            {
-                _errorLoginContainer.SetActive(true);
-                _errorLoginText.text = "Error connection";
-                Debug.LogError(e);
-            }
-            finally
-            {
-                SetLoginInteractable(true);
-            }
-        }
-
-        private async void OnRegisterClicked()
-        {
-            ClearAllErrors();
-
-            string email = _registerEmailInputField.text.Trim();
-            string password = _registerPasswordInputField.text;
-            string confirmPassword = _registerConfirmPasswordInputField.text;
-            string userName = email;
-
-            if (!ValidateEmail(email, out string emailError))
-            {
-                _errorRegisterContainer.SetActive(true);
-                _errorRegisterText.text = emailError;
-                return;
-            }
-
-            if (!ValidatePassword(password, out string passwordError))
-            {
-                _errorRegisterContainer.SetActive(true);
-                _errorRegisterText.text = passwordError;
-                return;
-            }
-
-            if (!ValidateConfirmPassword(password, confirmPassword, out string confirmError))
-            {
-                _errorRegisterContainer.SetActive(true);
-                _errorRegisterText.text = confirmError;
-                return;
-            }
-
-            if (!ValidateAge(_registerAgeInputField.text, out int age, out string ageError))
-            {
-                _errorRegisterContainer.SetActive(true);
-                _errorRegisterText.text = ageError;
-                return;
-            }
-
-            SetRegisterInteractable(false);
-
-            try
-            {
-                Result registerResult = await _authService.RegisterEmailAsync(Email.Create(email).Value,
-                    UserName.Create(userName).Value,
-                    Password.Create(password).Value,
-                    age);
-
-                if (registerResult.IsFailure)
-                {
-                    _errorRegisterContainer.SetActive(true);
-                    _errorRegisterText.text = registerResult.Error.Message;
-                }
-                else
-                {
-                    Debug.Log("Registration successful");
-                    //TODO: Registration complete
-                }
-            }
-            catch (Exception e)
-            {
-                _errorRegisterContainer.SetActive(true);
-                _errorRegisterText.text = "Error connection";
-                Debug.LogError(e);
-            }
-            finally
-            {
-                SetRegisterInteractable(true);
-            }
-        }
-
-        #endregion
-
-        private void SetLoginInteractable(bool interactable)
-        {
-            _loginButton.SetAvailability(interactable);
-        }
-
-        private void SetRegisterInteractable(bool interactable)
-        {
-            _registerButton.SetAvailability(interactable);
-        }
-
-        private bool ValidateAge(string ageText, out int age, out string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(ageText) || !int.TryParse(ageText, out age))
-            {
-                errorMessage = "Enter a valid age";
-                age = 0;
-                return false;
-            }
-
-            if (age < 13 || age > 120)
-            {
-                errorMessage = "Incorrect age";
-                return false;
-            }
-
-            errorMessage = null;
-            return true;
+            _registerAgeInputField.text = "";
         }
     }
 }

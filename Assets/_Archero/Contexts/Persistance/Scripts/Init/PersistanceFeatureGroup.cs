@@ -1,4 +1,4 @@
-﻿using Contexts.Persistence.Features.AuthProvider;
+﻿using Persistence.Features.AuthProvider;
 using Persistance.Features.User.Features.JsonUser;
 using Persistance.Features.Wallet;
 using Persistence.Features.Auth;

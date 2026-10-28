@@ -1,8 +1,6 @@
 ﻿using System;
-using Contexts.Persistence.Features.AuthProvider;
 using Cysharp.Threading.Tasks;
-using Persistence.Features.User.Scripts;
-using Template.Features.DataStorage;
+using Persistence.Features.AuthProvider;
 using Template.Scripts.DataHolders;
 using Template.Utilities.Primitives;
 using UnityEngine;
@@ -51,7 +49,9 @@ namespace Persistence.Features.Auth
                     "Profile is not found."));
             }*/
 
-            Result<UserData> userResult = null;//await _userService.GetUser(userId, true);
+            UserData mock = new UserData();
+            Error error = Error.None;
+            Result<UserData> userResult = new Result<UserData>(mock,true, error);//await _userService.GetUser(userId, true);
             if (userResult.IsFailure)
                 return Result.Failure(userResult.Error);
 

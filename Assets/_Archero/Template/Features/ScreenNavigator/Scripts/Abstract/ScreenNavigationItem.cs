@@ -28,6 +28,11 @@ namespace Template.Features.ScreenNavigator
         }
 
         protected ActivatableScreen<TPayload> Screen => _screen;
+        
+        protected virtual UniTask OnScreenActivated(ActivatableScreen<TPayload> screen, TPayload data)
+            => UniTask.CompletedTask;
+
+        protected virtual void OnScreenReleasing(ActivatableScreen<TPayload> screen) { }
 
         protected virtual ScreenType ResolveScreenType()
         {
@@ -43,6 +48,7 @@ namespace Template.Features.ScreenNavigator
             {
                 _screenActivated = true;
                 await _screen.Activate(data);
+                await OnScreenActivated(_screen, data);
             }
 
             await base.Activate(data);
@@ -61,6 +67,7 @@ namespace Template.Features.ScreenNavigator
 
                 _screenActivated = true;
                 await _screen.Activate(_payload);
+                await OnScreenActivated(_screen, _payload);
             }
 
             _screen.SetVisible(true);
@@ -82,6 +89,7 @@ namespace Template.Features.ScreenNavigator
             }
             finally
             {
+                OnScreenReleasing(screen); 
                 screen.SetVisible(false);
                 _screenFactory.Release(screen);
             }

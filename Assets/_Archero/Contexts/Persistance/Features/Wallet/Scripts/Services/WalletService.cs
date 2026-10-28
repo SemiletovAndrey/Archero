@@ -7,9 +7,10 @@ using Template.Features.DataStorage;
 
 namespace Persistance.Features.Wallet
 {
-    public class WalletService : IWalletService
+    public class WalletService : IWalletService, IDisposable
     {
         private readonly Dictionary<CurrencyTypes, ReactiveVariable<int>> _currencies;
+        private IDataProvider<PlayerData> _playerDataProvider;
 
         public WalletService(IDataProvider<PlayerData> playerDataProvider)
         {
@@ -23,8 +24,19 @@ namespace Persistance.Features.Wallet
 
             _currencies = currencies;
 
-            playerDataProvider.RegisterWriter(this);
-            playerDataProvider.RegisterReader(this);
+            _playerDataProvider = playerDataProvider;
+        }
+
+        public void Init()
+        {
+            _playerDataProvider.RegisterWriter(this);
+            _playerDataProvider.RegisterReader(this);
+        }
+
+        public void Dispose()
+        {
+            _playerDataProvider.UnRegisterWriter(this);
+            _playerDataProvider.UnRegisterReader(this);
         }
 
         public List<CurrencyTypes> AvailableCurrencies => _currencies.Keys.ToList();

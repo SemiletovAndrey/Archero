@@ -1,11 +1,11 @@
-﻿using Contexts.Persistence.Features.Auth;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
+using Persistence.Features.Auth;
 using Template.Scripts.DataHolders;
 using UnityEngine;
 
-namespace Contexts.Persistence.Features.AuthProvider
+namespace Persistence.Features.AuthProvider
 {
     public class EmailRegisterComponent : BaseRegisterComponentT<EmailRegisterComponentData>
     {

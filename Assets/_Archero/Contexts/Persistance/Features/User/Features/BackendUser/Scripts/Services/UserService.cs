@@ -1,4 +1,4 @@
-using Contexts.Persistence.Features.AuthProvider;
+using Persistence.Features.AuthProvider;
 using Cysharp.Threading.Tasks;
 using Persistence.Features.Auth;
 using Template.Features.DataStorage;

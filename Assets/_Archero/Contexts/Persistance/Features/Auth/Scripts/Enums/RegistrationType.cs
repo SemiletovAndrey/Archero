@@ -1,4 +1,4 @@
-﻿namespace Contexts.Persistence.Features.Auth
+﻿namespace Persistence.Features.Auth
 {
     public enum RegistrationType
     {

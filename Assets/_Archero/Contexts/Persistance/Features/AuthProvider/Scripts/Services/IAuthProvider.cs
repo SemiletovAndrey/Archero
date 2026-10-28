@@ -2,7 +2,7 @@
 using Firebase.Auth;
 using Template.Scripts.DataHolders;
 
-namespace Contexts.Persistence.Features.AuthProvider
+namespace Persistence.Features.AuthProvider
 {
     public interface IAuthProvider
     {

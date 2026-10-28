@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Template.Features.ProjectInit;
 
-namespace Contexts.Persistence.Features.AuthProvider
+namespace Persistence.Features.AuthProvider
 {
     public class AuthProviderFeature : BaseFeature
     {

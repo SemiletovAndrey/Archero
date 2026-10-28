@@ -1,6 +1,6 @@
-﻿using Contexts.Persistence.Features.Auth;
+﻿using Persistence.Features.Auth;
 
-namespace Contexts.Persistence.Features.AuthProvider
+namespace Persistence.Features.AuthProvider
 {
     public class RegistrationUserModel
     {

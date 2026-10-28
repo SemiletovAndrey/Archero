@@ -2,7 +2,7 @@
 using Template.Scripts.DataHolders;
 using Zenject;
 
-namespace Contexts.Persistence.Features.AuthProvider
+namespace Persistence.Features.AuthProvider
 {
     public abstract class BaseRegisterComponentT<TData> : BaseRegisterComponent
         where TData : RegisterComponentData

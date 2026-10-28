@@ -33,6 +33,18 @@ namespace Template.Features.DataStorage
             
             _readers.Add(reader);
         }
+        
+        public void UnRegisterWriter(IDataWriter<TData> writer)
+        {
+            if (_writers.Contains(writer))
+                _writers.Remove(writer);
+        }
+        
+        public void UnRegisterReader(IDataReader<TData> reader)
+        {
+            if (_readers.Contains(reader))
+                _readers.Remove(reader);
+        }
 
         public async UniTask<bool> TryLoad()
         {
