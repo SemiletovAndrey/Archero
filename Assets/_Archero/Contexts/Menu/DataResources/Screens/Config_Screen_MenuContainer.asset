@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Template.Features.ScreenNavigator.ScreenConfig
   AddressableEntries:
   - Type: 2
-    Pooled: 1
+    Pooled: 0
     Prefab:
       m_AssetGUID: a946e62d78c50f2419de6545f8d550fb
       m_SubObjectName: 
@@ -23,7 +23,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 0
     KeepLoaded: 0
   - Type: 3
-    Pooled: 1
+    Pooled: 0
     Prefab:
       m_AssetGUID: 6fc68b38ec12cb14aa531668f0974c4f
       m_SubObjectName: 
