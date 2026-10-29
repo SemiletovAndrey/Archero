@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -63,8 +62,10 @@ namespace Template.Features.ScreenNavigator
             List<BaseNavigationItem> closing = new(_currentPath.Count - common);
             for (int i = _currentPath.Count - 1; i >= common; i--)
                 closing.Add(_currentPath[i]);
-
+            
             List<BaseNavigationItem> opening = target.GetRange(common, target.Count - common);
+
+            await PrepareOpening(opening, target[target.Count - 1], payload);
 
             bool openingStarted = false;
             try
@@ -97,12 +98,52 @@ namespace Template.Features.ScreenNavigator
                 if (openingStarted)
                     await RollbackOpened(opening);
 
+                AbortPrepared(opening);
+                
                 RaisePathChanged();
                 throw;
             }
 
             RaisePathChanged();
         }
+        
+        private async UniTask PrepareOpening(
+            List<BaseNavigationItem> opening,
+            BaseNavigationItem targetItem,
+            BaseNavigationItemPayload payload)
+        {
+            try
+            {
+                foreach (BaseNavigationItem item in opening)
+                {
+                    if (item.IsPrepareBarrier)
+                        break;
+
+                    await item.Prepare(payload, ReferenceEquals(item, targetItem));
+                }
+            }
+            catch
+            {
+                AbortPrepared(opening);
+                throw;
+            }
+        }
+
+        private static void AbortPrepared(List<BaseNavigationItem> opening)
+        {
+            foreach (BaseNavigationItem item in opening)
+            {
+                try
+                {
+                    item.AbortPrepare();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
+        }
+
 
         private async UniTask RollbackOpened(List<BaseNavigationItem> opening)
         {

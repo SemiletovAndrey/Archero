@@ -5,7 +5,7 @@ namespace Template.Features.ScreenNavigator
 {
     public abstract class BaseNavigationItem
     {
-        protected List<BaseNavigationItem> InnerItems { get; set; } = new();
+                protected List<BaseNavigationItem> InnerItems { get; set; } = new();
 
         public IReadOnlyList<BaseNavigationItem> Children => InnerItems;
         
@@ -95,6 +95,18 @@ namespace Template.Features.ScreenNavigator
         {
             return UniTask.CompletedTask;
         }
+
+        internal virtual UniTask Prepare(BaseNavigationItemPayload payload, bool isTarget)
+        {
+            return UniTask.CompletedTask;
+        }
+
+        internal virtual void AbortPrepare()
+        {
+        }
+
+        // Элементы, которые нельзя готовить заранее (например, зависят от загрузки сцены).
+        internal virtual bool IsPrepareBarrier => false;
 
         private bool HasItem<TItem>() where TItem : BaseNavigationItem
         {

@@ -9,7 +9,7 @@ namespace Template.Features.ScreenNavigator
     public abstract class ScreenNavigationItem<TPayload> : BaseNavigationItem<TPayload>
         where TPayload : BaseNavigationItemPayload
     {
-        private IScreenFactory _screenFactory;
+                private IScreenFactory _screenFactory;
         private ILocalConfigService _configService;
 
         private ScreenEntryBase _entry;
@@ -17,6 +17,7 @@ namespace Template.Features.ScreenNavigator
 
         private ActivatableScreen<TPayload> _screen;
         private bool _screenActivated;
+        private bool _activatedInPrepare;
         
         private TPayload _payload;
 
@@ -34,6 +35,8 @@ namespace Template.Features.ScreenNavigator
 
         protected virtual void OnScreenReleasing(ActivatableScreen<TPayload> screen) { }
 
+        protected virtual bool WaitFrameBeforeReveal => true;
+
         protected virtual ScreenType ResolveScreenType()
         {
             ScreenTypeAttribute attribute = GetType().GetCustomAttribute<ScreenTypeAttribute>(inherit: false);
@@ -43,8 +46,12 @@ namespace Template.Features.ScreenNavigator
         public override async UniTask Activate(TPayload data)
         {
             _payload = data;
-            
-            if (await EnsureScreen())
+
+            if (_activatedInPrepare)
+            {
+                _activatedInPrepare = false;
+            }
+            else if (await EnsureScreen())
             {
                 _screenActivated = true;
                 await _screen.Activate(data);
@@ -52,6 +59,47 @@ namespace Template.Features.ScreenNavigator
             }
 
             await base.Activate(data);
+        }
+
+        internal override async UniTask Prepare(BaseNavigationItemPayload data, bool isTarget)
+        {
+            if (isTarget)
+            {
+                if (data is not TPayload typed)
+                    throw new InvalidCastException(
+                        $"{GetType().Name} expects payload {typeof(TPayload).Name}, " +
+                        $"got {(data == null ? "null" : data.GetType().Name)}.");
+
+                _payload = typed;
+            }
+
+            if (!await EnsureScreen())
+                return;
+
+            if (_screenActivated || _payload == null)
+                return;
+
+            _screenActivated = true;
+            _activatedInPrepare = isTarget;
+
+            await _screen.Activate(_payload);
+            await OnScreenActivated(_screen, _payload);
+
+            if (WaitFrameBeforeReveal)
+                await UniTask.NextFrame();
+        }
+
+        internal override void AbortPrepare()
+        {
+            if (_screen == null || IsActive)
+                return;
+
+            ActivatableScreen<TPayload> screen = _screen;
+            _screen = null;
+            _screenActivated = false;
+            _activatedInPrepare = false;
+
+            ReleaseScreen(screen);
         }
 
         protected override async UniTask OnOpen(NavigationItemOpenPayload payload)
@@ -89,10 +137,15 @@ namespace Template.Features.ScreenNavigator
             }
             finally
             {
-                OnScreenReleasing(screen); 
-                screen.SetVisible(false);
-                _screenFactory.Release(screen);
+                ReleaseScreen(screen);
             }
+        }
+
+        private void ReleaseScreen(ActivatableScreen<TPayload> screen)
+        {
+            OnScreenReleasing(screen);
+            screen.SetVisible(false);
+            _screenFactory.Release(screen);
         }
 
         private async UniTask<bool> EnsureScreen()
@@ -129,6 +182,7 @@ namespace Template.Features.ScreenNavigator
             _entryResolved = true;
             return entry;
         }
+
     }
 
     public abstract class ScreenNavigationItem : ScreenNavigationItem<EmptyNavigationItemPayload>

@@ -20,6 +20,8 @@ namespace Template.Features.ScreenNavigator
         public event Func<TPayload, UniTask> AfterSceneOpened;
         public event Action<TPayload> AfterSceneInitialized;
 
+        internal override bool IsPrepareBarrier => true;
+
         public override async UniTask MoveTo<TItem, TItemData>(TItemData data, NavigationItemOpenPayload payload)
         {
             TPayload scenePayload = GetType() == typeof(TItem) ? (TPayload)(object)data : null;
