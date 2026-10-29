@@ -1,9 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 
-namespace Template.Features.ScreenNavigator
+namespace Template.Features.Presenters
 {
-    public interface IScreenPresenter<in TPayload> : IDisposable
+    public interface IPresenter<in TPayload> : IDisposable
     {
         public UniTask Activate(TPayload payload);
     }

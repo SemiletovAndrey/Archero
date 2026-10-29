@@ -1,6 +1,8 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Template.Features.ClassFactory;
+using Template.Features.Presenters;
+using UnityEngine;
 using Zenject;
 
 namespace Template.Features.ScreenNavigator
@@ -9,26 +11,27 @@ namespace Template.Features.ScreenNavigator
         : ScreenNavigationItem<TPayload>
         where TPayload : BaseNavigationItemPayload
         where TView : class
-        where TPresenter : class, IScreenPresenter<TPayload>
+        where TPresenter : class, IPresenter<TPayload>
     {
-        private IClassFactory _classFactory;
-        private TPresenter _presenter;
+        private IPresenterFactory _presenterFactory;
+        private IPresenter<TPayload> _presenter;
 
         [Inject]
-        private void Construct(IClassFactory classFactory)
+        private void ConstructPresenter(IPresenterFactory presenterFactory)
         {
-            _classFactory = classFactory;
+            _presenterFactory = presenterFactory;
         }
 
         protected override async UniTask OnScreenActivated(ActivatableScreen<TPayload> screen, TPayload data)
         {
+            // Refresh вызывает Activate повторно на том же экране: презентер не пересоздаём
             if (_presenter == null)
             {
                 if (screen is not TView view)
                     throw new InvalidOperationException(
                         $"{screen.GetType().Name} must implement {typeof(TView).Name}.");
 
-                _presenter = _classFactory.Create<TPresenter>(new object[] { view });
+                _presenter = _presenterFactory.Create<TPresenter, TView>(view);
             }
 
             await _presenter.Activate(data);
@@ -36,8 +39,21 @@ namespace Template.Features.ScreenNavigator
 
         protected override void OnScreenReleasing(ActivatableScreen<TPayload> screen)
         {
-            _presenter?.Dispose();
+            if (_presenter == null)
+                return;
+
+            IPresenter<TPayload> presenter = _presenter;
             _presenter = null;
+
+            try
+            {
+                presenter.Dispose();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
+
     }
 }

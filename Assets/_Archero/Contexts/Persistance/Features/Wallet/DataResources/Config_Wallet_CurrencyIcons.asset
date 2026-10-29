@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d55c9d347ed249ee8efd2df42fba5422, type: 3}
   m_Name: Config_Wallet_CurrencyIcons
   m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.Wallet.CurrencyIconsConfig
-  _configs: []
+  _configs:
+  - <CurrencyType>k__BackingField: 1
+    <Sprite>k__BackingField: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  - <CurrencyType>k__BackingField: 2
+    <Sprite>k__BackingField: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}

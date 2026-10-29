@@ -38,7 +38,6 @@ namespace Template.Features.GameStateMachine
 
         public async UniTask Enter(CancellationToken lifetime)
         {
-            _authService.LogOut();
             if (!_authProvider.IsFirebaseInitialized)
                 await _authProvider.InitAsync().AttachExternalCancellation(lifetime);
 

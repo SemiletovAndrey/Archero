@@ -1,4 +1,5 @@
-﻿using Menu.Scripts.Navigation;
+﻿using Menu.Features.MainMenu;
+using Menu.Scripts.Navigation;
 using Template.Features.ClassFactory;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.ProjectInit;
@@ -22,6 +23,7 @@ namespace Menu.Scripts.Init
         protected override void AddFeatures()
         {
             AddFeature<MenuNavigationFeature>();
+            AddFeature<MainMenuFeature>();
         }
     }
 }

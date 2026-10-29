@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Template.Features.Presenters;
 using Template.Features.ProjectInit;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ namespace Template.Features.ScreenNavigator
 
             BindAsSingle<IScreenNavigator, ScreenNavigator>();
             BindAsSingle<IScreenFactory, AddressablesScreenFactory>();
+            BindAsSingle<IPresenterFactory, PresenterFactory>();
         }
 
         protected override UniTask InitServices()

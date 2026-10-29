@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using Persistence.Features.Auth;
-using Template.Features.ScreenNavigator;
+using Template.Features.Presenters;
 using Template.Scripts.DataHolders;
 using Template.Utilities.Primitives;
 using UnityEngine;
 
 namespace Persistance.Features.Auth
 {
-    public class SignInPresenter : IScreenPresenter<SignInScreenPayload>
+    public class SignInPresenter : IPresenter<SignInScreenPayload>
     {
         private readonly ISignInView _view;
         private readonly IAuthService _authService;
