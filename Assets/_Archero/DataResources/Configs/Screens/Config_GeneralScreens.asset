@@ -15,3 +15,4 @@ MonoBehaviour:
   ScreenConfigs:
   - {fileID: 11400000, guid: 7d9111610bbdc384d8515c365e1be9e9, type: 2}
   - {fileID: 11400000, guid: fdcbc6dfa2b9ceb41b9a34eea11deaef, type: 2}
+  - {fileID: 11400000, guid: d0cb1547628df6647aa932b6639547da, type: 2}

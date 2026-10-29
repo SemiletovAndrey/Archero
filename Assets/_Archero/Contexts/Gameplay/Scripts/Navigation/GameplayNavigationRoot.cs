@@ -1,4 +1,5 @@
-﻿using Template.Features.ScreenNavigator;
+﻿using Gameplay.Features.Hud;
+using Template.Features.ScreenNavigator;
 
 namespace Gameplay.Scripts
 {
@@ -6,7 +7,8 @@ namespace Gameplay.Scripts
     {
         protected override NavigationItemList AddInnerItems()
         {
-            return new NavigationItemList();
+            return new NavigationItemList()
+                .Add<HudItem>();
         }
     }
 }

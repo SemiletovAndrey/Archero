@@ -19,7 +19,7 @@ namespace Gameplay.Scripts
 
         protected override void AddFeatures()
         {
-            
+            AddFeature<GameplayNavigationFeature>();
         }
     }
 }

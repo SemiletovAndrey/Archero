@@ -5,5 +5,6 @@
         None = 0,
         SignInScreen = 1,
         Menu = 2,
+        Hud = 3,
     }
 }
