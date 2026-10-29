@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
+using Gameplay.Scripts;
 using Menu.Features.MainMenu.Scripts;
 using Template.Features.GameStateMachine;
 using Template.Features.ScreenNavigator;
-using UnityEngine;
 
 namespace Menu.Scripts
 {
@@ -20,12 +20,12 @@ namespace Menu.Scripts
 
         public UniTask ShowMainMenu(CancellationToken ct) =>
             _screenNavigator
-                .NavigateTo<MainMenuItem, MainMenuPayload>(new MainMenuPayload(OnPlay))
+                .NavigateTo<MainMenuItem, MainMenuScreenPayload>(new MainMenuScreenPayload(OnPlay))
                 .AttachExternalCancellation(ct);
 
         private void OnPlay()
         {
-            Debug.Log("OnPlay");
+            _stateMachine.Enter<GameplayState>();
         }
     }
 }

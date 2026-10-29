@@ -3,7 +3,7 @@
 namespace Menu.Features.MainMenu.Scripts
 {
     [ScreenType(ScreenType.Menu)]
-    public class MainMenuItem : PresentedScreenNavigationItem<MainMenuPayload, IMainMenuView, MainMenuPresenter>
+    public class MainMenuItem : PresentedScreenNavigationItem<MainMenuScreenPayload, IMainMenuView, MainMenuPresenter>
     {
         
     }

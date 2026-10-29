@@ -26,7 +26,10 @@ namespace Template.Features.Popups
         public UniTask Close(PopupType popupType);
         public UniTask Close<TPopup>() where TPopup : BasePopup;
         
+        public UniTask CloseAll(params PopupType[] except);
+        
         public UniTask Preload(PopupType popupType);
         public void Unload(PopupType popupType);
+        public void UnloadAll(params PopupType[] except);
     }
 }

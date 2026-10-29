@@ -1,11 +1,12 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Persistance.Features.User.Features.JsonUser;
 using Persistance.Features.Wallet;
 using Template.Features.DataStorage;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.NewInputFeature;
-using Template.Features.NewInputFeature.Scripts.Example;
+using Template.Features.Popups;
 using Template.Features.SceneLoader;
 using Template.Features.UILoader;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace Template.Features.GameStateMachine
 
         private readonly ISceneLoader _sceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
-        private readonly IInputProviderManager _inputProviderManager;
+        private readonly IPopupSystem _popupSystem;
         private readonly ILoadingSystem _loadingSystem;
         private readonly IDataProvider<PlayerData> _playerDataProvider;
 
@@ -26,13 +27,13 @@ namespace Template.Features.GameStateMachine
 
         public MenuState(
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer, IInputProviderManager inputProviderManager, ILoadingSystem loadingSystem, IDataProvider<PlayerData> playerDataProvider)
+            IFeatureInitializer featureInitializer, ILoadingSystem loadingSystem, IDataProvider<PlayerData> playerDataProvider, IPopupSystem popupSystem)
         {
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
-            _inputProviderManager = inputProviderManager;
             _loadingSystem = loadingSystem;
             _playerDataProvider = playerDataProvider;
+            _popupSystem = popupSystem;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
@@ -40,8 +41,6 @@ namespace Template.Features.GameStateMachine
             await _loadingSystem.Show();
             
             await LoadScene(lifetime);
-
-            HandleInputProvider();
 
             bool isPlayerDataSaveExists = await _playerDataProvider.Exists();
 
@@ -56,11 +55,6 @@ namespace Template.Features.GameStateMachine
             }
             
             await _loadingSystem.Hide();
-        }
-
-        private void HandleInputProvider()
-        {
-            _inputProviderManager.CreateProvider<ArcheroInputProvider>();
         }
 
         private async UniTask LoadScene(CancellationToken lifetime)
@@ -83,6 +77,17 @@ namespace Template.Features.GameStateMachine
             LoadedScene scene = _scene;
             _scene = null;
 
+            
+            try
+            {
+                await _popupSystem.CloseAll();
+                _popupSystem.UnloadAll();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            
             try
             {
                 await _featureInitializer.DeinitAll(scene.Features);

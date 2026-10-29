@@ -3,8 +3,6 @@
     public enum PopupType
     {
         None = 0,
-        Loader = 1,
-        Test = 2,
-        
+        MainMenu = 1,
     }
 }

@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Config_Popup_Container
   m_EditorClassIdentifier: Assembly_Template::Template.Features.Popups.Scripts.PopupConfig
   _entries:
-  - Type: 2
+  - Type: 1
     Pooled: 1
     Prefab:
-      m_AssetGUID: 3fe9be69d44d0ec46985af420a989cc7
+      m_AssetGUID: ddef54aecd562c44881443edb2a33be4
       m_SubObjectName: 
       m_SubObjectType: 
       m_SubObjectGUID: 
-      m_EditorAssetChanged: 0
+      m_EditorAssetChanged: 1
     KeepLoaded: 1

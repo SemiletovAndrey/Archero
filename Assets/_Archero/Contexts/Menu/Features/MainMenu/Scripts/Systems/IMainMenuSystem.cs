@@ -2,6 +2,6 @@
 {
     public interface IMainMenuSystem
     {
-        
+        void Test();
     }
 }

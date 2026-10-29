@@ -3,11 +3,11 @@ using Template.Features.ScreenNavigator;
 
 namespace Menu.Features.MainMenu.Scripts
 {
-    public class MainMenuPayload : BaseNavigationItemPayload
+    public class MainMenuScreenPayload : BaseNavigationItemPayload
     {
         public Action OnPlay { get; }
         
-        public MainMenuPayload(Action onPlay)
+        public MainMenuScreenPayload(Action onPlay)
         {
             OnPlay = onPlay;
         }

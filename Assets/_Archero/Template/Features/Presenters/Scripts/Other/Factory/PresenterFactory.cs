@@ -18,9 +18,7 @@ namespace Template.Features.Presenters
         {
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
-
-            // Временный дочерний контейнер: видит всё, что видит _container, плюс View и доп. привязки.
-            // Благодаря этому презентеру не нужно использовать все переданные объекты (в отличие от extra args).
+            
             DiContainer sub = _container.CreateSubContainer();
             sub.Bind<TView>().FromInstance(view);
             bindExtra?.Invoke(sub);

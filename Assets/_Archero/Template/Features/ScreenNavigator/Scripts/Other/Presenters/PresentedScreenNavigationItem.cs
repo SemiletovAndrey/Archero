@@ -24,7 +24,6 @@ namespace Template.Features.ScreenNavigator
 
         protected override async UniTask OnScreenActivated(ActivatableScreen<TPayload> screen, TPayload data)
         {
-            // Refresh вызывает Activate повторно на том же экране: презентер не пересоздаём
             if (_presenter == null)
             {
                 if (screen is not TView view)

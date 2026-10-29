@@ -66,6 +66,8 @@ namespace Template.Features.Popups
         private readonly Dictionary<PopupType, PopupSlot> _slots = new();
 
         private bool _initialized;
+        
+        private const int MaxCloseAllPasses = 5;
 
         public event Action<BasePopup> PopupOpened;
         public event Action<BasePopup> PopupClosed;
@@ -275,18 +277,41 @@ namespace Template.Features.Popups
 
         public async UniTask CloseAll(params PopupType[] except)
         {
-            List<UniTask> tasks = new();
-
-            foreach (PopupType popupType in new List<PopupType>(_slots.Keys))
+            for (int pass = 0; pass < MaxCloseAllPasses; pass++)
             {
-                if (except != null && Array.IndexOf(except, popupType) >= 0)
-                    continue;
+                List<UniTask> tasks = new();
 
-                tasks.Add(Close(popupType));
+                foreach (PopupType popupType in new List<PopupType>(_slots.Keys))
+                {
+                    if (except != null && Array.IndexOf(except, popupType) >= 0)
+                        continue;
+
+                    tasks.Add(CloseSafe(popupType));
+                }
+
+                if (tasks.Count == 0)
+                    return;
+
+                await UniTask.WhenAll(tasks);
             }
 
-            await UniTask.WhenAll(tasks);
+            Debug.LogWarning($"[{nameof(PopupSystem)}] CloseAll: popups are still being opened after " +
+                             $"{MaxCloseAllPasses} passes. Something keeps opening popups while closing.");
         }
+
+
+        private async UniTask CloseSafe(PopupType popupType)
+        {
+            try
+            {
+                await Close(popupType);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+
 
         private async UniTask CloseSlot(PopupSlot slot)
         {
@@ -339,6 +364,22 @@ namespace Template.Features.Popups
 
             if (_entries.TryGetValue(popupType, out PopupEntryBase entry))
                 _factory.Unload(entry);
+        }
+        
+        public void UnloadAll(params PopupType[] except)
+        {
+            EnsureInitialized();
+
+            foreach (KeyValuePair<PopupType, PopupEntryBase> pair in _entries)
+            {
+                if (except != null && Array.IndexOf(except, pair.Key) >= 0)
+                    continue;
+
+                if (_slots.ContainsKey(pair.Key))
+                    continue;
+
+                _factory.Unload(pair.Value);
+            }
         }
 
         #endregion

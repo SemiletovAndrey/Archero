@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Archero/Contexts/Menu/DataResources/Scenes/Scene_Menu.unity
     guid: 8f6ee9e05d52e9d4d9b279160737df7b
+  - enabled: 1
+    path: Assets/_Archero/Contexts/Gameplay/DataResources/Scenes/Scene_Gameplay.unity
+    guid: 647e5b887b231ec4ebc76f11d3252a4e
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 5ed9166f74eef79458ae7f7d1ffeb82c, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 4b544d9c51eb6bd4395a3437476b85be, type: 3}
