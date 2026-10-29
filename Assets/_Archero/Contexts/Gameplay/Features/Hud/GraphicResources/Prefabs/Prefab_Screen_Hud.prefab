@@ -401,6 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00e3c8d102da431cb7cca12d91f4293c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Features.Hud.HudScreenView
+  _button: {fileID: 7831224198611102799}
 --- !u!222 &373107779162299201
 CanvasRenderer:
   m_ObjectHideFlags: 0

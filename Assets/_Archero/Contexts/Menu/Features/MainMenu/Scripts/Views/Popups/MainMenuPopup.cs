@@ -16,7 +16,6 @@ namespace Menu.Features.MainMenu
         private IMainMenuSystem _menuSystem;
         public override UniTask Activate(MainMenuPopupPayload payload)
         {
-            Debug.Log("Activating Main Menu POPUP");
             _menuSystem = payload.MainMenu;
             
             _testButton.AssignAction(TestSystems);
