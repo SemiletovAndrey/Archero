@@ -24,7 +24,7 @@ namespace Template.Features.GameStateMachine
  
         public async UniTask Enter(CancellationToken lifetime)
         {
-            await _loadingSystem.Show();
+            await _loadingSystem.ShowWithoutAnimation();
             ApplyApplicationSettings();
             
             await _featureInitializer.InitAll(_globalFeatures, lifetime);

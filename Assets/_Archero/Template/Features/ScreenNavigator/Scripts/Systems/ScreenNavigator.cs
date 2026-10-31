@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -39,19 +40,20 @@ namespace Template.Features.ScreenNavigator
                 ValidateTree(root, new HashSet<Type>());
         }
 
-        public UniTask NavigateTo<TItem, TPayload>(TPayload payload)
+        public UniTask NavigateTo<TItem, TPayload>(TPayload payload, CancellationToken cancellationToken = default)
             where TItem : BaseNavigationItem<TPayload>
             where TPayload : BaseNavigationItemPayload
         {
-            return RunExclusive(() => Navigate<TItem, TPayload>(payload));
+            return RunExclusive(() => Navigate<TItem, TPayload>(payload, cancellationToken), cancellationToken);
         }
 
-        public UniTask NavigateTo<TItem>() where TItem : BaseNavigationItem<EmptyNavigationItemPayload>
+        public UniTask NavigateTo<TItem>(CancellationToken cancellationToken = default)
+            where TItem : BaseNavigationItem<EmptyNavigationItemPayload>
         {
-            return NavigateTo<TItem, EmptyNavigationItemPayload>(new EmptyNavigationItemPayload());
+            return NavigateTo<TItem, EmptyNavigationItemPayload>(new EmptyNavigationItemPayload(), cancellationToken);
         }
 
-        private async UniTask Navigate<TItem, TPayload>(TPayload payload)
+        private async UniTask Navigate<TItem, TPayload>(TPayload payload, CancellationToken cancellationToken)
             where TItem : BaseNavigationItem<TPayload>
             where TPayload : BaseNavigationItemPayload
         {
@@ -62,10 +64,10 @@ namespace Template.Features.ScreenNavigator
             List<BaseNavigationItem> closing = new(_currentPath.Count - common);
             for (int i = _currentPath.Count - 1; i >= common; i--)
                 closing.Add(_currentPath[i]);
-            
+
             List<BaseNavigationItem> opening = target.GetRange(common, target.Count - common);
 
-            await PrepareOpening(opening, target[target.Count - 1], payload);
+            await PrepareOpening(opening, target[target.Count - 1], payload, cancellationToken);
 
             bool openingStarted = false;
             try
@@ -99,18 +101,19 @@ namespace Template.Features.ScreenNavigator
                     await RollbackOpened(opening);
 
                 AbortPrepared(opening);
-                
+
                 RaisePathChanged();
                 throw;
             }
 
             RaisePathChanged();
         }
-        
+
         private async UniTask PrepareOpening(
             List<BaseNavigationItem> opening,
             BaseNavigationItem targetItem,
-            BaseNavigationItemPayload payload)
+            BaseNavigationItemPayload payload,
+            CancellationToken cancellationToken)
         {
             try
             {
@@ -119,8 +122,11 @@ namespace Template.Features.ScreenNavigator
                     if (item.IsPrepareBarrier)
                         break;
 
-                    await item.Prepare(payload, ReferenceEquals(item, targetItem));
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await item.Prepare(payload, ReferenceEquals(item, targetItem), cancellationToken);
                 }
+
+                cancellationToken.ThrowIfCancellationRequested();
             }
             catch
             {
@@ -143,7 +149,6 @@ namespace Template.Features.ScreenNavigator
                 }
             }
         }
-
 
         private async UniTask RollbackOpened(List<BaseNavigationItem> opening)
         {
@@ -199,19 +204,27 @@ namespace Template.Features.ScreenNavigator
                 ValidateTree(child, seen);
         }
 
-        private async UniTask RunExclusive(Func<UniTask> operation)
+        private async UniTask RunExclusive(Func<UniTask> operation, CancellationToken cancellationToken)
         {
             UniTaskCompletionSource previous = _lastOperation;
             UniTaskCompletionSource current = new UniTaskCompletionSource();
             _lastOperation = current;
             _pendingOperations++;
 
+            bool hadTurn = false;
             try
             {
                 if (previous != null)
-                    await previous.Task;
+                    await previous.Task.AttachExternalCancellation(cancellationToken);
+
+                hadTurn = true;
+                cancellationToken.ThrowIfCancellationRequested();
 
                 await operation();
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -221,8 +234,20 @@ namespace Template.Features.ScreenNavigator
             finally
             {
                 _pendingOperations--;
-                current.TrySetResult();
+
+                if (hadTurn || previous == null)
+                    current.TrySetResult();
+                else
+                    // Отменились ещё в очереди: следующая операция не должна стартовать раньше предыдущей.
+                    CompleteAfter(previous, current).Forget();
             }
+        }
+
+        private static async UniTaskVoid CompleteAfter(UniTaskCompletionSource previous,
+            UniTaskCompletionSource current)
+        {
+            await previous.Task;
+            current.TrySetResult();
         }
 
         private void RaisePathChanged()

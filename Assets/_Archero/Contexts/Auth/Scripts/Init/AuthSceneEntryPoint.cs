@@ -28,9 +28,9 @@ namespace Auth.Scripts.Init
             _authService.LoggedIn += OnLoggedIn;
             try
             {
-                await _screenNavigator
+                _screenNavigator
                     .NavigateTo<SignInScreenItem, SignInScreenPayload>(new SignInScreenPayload())
-                    .AttachExternalCancellation(lifetime);
+                    .AttachExternalCancellation(lifetime).Forget();
 
                 await _loadingSystem.Hide();
                 await completion.Task.AttachExternalCancellation(lifetime);

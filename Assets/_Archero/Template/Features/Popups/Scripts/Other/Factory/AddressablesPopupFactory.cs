@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Domain.AddressableLoading;
 using Template.Features.ClassFactory;
@@ -27,17 +28,16 @@ namespace Template.Features.Popups
             _prefabs.Release(AsAddressable(entry).Prefab.AssetGUID);
         }
 
-        public override UniTask Preload(PopupEntryBase entry)
+        public override UniTask Preload(PopupEntryBase entry, CancellationToken cancellationToken = default)
         {
             AddressablePopupEntry addressable = AsAddressable(entry);
             EnsureSource(addressable);
 
-            return _prefabs.Preload(addressable.Prefab.AssetGUID);
+            return _prefabs.Preload(addressable.Prefab.AssetGUID).AttachExternalCancellation(cancellationToken);
         }
 
         public override void Unload(PopupEntryBase entry)
         {
-            // Сначала уничтожаем спрятанный в пуле экземпляр (он держит использование ассета).
             base.Unload(entry);
 
             AddressablePopupEntry addressable = entry as AddressablePopupEntry;

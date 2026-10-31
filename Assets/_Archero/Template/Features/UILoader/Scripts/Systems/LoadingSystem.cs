@@ -16,8 +16,12 @@ namespace Template.Features.UILoader
 
         private bool _isShown;
         private float _shownAt;
+        
+        private bool _instantShowRequested;
 
         private UniTaskCompletionSource _shownSignal = new();
+        
+        private UniTaskCompletionSource _hideInterrupt;
 
         private UniTaskCompletionSource _settled;
 
@@ -40,6 +44,14 @@ namespace Template.Features.UILoader
                 _view.SetMessage(message);
 
             return AwaitShown();
+        }
+        
+        public UniTask ShowWithoutAnimation(string message = null)
+        {
+            if (!_isShown)
+                _instantShowRequested = true;
+
+            return Show(message);
         }
 
         public UniTask Hide()
@@ -74,9 +86,10 @@ namespace Template.Features.UILoader
 
         private UniTask AwaitShown()
         {
-            if (_isShown)
+            if (_isShown && _hideInterrupt == null)
                 return UniTask.CompletedTask;
 
+            _hideInterrupt?.TrySetResult();
             EnsureReconciling().Forget();
             return _shownSignal.Task;
         }
@@ -135,7 +148,10 @@ namespace Template.Features.UILoader
                 {
                     if (_users > 0)
                     {
-                        await SafeShow();
+                        bool instant = _instantShowRequested;
+                        _instantShowRequested = false;
+
+                        await SafeShow(instant);
 
                         _isShown = true;
                         _shownAt = Time.unscaledTime;
@@ -150,26 +166,46 @@ namespace Template.Features.UILoader
                         if (_users > 0)
                             continue;
 
-                        await SafeHide();
-
-                        _isShown = false;
+                        UniTaskCompletionSource interrupt = new UniTaskCompletionSource();
+                        _hideInterrupt = interrupt;
                         _shownSignal = new UniTaskCompletionSource();
+
+                        int finished = await UniTask.WhenAny(SafeHide(), interrupt.Task);
+
+                        _hideInterrupt = null;
+
+                        if (finished == 0)
+                        {
+                            _isShown = false;
+                        }
+                        else
+                        {
+                            await SafeShow(false);
+
+                            _shownAt = Time.unscaledTime;
+                            _shownSignal.TrySetResult();
+                        }
                     }
                 }
             }
             finally
             {
+                _instantShowRequested = false;
+
                 UniTaskCompletionSource settled = _settled;
                 _settled = null;
                 settled?.TrySetResult();
             }
         }
 
-        private async UniTask SafeShow()
+        private async UniTask SafeShow(bool instant)
         {
             try
             {
-                await _view.Show();
+                if (instant)
+                    await _view.ShowWithoutAnimation();
+                else
+                    await _view.Show();
             }
             catch (Exception e)
             {

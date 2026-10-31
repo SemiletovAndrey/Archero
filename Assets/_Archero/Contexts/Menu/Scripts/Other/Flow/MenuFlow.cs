@@ -19,10 +19,18 @@ namespace Menu.Scripts
             _stateMachine = stateMachine;
         }
 
-        public UniTask ShowMainMenu(CancellationToken ct) =>
-            _screenNavigator
+        public async UniTask ShowMainMenu(CancellationToken ct)
+        {
+            await _screenNavigator
                 .NavigateTo<MainMenuItem, MainMenuScreenPayload>(new MainMenuScreenPayload(OnPlay))
                 .AttachExternalCancellation(ct);
+        }
+
+        public async UniTask ShowHud(CancellationToken ct)
+        {
+            await _screenNavigator
+                .NavigateTo<HudItem, HudScreenPayload>(new());
+        }
 
         private void OnPlay()
         {

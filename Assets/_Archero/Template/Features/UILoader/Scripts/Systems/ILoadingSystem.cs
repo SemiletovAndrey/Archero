@@ -18,5 +18,6 @@ namespace Template.Features.UILoader
         public UniTask Run(Func<UniTask> work, string message = null);
 
         public UniTask<T> Run<T>(Func<UniTask<T>> work, string message = null);
+        UniTask ShowWithoutAnimation(string message = null);
     }
 }

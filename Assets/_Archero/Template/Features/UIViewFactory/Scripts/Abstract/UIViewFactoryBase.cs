@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Template.Features.ClassFactory;
 using Template.Features.LayerUI;
@@ -11,7 +12,7 @@ namespace Template.Features.UIViewFactory
         where TView : Component
         where TEntry : class
     {
-        private const int NoSortingOrder = -1;
+                private const int NoSortingOrder = -1;
 
         private sealed class ViewInstance
         {
@@ -93,9 +94,54 @@ namespace Template.Features.UIViewFactory
             OnDispose();
         }
 
-        public virtual UniTask Preload(TEntry entry)
+        public virtual UniTask Preload(TEntry entry, CancellationToken cancellationToken = default)
         {
             return UniTask.CompletedTask;
+        }
+
+        // Создаёт экземпляр заранее и кладёт его в пул неактивным.
+        // Первый Create для этого entry потом отработает как повторный (из пула).
+        public virtual async UniTask Prewarm(TEntry entry, CancellationToken cancellationToken = default)
+        {
+            EnsureSource(entry);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int key = GetKey(entry);
+            if (!IsPooled(entry) || _pool.ContainsKey(key))
+                return;
+
+            GameObject prefab = await AcquirePrefabOrCancel(entry, cancellationToken);
+
+            if (_pool.ContainsKey(key))
+            {
+                ReleasePrefab(entry);
+                return;
+            }
+
+            TView view = null;
+            try
+            {
+                view = InstantiateView<TView>(prefab, entry, ResolveParent(null));
+                _instances[view] = new ViewInstance(entry);
+
+                OnViewCreated(view, entry);
+
+                view.gameObject.SetActive(false);
+                _pool[key] = view;
+            }
+            catch
+            {
+                if (view != null)
+                {
+                    _instances.Remove(view);
+
+                    if (!IsDestroyed(view))
+                        Object.Destroy(view.gameObject);
+                }
+
+                ReleasePrefab(entry);
+                throw;
+            }
         }
 
         public virtual void Unload(TEntry entry)
@@ -111,15 +157,17 @@ namespace Template.Features.UIViewFactory
                 Object.Destroy(pooled.gameObject);
         }
 
-        public async UniTask<T> Create<T>(TEntry entry, Transform parent = null) where T : TView
+        public async UniTask<T> Create<T>(TEntry entry, Transform parent = null,
+            CancellationToken cancellationToken = default) where T : TView
         {
             Transform target = ResolveParent(parent);
             EnsureSource(entry);
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (IsPooled(entry) && TryTakeFromPool(entry, target, out T pooled))
                 return pooled;
 
-            GameObject prefab = await AcquirePrefab(entry);
+            GameObject prefab = await AcquirePrefabOrCancel(entry, cancellationToken);
 
             T view = null;
             ViewInstance info = null;
@@ -177,6 +225,53 @@ namespace Template.Features.UIViewFactory
 
             DisposeInstance(view, info);
         }
+
+        #region Cancellation
+
+        
+        private async UniTask<GameObject> AcquirePrefabOrCancel(TEntry entry, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.CanBeCanceled)
+                return await AcquirePrefab(entry);
+
+            UniTask<GameObject> acquire = AcquirePrefab(entry).Preserve();
+
+            GameObject prefab;
+            try
+            {
+                prefab = await acquire.AttachExternalCancellation(cancellationToken);
+            }
+            catch (System.OperationCanceledException)
+            {
+                ReleaseWhenLoaded(acquire, entry).Forget();
+                throw;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                ReleasePrefab(entry);
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            return prefab;
+        }
+
+        private async UniTaskVoid ReleaseWhenLoaded(UniTask<GameObject> acquire, TEntry entry)
+        {
+            try
+            {
+                await acquire;
+            }
+            catch
+            {
+                // Загрузка не удалась: ссылка не бралась, освобождать нечего.
+                return;
+            }
+
+            ReleasePrefab(entry);
+        }
+
+        #endregion
 
         #region Instances
 

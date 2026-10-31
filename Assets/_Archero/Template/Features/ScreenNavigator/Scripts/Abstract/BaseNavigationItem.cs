@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 
 namespace Template.Features.ScreenNavigator
 {
     public abstract class BaseNavigationItem
     {
-                protected List<BaseNavigationItem> InnerItems { get; set; } = new();
+        protected List<BaseNavigationItem> InnerItems { get; set; } = new();
 
         public IReadOnlyList<BaseNavigationItem> Children => InnerItems;
-        
+
         public bool IsActive { get; protected set; }
 
         public virtual void Init()
@@ -95,17 +96,17 @@ namespace Template.Features.ScreenNavigator
         {
             return UniTask.CompletedTask;
         }
-
-        internal virtual UniTask Prepare(BaseNavigationItemPayload payload, bool isTarget)
+        
+        internal virtual UniTask Prepare(BaseNavigationItemPayload payload, bool isTarget,
+            CancellationToken cancellationToken)
         {
             return UniTask.CompletedTask;
         }
-
+        
         internal virtual void AbortPrepare()
         {
         }
-
-        // Элементы, которые нельзя готовить заранее (например, зависят от загрузки сцены).
+        
         internal virtual bool IsPrepareBarrier => false;
 
         private bool HasItem<TItem>() where TItem : BaseNavigationItem

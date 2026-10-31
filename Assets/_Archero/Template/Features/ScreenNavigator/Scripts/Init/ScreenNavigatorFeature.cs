@@ -16,6 +16,7 @@ namespace Template.Features.ScreenNavigator
             BindAsSingle<IScreenNavigator, ScreenNavigator>();
             BindAsSingle<IScreenFactory, AddressablesScreenFactory>();
             BindAsSingle<IPresenterFactory, PresenterFactory>();
+            BindAsSingle<IScreenPrewarmer, ScreenPrewarmer>();
         }
 
         protected override UniTask InitServices()

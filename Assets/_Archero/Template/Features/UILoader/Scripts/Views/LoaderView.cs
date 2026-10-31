@@ -8,6 +8,8 @@ namespace Template.Features.UILoader
     [RequireComponent(typeof(Canvas), typeof(CanvasGroup), typeof(GraphicRaycaster))]
     public class LoaderView : MonoBehaviour, ILoaderView
     {
+        private const float MaxFadeStep = 1f / 30f;
+
         [Tooltip("Выше диапазонов UILayerType (до 299), чтобы загрузка закрывала все.")] [SerializeField]
         private int _sortingOrder = 1000;
 
@@ -41,18 +43,25 @@ namespace Template.Features.UILoader
 
         public async UniTask Show()
         {
-            int version = ++_animationVersion;
-
-            _canvas.enabled = true;
-
-            // Ввод блокируем сразу, не дожидаясь конца анимации.
-            _group.blocksRaycasts = true;
+            int version = BeginShow();
 
             await Fade(1f, version);
         }
 
+        public UniTask ShowWithoutAnimation()
+        {
+            BeginShow();
+
+            _group.alpha = 1f;
+
+            return UniTask.CompletedTask;
+        }
+
         public async UniTask Hide()
         {
+            if (!_canvas.enabled)
+                return;
+
             int version = ++_animationVersion;
 
             await Fade(0f, version);
@@ -82,6 +91,16 @@ namespace Template.Features.UILoader
             _message.gameObject.SetActive(!string.IsNullOrEmpty(message));
         }
 
+        private int BeginShow()
+        {
+            int version = ++_animationVersion;
+
+            _canvas.enabled = true;
+            _group.blocksRaycasts = true;
+
+            return version;
+        }
+
         private void ApplyHidden()
         {
             _group.alpha = 0f;
@@ -89,7 +108,6 @@ namespace Template.Features.UILoader
             _canvas.enabled = false;
         }
 
-        // Следующий показ начинается с чистого состояния.
         private void ResetContent()
         {
             if (_progressBar != null)
@@ -105,20 +123,22 @@ namespace Template.Features.UILoader
         private async UniTask Fade(float target, int version)
         {
             float start = _group.alpha;
+
+            float duration = _fadeDuration * Mathf.Abs(target - start);
             float time = 0f;
 
-            while (time < _fadeDuration)
+            while (time < duration)
             {
-                if (version != _animationVersion)
+                if (version != _animationVersion || _group == null)
                     return;
 
-                time += Time.unscaledDeltaTime;
-                _group.alpha = Mathf.Lerp(start, target, time / _fadeDuration);
+                time += Mathf.Min(Time.unscaledDeltaTime, MaxFadeStep);
+                _group.alpha = Mathf.Lerp(start, target, time / duration);
 
                 await UniTask.Yield();
             }
 
-            if (version == _animationVersion)
+            if (version == _animationVersion && _group != null)
                 _group.alpha = target;
         }
     }
