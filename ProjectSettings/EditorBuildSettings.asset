@@ -6,16 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Archero/Contexts/Preloader/GraphicResources/Scenes/Scene_Preloader.unity
+    path: Assets/Archero/Contexts/Preloader/GraphicResources/Scenes/Scene_Preloader.unity
     guid: f5453c5462ceea54e91e84a8a0eb53ab
   - enabled: 1
-    path: Assets/_Archero/Contexts/Auth/DataResources/Scenes/Scene_Auth.unity
+    path: Assets/Archero/Contexts/Auth/DataResources/Scenes/Scene_Auth.unity
     guid: 8df504001120b7940a5e528d40617a31
   - enabled: 1
-    path: Assets/_Archero/Contexts/Menu/DataResources/Scenes/Scene_Menu.unity
+    path: Assets/Archero/Contexts/Menu/DataResources/Scenes/Scene_Menu.unity
     guid: 8f6ee9e05d52e9d4d9b279160737df7b
   - enabled: 1
-    path: Assets/_Archero/Contexts/Gameplay/DataResources/Scenes/Scene_Gameplay.unity
+    path: Assets/Archero/Contexts/Gameplay/DataResources/Scenes/Scene_Gameplay.unity
     guid: 647e5b887b231ec4ebc76f11d3252a4e
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 5ed9166f74eef79458ae7f7d1ffeb82c, type: 2}

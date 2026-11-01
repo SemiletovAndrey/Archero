@@ -18,17 +18,20 @@ MonoBehaviour:
   - m_GUID: 6fc68b38ec12cb14aa531668f0974c4f
     m_Address: Prefab_Screen_Hud
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a946e62d78c50f2419de6545f8d550fb
     m_Address: MainMenuScreen
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f8715b340bcb9b045bf5d8ab42125233
     m_Address: Prefab_Screen_SignIn
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: b4788a72848b4db49a5f6876ae18edc4, type: 2}
