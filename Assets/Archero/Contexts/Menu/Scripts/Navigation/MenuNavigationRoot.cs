@@ -1,6 +1,6 @@
 ﻿using Gameplay.Features.Hud;
 using Menu.Features.MainMenu.Scripts;
-using Persistence.Features.Auth;
+using Persistance.Features.LevelProgression;
 using Template.Features.ScreenNavigator;
 
 namespace Menu.Scripts.Navigation

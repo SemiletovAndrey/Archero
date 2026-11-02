@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9a0f6a6088045be88b710f9090c6f16, type: 3}
   m_Name: LevelsListConfig
   m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.LevelProgression.LevelsListConfig
-  <LevelConfigs>k__BackingField: []
+  <LevelConfigs>k__BackingField:
+  - {fileID: 11400000, guid: 9b707ed76408fe4409a2486ee64ed5c2, type: 2}

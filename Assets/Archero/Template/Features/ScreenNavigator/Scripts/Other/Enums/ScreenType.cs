@@ -4,8 +4,9 @@
     {
         None = 0,
         SignInScreen = 1,
-        Menu = 2,
-        Hud = 3,
+        MenuScreen = 2,
+        HudScreen = 3,
         Hud2 = 4,
+        ChoiceLevelScreen = 4,
     }
 }
