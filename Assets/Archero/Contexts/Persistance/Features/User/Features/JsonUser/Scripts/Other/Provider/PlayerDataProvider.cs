@@ -20,6 +20,7 @@ namespace Persistance.Features.User.Features.JsonUser
             return new PlayerData()
             {
                 WalletData = InitWalletData(),
+                CompletedLevels = new List<int>()
             };
         }
 

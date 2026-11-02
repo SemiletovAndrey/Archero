@@ -7,5 +7,7 @@ namespace Persistance.Features.User.Features.JsonUser
     public class PlayerData : ISaveData
     {
         public Dictionary<CurrencyTypes, int> WalletData;
+        public List<int> CompletedLevels;
+
     }
 }

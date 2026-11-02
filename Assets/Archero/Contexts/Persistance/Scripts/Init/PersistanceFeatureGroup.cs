@@ -1,4 +1,5 @@
-﻿using Persistence.Features.AuthProvider;
+﻿using Persistance.Features.LevelProgression;
+using Persistence.Features.AuthProvider;
 using Persistance.Features.User.Features.JsonUser;
 using Persistance.Features.Wallet;
 using Persistence.Features.Auth;
@@ -14,6 +15,7 @@ namespace _Archero.Contexts.Persistance.Scripts.Init
             AddFeature<AuthProviderFeature>();
             AddFeature<WalletFeature>();
             AddFeature<JsonUserFeature>();
+            AddFeature<LevelProgressionFeature>();
         }
     }
 }
