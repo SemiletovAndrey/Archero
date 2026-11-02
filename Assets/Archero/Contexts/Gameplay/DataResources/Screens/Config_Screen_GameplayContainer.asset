@@ -22,3 +22,12 @@ MonoBehaviour:
       m_SubObjectGUID: 
       m_EditorAssetChanged: 0
     KeepLoaded: 0
+  - Type: 4
+    Pooled: 1
+    Prefab:
+      m_AssetGUID: ddb1ab933107fe547802686534f37e9d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0
+    KeepLoaded: 0

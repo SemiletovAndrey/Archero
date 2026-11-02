@@ -42,7 +42,6 @@ namespace Template.Features.ScreenNavigator
 
         protected virtual void OnScreenReleasing(ActivatableScreen<TPayload> screen) { }
 
-        // Ждать один кадр после подготовки, чтобы Start()/первый layout отработали, пока экран скрыт.
         protected virtual bool WaitFrameBeforeReveal => true;
 
         protected virtual ScreenType ResolveScreenType()
@@ -57,12 +56,10 @@ namespace Template.Features.ScreenNavigator
 
             if (_state == ScreenState.Prepared)
             {
-                // Экран уже создан и активирован в Prepare: повторная активация не нужна.
                 _state = ScreenState.Activated;
             }
             else if (await EnsureScreen(CancellationToken.None))
             {
-                // Сюда же попадает Refresh: экран уже Activated и активируется заново с новыми данными.
                 await ActivateScreen(data, ScreenState.Activated);
             }
 
@@ -85,7 +82,6 @@ namespace Template.Features.ScreenNavigator
             if (!await EnsureScreen(cancellationToken))
                 return;
 
-            // Уже подготовлен/активирован, либо нечем активировать (родитель, который ещё ни разу не активировался).
             if (_state != ScreenState.Created || _payload == null)
                 return;
 
@@ -114,7 +110,6 @@ namespace Template.Features.ScreenNavigator
             _state = ScreenState.None;
             IsActive = false;
 
-            // ReferenceEquals: вью могли уничтожить вместе со сценой, но презентер всё равно нужно освободить.
             if (ReferenceEquals(screen, null))
                 return;
 
@@ -168,7 +163,6 @@ namespace Template.Features.ScreenNavigator
         {
             OnScreenReleasing(screen);
 
-            // Вью могли уже уничтожить (выгрузка сцены).
             if (screen != null)
                 screen.SetVisible(false);
 
@@ -192,8 +186,6 @@ namespace Template.Features.ScreenNavigator
 
         private async UniTask ActivateScreen(TPayload data, ScreenState resultState)
         {
-            // Состояние выставляется до await: если активация упадёт, экран всё равно считается созданным
-            // и будет освобождён при откате перехода.
             _state = resultState;
 
             await _screen.Activate(data);

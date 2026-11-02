@@ -2,7 +2,6 @@
 using Menu.Features.MainMenu.Scripts;
 using Template.Features.Popups;
 using Template.Features.Presenters;
-using UnityEngine;
 
 namespace Menu.Features.MainMenu
 {
@@ -21,14 +20,13 @@ namespace Menu.Features.MainMenu
             _popupSystem = popupSystem;
             
             _view.PlayClicked += OnPlayClicked;
+            _view.OpenPopupClicked += OnOpenPopupClicked;
         }
 
         public UniTask Activate(MainMenuScreenPayload screenPayload)
         {
-            Debug.Log("Activating menu");
             _payload = screenPayload;
             
-            _popupSystem.Open<MainMenuPopup, MainMenuPopupPayload>(new(_menuSystem)).Forget();
             return UniTask.CompletedTask;
         }
 
@@ -36,10 +34,16 @@ namespace Menu.Features.MainMenu
         {
             _payload?.OnPlay?.Invoke();
         }
+        
+        private void OnOpenPopupClicked()
+        {
+            _popupSystem.Open<MainMenuPopup, MainMenuPopupPayload>(new(_menuSystem));
+        }
 
         public void Dispose()
         {
             _view.PlayClicked -= OnPlayClicked;
+            _view.OpenPopupClicked -= OnOpenPopupClicked;
         }
     }
 }

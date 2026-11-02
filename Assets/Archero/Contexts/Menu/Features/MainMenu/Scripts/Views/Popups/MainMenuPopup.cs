@@ -8,7 +8,7 @@ using Zenject;
 namespace Menu.Features.MainMenu
 {
     [PopupType(PopupType.MainMenu)]
-    public class MainMenuPopup : BasePopupT<MainMenuPopupPayload>
+    public class MainMenuPopup : AnimatedPopup<MainMenuPopupPayload>
     {
         [SerializeField] private UIButton _testButton;
         [SerializeField] private UIButton _closeButton;
@@ -38,14 +38,14 @@ namespace Menu.Features.MainMenu
             return UniTask.CompletedTask;
         }
 
-        public override UniTask Show()
+        public override async UniTask Show()
         {
-            return UniTask.CompletedTask;
+            await base.Show();
         }
 
-        public override UniTask Hide()
+        public override async UniTask Hide()
         {
-            return UniTask.CompletedTask;
+            await base.Hide();
         }
     }
 }

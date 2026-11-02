@@ -27,6 +27,11 @@ MonoBehaviour:
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ddb1ab933107fe547802686534f37e9d
+    m_Address: Prefab_Screen_Hud2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f8715b340bcb9b045bf5d8ab42125233
     m_Address: Prefab_Screen_SignIn
     m_ReadOnly: 0

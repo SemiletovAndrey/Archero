@@ -11,6 +11,7 @@ namespace Menu.Features.MainMenu.Scripts
     public class MainMenuScreenView : AnimatedActivatableScreen<MainMenuScreenPayload>, IMainMenuView
     {
         [SerializeField] private UIButton _playButton;
+        [SerializeField] private UIButton _openPopupButton;
         
         private ILoadingSystem _loadingSystem;
 
@@ -21,10 +22,12 @@ namespace Menu.Features.MainMenu.Scripts
         }
         
         public event Action PlayClicked;
+        public event Action OpenPopupClicked;
         
         public override UniTask Activate(MainMenuScreenPayload data)
         {
             _playButton.AssignAction(OnPlayClicked);
+            _openPopupButton.AssignAction(OnOpenPopupClicked);
             return UniTask.CompletedTask;
         }
 
@@ -34,10 +37,20 @@ namespace Menu.Features.MainMenu.Scripts
             return base.Open(payload);
         }
 
+        public override UniTask Close(NavigationItemClosePayload payload)
+        {
+            _playButton.SetAvailability(false);
+            return base.Close(payload);
+        }
+
         private void OnPlayClicked()
         {
             PlayClicked?.Invoke();
         }
 
+        private void OnOpenPopupClicked()
+        {
+            OpenPopupClicked?.Invoke();
+        }
     }
 }

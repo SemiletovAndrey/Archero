@@ -1,6 +1,5 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Template.Features.ClassFactory;
 using Template.Features.Presenters;
 using UnityEngine;
 using Zenject;
