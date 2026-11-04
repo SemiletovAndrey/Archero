@@ -20,19 +20,16 @@ namespace Template.Features.GameStateMachine
         private readonly IFeatureInitializer _featureInitializer;
         private readonly IPopupSystem _popupSystem;
         private readonly ILoadingSystem _loadingSystem;
-        private readonly IDataProvider<PlayerData> _playerDataProvider;
 
         private LoadedScene _scene;
 
         public MenuState(
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer, ILoadingSystem loadingSystem,
-            IDataProvider<PlayerData> playerDataProvider, IPopupSystem popupSystem)
+            IFeatureInitializer featureInitializer, ILoadingSystem loadingSystem, IPopupSystem popupSystem)
         {
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
             _loadingSystem = loadingSystem;
-            _playerDataProvider = playerDataProvider;
             _popupSystem = popupSystem;
         }
 
@@ -41,18 +38,6 @@ namespace Template.Features.GameStateMachine
             await _loadingSystem.Show();
 
             await LoadScene(lifetime);
-
-            bool isPlayerDataSaveExists = await _playerDataProvider.Exists();
-
-            if (isPlayerDataSaveExists)
-            {
-                await _playerDataProvider.TryLoad();
-                Debug.Log($"Player data already used {_playerDataProvider.Data.WalletData[CurrencyTypes.Diamond]}");
-            }
-            else
-            {
-                _playerDataProvider.Reset();
-            }
         }
 
         private async UniTask LoadScene(CancellationToken lifetime)

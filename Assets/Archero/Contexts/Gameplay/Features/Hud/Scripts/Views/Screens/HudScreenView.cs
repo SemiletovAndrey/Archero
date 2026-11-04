@@ -35,7 +35,7 @@ namespace Gameplay.Features.Hud
 
         private void OpenTestScren()
         {
-            _screenNavigator.NavigateTo<HudInventoryItem, HudScreenPayload>(new()).Forget();
+            
         }
     }
 }

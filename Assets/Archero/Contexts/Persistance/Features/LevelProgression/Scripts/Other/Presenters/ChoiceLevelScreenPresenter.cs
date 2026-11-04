@@ -3,7 +3,7 @@ using Template.Features.Presenters;
 
 namespace Persistance.Features.LevelProgression
 {
-    public class ChoiceLevelPresenter : IPresenter<ChoiceLevelPayload>
+    public class ChoiceLevelScreenPresenter : IScreenPresenter<ChoiceLevelPayload>
     {
         public UniTask Activate(ChoiceLevelPayload payload)
         {

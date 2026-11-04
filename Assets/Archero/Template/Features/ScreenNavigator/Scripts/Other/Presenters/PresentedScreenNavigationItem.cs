@@ -10,10 +10,10 @@ namespace Template.Features.ScreenNavigator
         : ScreenNavigationItem<TPayload>
         where TPayload : BaseNavigationItemPayload
         where TView : class
-        where TPresenter : class, IPresenter<TPayload>
+        where TPresenter : class, IScreenPresenter<TPayload>
     {
         private IPresenterFactory _presenterFactory;
-        private IPresenter<TPayload> _presenter;
+        private IScreenPresenter<TPayload> _screenPresenter;
 
         [Inject]
         private void ConstructPresenter(IPresenterFactory presenterFactory)
@@ -23,29 +23,29 @@ namespace Template.Features.ScreenNavigator
 
         protected override async UniTask OnScreenActivated(ActivatableScreen<TPayload> screen, TPayload data)
         {
-            if (_presenter == null)
+            if (_screenPresenter == null)
             {
                 if (screen is not TView view)
                     throw new InvalidOperationException(
                         $"{screen.GetType().Name} must implement {typeof(TView).Name}.");
 
-                _presenter = _presenterFactory.Create<TPresenter, TView>(view);
+                _screenPresenter = _presenterFactory.Create<TPresenter, TView>(view);
             }
 
-            await _presenter.Activate(data);
+            await _screenPresenter.Activate(data);
         }
 
         protected override void OnScreenReleasing(ActivatableScreen<TPayload> screen)
         {
-            if (_presenter == null)
+            if (_screenPresenter == null)
                 return;
 
-            IPresenter<TPayload> presenter = _presenter;
-            _presenter = null;
+            IScreenPresenter<TPayload> screenPresenter = _screenPresenter;
+            _screenPresenter = null;
 
             try
             {
-                presenter.Dispose();
+                screenPresenter.Dispose();
             }
             catch (Exception e)
             {

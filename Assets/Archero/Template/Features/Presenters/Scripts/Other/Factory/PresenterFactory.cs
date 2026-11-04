@@ -25,6 +25,5 @@ namespace Template.Features.Presenters
 
             return sub.Instantiate<TPresenter>();
         }
-
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace Template.Features.UIExtensions
 {
+    [RequireComponent(typeof(Button))]
     public class UIButton : MonoBehaviour
     {
         [field: SerializeField] public Button Button { get; private set; }

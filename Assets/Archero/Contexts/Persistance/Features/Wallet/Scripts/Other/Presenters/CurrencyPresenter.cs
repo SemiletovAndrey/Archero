@@ -1,21 +1,20 @@
 ﻿using System;
 using Contexts.Scripts.Utilities.Reactive;
-using Template.Features.UIExtensions;
 
 namespace Persistance.Features.Wallet
 {
-    public class CurrencyPresenter
+    public class CurrencyPresenter : IDisposable
     {
         private readonly IReadOnlyVariable<int> _currency;
         private readonly CurrencyTypes _currencyType;
         private readonly CurrencyIconsConfig _currencyIconsConfig;
 
-        private IconTextView _currencyTextView;
+        private CurrencyIconTextView _currencyTextView;
 
         private IDisposable _disposable;
 
         public CurrencyPresenter(IReadOnlyVariable<int> currency, CurrencyTypes currencyType,
-            CurrencyIconsConfig currencyIconsConfig, IconTextView currencyTextView)
+            CurrencyIconsConfig currencyIconsConfig, CurrencyIconTextView currencyTextView)
         {
             _currency = currency;
             _currencyType = currencyType;
@@ -30,11 +29,6 @@ namespace Persistance.Features.Wallet
 
             _disposable = _currency.Subscribe(OnCurrencyUpdate);
         }
-
-        public void Disable()
-        {
-            _disposable.Dispose();
-        }
         
         private void OnCurrencyUpdate(int arg1, int newValue)
         {
@@ -44,6 +38,12 @@ namespace Persistance.Features.Wallet
         private void UpdateTextView(int value)
         {
             _currencyTextView.SetText(value.ToString());
+        }
+
+        public void Dispose()
+        {
+            _disposable?.Dispose();
+            _disposable = null;
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Template.Features.UIExtensions
 {
-    public class IconTextView : MonoBehaviour
+    public class IconTextView : MonoBehaviour, IView
     {
         [SerializeField] private TextMeshProUGUI _text;
         [SerializeField] private Image _image;

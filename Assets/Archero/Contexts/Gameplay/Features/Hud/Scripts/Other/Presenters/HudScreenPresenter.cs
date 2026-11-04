@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Gameplay.Features.Hud
 {
-    public class HudPresenter : IPresenter<HudScreenPayload>
+    public class HudScreenPresenter : IScreenPresenter<HudScreenPayload>
     {
         public UniTask Activate(HudScreenPayload payload)
         {

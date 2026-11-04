@@ -1,10 +1,10 @@
 ﻿using System.Threading;
-using Persistence.Features.AuthProvider;
 using Cysharp.Threading.Tasks;
-using Persistence.Features.Auth;
+using Persistance.Features.User.Features.JsonUser;
+using Persistence.Features.AuthProvider;
+using Template.Features.DataStorage;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.SceneLoader;
-using Template.Features.UILoader;
 
 namespace Template.Features.GameStateMachine
 {
@@ -14,26 +14,23 @@ namespace Template.Features.GameStateMachine
 
         private readonly IGameStateMachine _stateMachine;
         private readonly IAuthProvider _authProvider;
-        private readonly IAuthService _authService;
-        private readonly ILoadingSystem _loadingSystem;
         private readonly ISceneLoader _sceneLoader;
         private readonly IFeatureInitializer _featureInitializer;
+        private readonly IDataProvider<PlayerData> _playerDataProvider;
 
         private LoadedScene _scene;
 
         public AuthState(
             IGameStateMachine stateMachine,
             IAuthProvider authProvider,
-            ILoadingSystem loadingSystem,
             ISceneLoader sceneLoader,
-            IFeatureInitializer featureInitializer, IAuthService authService)
+            IFeatureInitializer featureInitializer, IDataProvider<PlayerData> playerDataProvider)
         {
             _stateMachine = stateMachine;
             _authProvider = authProvider;
-            _loadingSystem = loadingSystem;
             _sceneLoader = sceneLoader;
             _featureInitializer = featureInitializer;
-            _authService = authService;
+            _playerDataProvider = playerDataProvider;
         }
 
         public async UniTask Enter(CancellationToken lifetime)
@@ -45,6 +42,8 @@ namespace Template.Features.GameStateMachine
             {
                 await RunSignIn(lifetime);
             }
+
+            await LoadPlayerData(lifetime);
 
             _stateMachine.Enter<MenuState>();
         }
@@ -68,6 +67,16 @@ namespace Template.Features.GameStateMachine
             await _featureInitializer.DeinitAll(scene.Features);
             _scene = null;
             await _sceneLoader.Release(scene);
+        }
+
+        private async UniTask LoadPlayerData(CancellationToken lifetime)
+        {
+            bool exists = await _playerDataProvider.Exists();
+
+            if (exists)
+                await _playerDataProvider.TryLoad();
+            else
+                _playerDataProvider.Reset();
         }
     }
 }

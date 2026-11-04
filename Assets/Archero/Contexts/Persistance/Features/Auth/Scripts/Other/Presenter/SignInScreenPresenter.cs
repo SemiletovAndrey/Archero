@@ -8,14 +8,14 @@ using UnityEngine;
 
 namespace Persistance.Features.Auth
 {
-    public class SignInPresenter : IPresenter<SignInScreenPayload>
+    public class SignInScreenPresenter : IScreenPresenter<SignInScreenPayload>
     {
         private readonly ISignInView _view;
         private readonly IAuthService _authService;
 
         private bool _disposed;
 
-        public SignInPresenter(ISignInView view, IAuthService authService)
+        public SignInScreenPresenter(ISignInView view, IAuthService authService)
         {
             _view = view;
             _authService = authService;

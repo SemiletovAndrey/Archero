@@ -3,12 +3,8 @@
 namespace Gameplay.Features.Hud
 {
     [ScreenType(ScreenType.HudScreen)]
-    public class HudItem : PresentedScreenNavigationItem<HudScreenPayload, IHudView, HudPresenter>
+    public class HudItem : PresentedScreenNavigationItem<HudScreenPayload, IHudView, HudScreenPresenter>
     {
-        protected override NavigationItemList AddInnerItems()
-        {
-            return new NavigationItemList()
-                .Add<HudInventoryItem>();
-        }
+
     }
 }

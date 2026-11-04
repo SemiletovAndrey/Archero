@@ -4,6 +4,7 @@ using System.Linq;
 using Contexts.Scripts.Utilities.Reactive;
 using Persistance.Features.User.Features.JsonUser;
 using Template.Features.DataStorage;
+using UnityEngine;
 
 namespace Persistance.Features.Wallet
 {

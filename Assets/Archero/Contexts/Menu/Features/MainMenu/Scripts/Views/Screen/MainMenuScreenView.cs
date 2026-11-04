@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using Persistance.Features.Wallet;
 using Template.Features.ScreenNavigator;
 using Template.Features.UIExtensions;
 using Template.Features.UILoader;
@@ -13,6 +14,8 @@ namespace Menu.Features.MainMenu.Scripts
         [SerializeField] private UIButton _playButton;
         [SerializeField] private UIButton _openPopupButton;
         
+        [SerializeField] private WalletView _walletView;
+        
         private ILoadingSystem _loadingSystem;
 
         [Inject]
@@ -23,6 +26,8 @@ namespace Menu.Features.MainMenu.Scripts
         
         public event Action PlayClicked;
         public event Action OpenPopupClicked;
+        
+        public WalletView WalletView => _walletView;
         
         public override UniTask Activate(MainMenuScreenPayload data)
         {

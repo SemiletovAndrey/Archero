@@ -3,5 +3,6 @@
     "Gold": 200,
     "Diamond": 10,
     "None": 0
-  }
+  },
+  "CompletedLevels": []
 }
