@@ -19,7 +19,10 @@ namespace Persistance.Features.Auth
         {
             _view = view;
             _authService = authService;
+        }
 
+        public void Init()
+        {
             _view.LoginSubmitted += OnLoginSubmitted;
             _view.RegisterSubmitted += OnRegisterSubmitted;
         }
@@ -28,6 +31,13 @@ namespace Persistance.Features.Auth
         {
             _view.Reset();
             return UniTask.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            _disposed = true;
+            _view.LoginSubmitted -= OnLoginSubmitted;
+            _view.RegisterSubmitted -= OnRegisterSubmitted;
         }
 
         private void OnLoginSubmitted(LoginForm form) => LoginAsync(form).Forget();
@@ -148,13 +158,6 @@ namespace Persistance.Features.Auth
                 if (!_disposed)
                     _view.SetBusy(AuthForm.Register, false);
             }
-        }
-
-        public void Dispose()
-        {
-            _disposed = true;
-            _view.LoginSubmitted -= OnLoginSubmitted;
-            _view.RegisterSubmitted -= OnRegisterSubmitted;
         }
     }
 }

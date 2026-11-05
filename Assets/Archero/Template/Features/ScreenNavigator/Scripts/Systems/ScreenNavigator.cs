@@ -36,6 +36,8 @@ namespace Template.Features.ScreenNavigator
         public IReadOnlyList<BaseNavigationItem> CurrentPath => _currentPathView;
 
         public bool IsNavigating => _pendingOperations > 0;
+        
+        public bool CanGoBack => _currentPath.Count > 2;
 
         public void Init()
         {
@@ -90,6 +92,32 @@ namespace Template.Features.ScreenNavigator
             where TItem : BaseNavigationItem<EmptyNavigationItemPayload>
         {
             return NavigateTo<TItem, EmptyNavigationItemPayload>(new EmptyNavigationItemPayload(), cancellationToken);
+        }
+        
+        public UniTask Back(CancellationToken cancellationToken = default)
+        {
+            if (_disposed)
+                return UniTask.FromCanceled(new CancellationToken(true));
+
+            return RunExclusive(GoBack, cancellationToken);
+        }
+
+        private async UniTask GoBack(CancellationToken cancellationToken)
+        {
+            if (!CanGoBack)
+                return;
+
+            BaseNavigationItem leaf = _currentPath[_currentPath.Count - 1];
+
+            try
+            {
+                await leaf.Deactivate(new NavigationItemClosePayload(new List<BaseNavigationItem>()));
+            }
+            finally
+            {
+                _currentPath.RemoveAt(_currentPath.Count - 1);
+                RaisePathChanged();
+            }
         }
 
         private async UniTask Navigate<TItem, TPayload>(TPayload payload, CancellationToken cancellationToken)

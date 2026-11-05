@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 3455237504709529580}
   - component: {fileID: 4291301931950425688}
   - component: {fileID: 6439216249096174375}
+  - component: {fileID: 6090849311249097283}
+  - component: {fileID: 5989519843198826248}
   m_Layer: 5
   m_Name: Prefab_LevelTile
   m_TagString: Untagged
@@ -38,7 +40,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4113502180615818467
 CanvasRenderer:
@@ -61,7 +63,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4048077, g: 0.79622644, b: 0.37107152, a: 1}
+  m_Color: {r: 0.79607844, g: 0.7531798, b: 0.37254906, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -135,6 +137,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Template.Features.UIExtensions.UIButton
   <Button>k__BackingField: {fileID: 4291301931950425688}
+--- !u!225 &6090849311249097283
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271756794429698057}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &5989519843198826248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271756794429698057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21c79c70b3e346cf93d81e7d4f49bb4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.LevelProgression.LevelTileView
+  _background: {fileID: 3455237504709529580}
+  _levelNumberText: {fileID: 5528597655459104658}
+  _button: {fileID: 6439216249096174375}
+  _activeColor: {r: 0.79607844, g: 0.7529412, b: 0.37254903, a: 1}
+  _completedColor: {r: 0.47432533, g: 0.81886786, b: 0.52240103, a: 1}
+  _blockedColor: {r: 0.4792453, g: 0.4792453, b: 0.4792453, a: 1}
 --- !u!1 &3618216394688107580
 GameObject:
   m_ObjectHideFlags: 0

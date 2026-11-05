@@ -29,7 +29,19 @@ namespace Template.Features.ScreenNavigator
                     throw new InvalidOperationException(
                         $"{screen.GetType().Name} must implement {typeof(TView).Name}.");
 
-                _screenPresenter = _presenterFactory.Create<TPresenter, TView>(view);
+                IScreenPresenter<TPayload> presenter = _presenterFactory.Create<TPresenter, TView>(view);
+                
+                try
+                {
+                    presenter.Init();
+                }
+                catch
+                {
+                    presenter.Dispose();
+                    throw;
+                }
+
+                _screenPresenter = presenter;
             }
 
             await _screenPresenter.Activate(data);

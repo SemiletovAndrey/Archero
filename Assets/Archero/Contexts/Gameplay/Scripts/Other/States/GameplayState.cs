@@ -1,19 +1,16 @@
 ﻿using System.Threading;
+using Contexts.Gameplay;
 using Cysharp.Threading.Tasks;
-using Persistance.Features.User.Features.JsonUser;
-using Persistance.Features.Wallet;
-using Template.Features.DataStorage;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.GameStateMachine;
 using Template.Features.NewInputFeature;
 using Template.Features.NewInputFeature.Scripts.Example;
 using Template.Features.SceneLoader;
 using Template.Features.UILoader;
-using UnityEngine;
 
-namespace Gameplay.Scripts
+namespace Template.Gameplay
 {
-    public class GameplayState : IState
+    public class GameplayState : IPayloadState<GamePlayStatePayloads>
     {
         private const string SceneName = "Scene_Gameplay";
 
@@ -34,8 +31,8 @@ namespace Gameplay.Scripts
             _inputProviderManager = inputProviderManager;
             _loadingSystem = loadingSystem;
         }
-
-        public async UniTask Enter(CancellationToken lifetime)
+        
+        public async UniTask Enter(GamePlayStatePayloads payload, CancellationToken lifetime)
         {
             await _loadingSystem.Show();
 

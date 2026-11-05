@@ -1,5 +1,4 @@
-﻿using Gameplay.Features.Hud;
-using Persistance.Features.LevelProgression;
+﻿using Persistance.Features.LevelProgression;
 using Template.Features.ScreenNavigator;
 
 namespace Menu.Features.MainMenu.Scripts

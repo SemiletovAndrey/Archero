@@ -1,72 +1,76 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
 namespace Template.Features.ScreenNavigator
 {
-    [Serializable]
-    public class ScreenOpenAnimationSettings
-    {
-        public bool Enabled = true;
-
-        [Min(0f)] public float Duration = 0.25f;
-
-        public bool Fade = true;
-        public Ease FadeEase = Ease.OutQuad;
-
-        public bool Scale = true;
-        [Range(0.5f, 1f)] public float StartScale = 0.9f;
-        public Ease ScaleEase = Ease.OutBack;
-        
-        public bool IgnoreTimeScale = true;
-    }
-
-
     public abstract class AnimatedActivatableScreen<TData> : ActivatableScreen<TData>
         where TData : BaseNavigationItemPayload
     {
-        [Header("Open animation")]
-        [Tooltip("Что анимируется. Если не задано - корень экрана.\n" +
-                 "Для полноэкранных экранов укажите контейнер с содержимым БЕЗ фона: иначе при появлении " +
-                 "из прозрачности сквозь экран будет видна камера (скайбокс).")]
-        [SerializeField]
+        [Header("Open animation")] [SerializeField]
         private Transform _animationTarget;
 
         [SerializeField] private ScreenOpenAnimationSettings _openAnimation = new ScreenOpenAnimationSettings();
 
+        [Header("Close animation")] [SerializeField]
+        private ScreenCloseAnimationSettings _closeAnimation = new ScreenCloseAnimationSettings();
+
         private bool _animationRefsResolved;
+
         private CanvasGroup _rootGroup;
         private CanvasGroup _targetGroup;
+
         private Vector3 _baseScale;
         private float _baseAlpha;
         private bool _baseBlocksRaycasts;
 
-        private Tween _openTween;
+        private Tween _tween;
+        private bool _tweenIsClosing;
+        private bool _inputBlocked;
 
-        public bool IsOpenAnimationPlaying => _openTween != null && _openTween.IsActive();
+        private bool IsPlaying => _tween != null && _tween.IsActive();
+
+        public bool IsOpenAnimationPlaying => IsPlaying && !_tweenIsClosing;
+        public bool IsCloseAnimationPlaying => IsPlaying && _tweenIsClosing;
 
         protected ScreenOpenAnimationSettings OpenAnimationSettings => _openAnimation;
-        protected Transform AnimationTarget => _animationTarget != null ? _animationTarget : transform;
+        protected ScreenCloseAnimationSettings CloseAnimationSettings => _closeAnimation;
+
+        protected Transform AnimationTarget =>
+            _animationTarget != null ? _animationTarget : transform;
+
         protected CanvasGroup AnimationGroup => _targetGroup;
         protected Vector3 BaseScale => _baseScale;
         protected float BaseAlpha => _baseAlpha;
 
         public override UniTask Open(NavigationItemOpenPayload payload)
         {
-            return PlayOpenAnimation(this.GetCancellationTokenOnDestroy());
+            ResolveAnimationRefs();
+
+            RestoreVisualState();
+
+            return PlayAnimation(false, this.GetCancellationTokenOnDestroy());
         }
 
-        public override UniTask Close(NavigationItemClosePayload payload)
+        public override async UniTask Close(NavigationItemClosePayload payload)
         {
-            StopOpenAnimation();
-            return base.Close(payload);
+            await PlayAnimation(true, this.GetCancellationTokenOnDestroy());
+            await base.Close(payload);
         }
-        
+
+        public void SetInputBlocked(bool blocked)
+        {
+            ResolveAnimationRefs();
+
+            _inputBlocked = blocked;
+            ApplyRaycasts();
+        }
+
         protected virtual Tween BuildOpenAnimation()
         {
             ScreenOpenAnimationSettings settings = _openAnimation;
+
             if (!settings.Fade && !settings.Scale)
                 return null;
 
@@ -77,8 +81,11 @@ namespace Template.Features.ScreenNavigator
                 _targetGroup.alpha = 0f;
 
                 sequence.Join(
-                    DOTween.To(() => _targetGroup.alpha, value => _targetGroup.alpha = value,
-                            _baseAlpha, settings.Duration)
+                    DOTween.To(
+                            () => _targetGroup.alpha,
+                            value => _targetGroup.alpha = value,
+                            _baseAlpha,
+                            settings.Duration)
                         .SetEase(settings.FadeEase));
             }
 
@@ -86,71 +93,126 @@ namespace Template.Features.ScreenNavigator
             {
                 AnimationTarget.localScale = _baseScale * settings.StartScale;
 
-                sequence.Join(AnimationTarget.DOScale(_baseScale, settings.Duration).SetEase(settings.ScaleEase));
+                sequence.Join(
+                    AnimationTarget
+                        .DOScale(_baseScale, settings.Duration)
+                        .SetEase(settings.ScaleEase));
             }
 
             return sequence;
         }
 
-        private async UniTask PlayOpenAnimation(CancellationToken cancellationToken)
+        protected virtual Tween BuildCloseAnimation()
         {
-            StopOpenAnimation();
+            ScreenCloseAnimationSettings settings = _closeAnimation;
 
-            if (!_openAnimation.Enabled || _openAnimation.Duration <= 0f)
+            if (!settings.Fade && !settings.Scale)
+                return null;
+
+            Sequence sequence = DOTween.Sequence();
+
+            if (settings.Fade)
+            {
+                sequence.Join(
+                    DOTween.To(
+                            () => _targetGroup.alpha,
+                            value => _targetGroup.alpha = value,
+                            0f,
+                            settings.Duration)
+                        .SetEase(settings.FadeEase));
+            }
+
+            if (settings.Scale)
+            {
+                sequence.Join(
+                    AnimationTarget
+                        .DOScale(_baseScale * settings.EndScale, settings.Duration)
+                        .SetEase(settings.ScaleEase));
+            }
+
+            return sequence;
+        }
+
+        private async UniTask PlayAnimation(
+            bool closing,
+            CancellationToken cancellationToken)
+        {
+            StopTween();
+
+            bool enabled = closing
+                ? _closeAnimation.Enabled && _closeAnimation.Duration > 0f
+                : _openAnimation.Enabled && _openAnimation.Duration > 0f;
+
+            if (!enabled)
                 return;
 
             ResolveAnimationRefs();
-            
-            _rootGroup.blocksRaycasts = false;
 
-            Tween tween;
-            try
-            {
-                tween = BuildOpenAnimation();
-            }
-            catch
-            {
-                _rootGroup.blocksRaycasts = _baseBlocksRaycasts;
-                throw;
-            }
+            Tween tween = closing
+                ? BuildCloseAnimation()
+                : BuildOpenAnimation();
 
             if (tween == null)
-            {
-                _rootGroup.blocksRaycasts = _baseBlocksRaycasts;
                 return;
-            }
 
-            UniTaskCompletionSource completion = new UniTaskCompletionSource();
-            
+            UniTaskCompletionSource completion = new();
+
+            bool finished = false;
+
             void Finish()
             {
-                if (_rootGroup != null)
-                    _rootGroup.blocksRaycasts = _baseBlocksRaycasts;
+                if (finished)
+                    return;
+
+                finished = true;
+
+                if (_tween == tween)
+                {
+                    _tween = null;
+                    _tweenIsClosing = false;
+                }
 
                 completion.TrySetResult();
             }
 
+            bool ignoreTimeScale = closing
+                ? _closeAnimation.IgnoreTimeScale
+                : _openAnimation.IgnoreTimeScale;
+
             tween.SetAutoKill(true)
-                .SetUpdate(_openAnimation.IgnoreTimeScale)
+                .SetUpdate(ignoreTimeScale)
                 .SetLink(gameObject, LinkBehaviour.KillOnDisable)
                 .OnComplete(Finish)
                 .OnKill(Finish);
 
-            _openTween = tween;
+            _tween = tween;
+            _tweenIsClosing = closing;
 
-            using (cancellationToken.Register(StopOpenAnimation))
+            using (cancellationToken.Register(StopTween))
             {
                 await completion.Task;
             }
         }
 
-        private void StopOpenAnimation()
+        private void StopTween()
         {
-            Tween tween = _openTween;
-            _openTween = null;
+            Tween tween = _tween;
+            _tween = null;
+            _tweenIsClosing = false;
 
             if (tween != null && tween.IsActive())
                 tween.Kill();
+        }
+
+        private void RestoreVisualState()
+        {
+            if (!_animationRefsResolved)
+                return;
+
+            _targetGroup.alpha = _baseAlpha;
+            AnimationTarget.localScale = _baseScale;
+
+            ApplyRaycasts();
         }
 
         private void ResolveAnimationRefs()
@@ -160,17 +222,35 @@ namespace Template.Features.ScreenNavigator
 
             _rootGroup = GetOrAddCanvasGroup(gameObject);
             _targetGroup = GetOrAddCanvasGroup(AnimationTarget.gameObject);
-            
+
             _baseScale = AnimationTarget.localScale;
             _baseAlpha = _targetGroup.alpha;
             _baseBlocksRaycasts = _rootGroup.blocksRaycasts;
 
             _animationRefsResolved = true;
+
+            ApplyRaycasts();
+        }
+
+        private void ApplyRaycasts()
+        {
+            if (_rootGroup != null)
+            {
+                _rootGroup.blocksRaycasts =
+                    _baseBlocksRaycasts && !_inputBlocked;
+            }
         }
 
         private static CanvasGroup GetOrAddCanvasGroup(GameObject target)
         {
-            return target.TryGetComponent(out CanvasGroup group) ? group : target.AddComponent<CanvasGroup>();
+            return target.TryGetComponent(out CanvasGroup group)
+                ? group
+                : target.AddComponent<CanvasGroup>();
+        }
+
+        private void OnDestroy()
+        {
+            StopTween();
         }
     }
 }

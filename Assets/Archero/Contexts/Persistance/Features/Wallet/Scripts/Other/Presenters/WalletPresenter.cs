@@ -20,7 +20,7 @@ namespace Persistance.Features.Wallet
                     currencyView);
                 _currencyPresenters.Add(currencyPresenter);
 
-                currencyPresenter.Enable();
+                currencyPresenter.Init();
             }
         }
 

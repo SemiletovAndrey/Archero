@@ -2,7 +2,7 @@
 
 namespace Persistance.Features.LevelProgression
 {
-    public class LevelTilesListView : ElementsListView<LevelTileView>
+    public class LevelTilesListView : SpawnableElementsListView<LevelTileView>
     {
         
     }

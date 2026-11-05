@@ -1,9 +1,10 @@
 ﻿using System;
 using Contexts.Scripts.Utilities.Reactive;
+using Template.Features.Presenters;
 
 namespace Persistance.Features.Wallet
 {
-    public class CurrencyPresenter : IDisposable
+    public class CurrencyPresenter : IDefaultClassPresenter
     {
         private readonly IReadOnlyVariable<int> _currency;
         private readonly CurrencyTypes _currencyType;
@@ -22,7 +23,7 @@ namespace Persistance.Features.Wallet
             _currencyTextView = currencyTextView;
         }
 
-        public void Enable()
+        public void Init()
         {
             UpdateTextView(_currency.Value);
             _currencyTextView.SetIcon(_currencyIconsConfig.GetSpriteFor(_currencyType));

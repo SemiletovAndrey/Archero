@@ -15,12 +15,16 @@ namespace Template.Features.ScreenNavigator
 
         public bool IsNavigating { get; }
         
+        public bool CanGoBack { get; }
+        
         public UniTask NavigateTo<TItem, TPayload>(TPayload payload, CancellationToken cancellationToken = default)
             where TItem : BaseNavigationItem<TPayload>
             where TPayload : BaseNavigationItemPayload;
 
         public UniTask NavigateTo<TItem>(CancellationToken cancellationToken = default)
             where TItem : BaseNavigationItem<EmptyNavigationItemPayload>;
+        
+        public UniTask Back(CancellationToken cancellationToken = default);
 
     }
 }

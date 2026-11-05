@@ -1,10 +1,11 @@
 ﻿using System.Threading;
+using Contexts.Gameplay;
 using Cysharp.Threading.Tasks;
 using Gameplay.Features.Hud;
-using Gameplay.Scripts;
 using Menu.Features.MainMenu.Scripts;
 using Template.Features.GameStateMachine;
 using Template.Features.ScreenNavigator;
+using Template.Gameplay;
 
 namespace Menu.Scripts
 {
@@ -34,7 +35,7 @@ namespace Menu.Scripts
 
         private void OnPlay()
         {
-            _stateMachine.Enter<GameplayState>();
+            _stateMachine.Enter<GameplayState, GamePlayStatePayloads>(new(1));
         }
     }
 }

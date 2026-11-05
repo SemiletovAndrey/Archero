@@ -7,6 +7,8 @@ namespace Template.Features.UIExtensions
     {
         [SerializeField] private Transform _parent;
         
+        protected Transform Parent => _parent;
+        
         private List<TElement> _elements = new();
         
         public IReadOnlyList<TElement> Elements => _elements;
