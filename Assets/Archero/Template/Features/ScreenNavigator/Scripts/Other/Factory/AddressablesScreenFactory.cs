@@ -9,7 +9,7 @@ namespace Template.Features.ScreenNavigator
 {
     public class AddressablesScreenFactory : ScreenFactoryBase
     {
-                private readonly AddressablePrefabCache _prefabs = new();
+        private readonly AddressablePrefabCache _prefabs = new();
 
         public AddressablesScreenFactory(IClassFactory classFactory, IUILayersService layersService)
             : base(classFactory, layersService)
@@ -31,7 +31,7 @@ namespace Template.Features.ScreenNavigator
         {
             AddressableScreenEntry addressable = AsAddressable(entry);
             EnsureSource(addressable);
-            
+
             return _prefabs.Preload(addressable.Prefab.AssetGUID).AttachExternalCancellation(cancellationToken);
         }
 

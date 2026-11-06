@@ -1,10 +1,12 @@
 ﻿using System.Threading;
+using Contexts.Gameplay;
 using Cysharp.Threading.Tasks;
 using Persistance.Features.User.Features.JsonUser;
 using Persistence.Features.AuthProvider;
 using Template.Features.DataStorage;
 using Template.Features.GameFlow.Scripts;
 using Template.Features.SceneLoader;
+using Template.Gameplay;
 
 namespace Template.Features.GameStateMachine
 {
@@ -45,7 +47,7 @@ namespace Template.Features.GameStateMachine
 
             await LoadPlayerData(lifetime);
 
-            _stateMachine.Enter<MenuState>();
+            _stateMachine.Enter<GameplayState, GamePlayStatePayloads>(new(1));
         }
 
         private async UniTask RunSignIn(CancellationToken lifetime)

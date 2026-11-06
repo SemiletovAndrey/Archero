@@ -21,7 +21,6 @@ namespace Domain.AddressableLoading
 
         public static void Release(AddressableLoadResult result)
         {
-            // IsValid защищает от двойного Release.
             if (result.Handle.IsValid())
                 Addressables.Release(result.Handle);
         }
@@ -31,7 +30,6 @@ namespace Domain.AddressableLoading
         {
             try
             {
-                // ToUniTask вместо handle.Task: без лишнего Task и с нормальной передачей исключений.
                 await handle.ToUniTask();
             }
             catch
@@ -42,8 +40,7 @@ namespace Domain.AddressableLoading
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
                 return new AddressableLoadResult(handle.Result, handle);
-
-            // Раньше при неудаче handle оставался неосвобожденным (утечка).
+            
             ReleaseHandle(handle);
             throw new Exception($"Failed to load asset with {description}");
         }

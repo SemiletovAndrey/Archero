@@ -49,8 +49,10 @@ namespace Template.Features.ScreenNavigator
             ResolveAnimationRefs();
 
             RestoreVisualState();
+            PlayAnimation(false, this.GetCancellationTokenOnDestroy()).Forget();
 
-            return PlayAnimation(false, this.GetCancellationTokenOnDestroy());
+            return UniTask.CompletedTask;
+            //return PlayAnimation(false, this.GetCancellationTokenOnDestroy());
         }
 
         public override async UniTask Close(NavigationItemClosePayload payload)

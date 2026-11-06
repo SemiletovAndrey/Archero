@@ -17,6 +17,10 @@ namespace Template.Features.ClassFactory
 
         public T CreateMonoBehaviour<T>(T prefab, Transform parent, bool dontDestroy = false) where T : Component;
         public T CreateMonoBehaviour<T>(GameObject prefab, Transform parent, bool dontDestroy = false) where T : Component;
+        public T CreateMonoBehaviour<T>(GameObject prefab, Vector3 position, Quaternion quaternion, Transform parent,
+            bool dontDestroy = false) where T : Component;
+        public T CreateMonoBehaviour<T>(T prefab, Vector3 position, Quaternion quaternion, Transform parent,
+            bool dontDestroy = false) where T : Component;
         public T CreateMonoBehaviourAndBind<T>(T prefab, Transform parent, bool dontDestroy = false) where T : Component;
         
         public T CreateAndBind<T>();

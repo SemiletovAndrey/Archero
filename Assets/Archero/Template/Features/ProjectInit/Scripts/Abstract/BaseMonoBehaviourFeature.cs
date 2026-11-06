@@ -35,10 +35,8 @@ namespace Template.Features.ProjectInit
 
         public async UniTask InitFeature()
         {
-            AddPopups();
             await InitServices();
             await InitSystems();
-            await AddTrackers();
         }
 
         protected virtual UniTask InitServices()
@@ -49,16 +47,6 @@ namespace Template.Features.ProjectInit
         protected virtual UniTask InitSystems()
         {
             return UniTask.CompletedTask;
-        }
-
-        protected virtual UniTask AddTrackers()
-        {
-            return UniTask.CompletedTask;
-        }
-
-        protected virtual void AddPopups()
-        {
-            
         }
 
         protected ConcreteIdArgConditionCopyNonLazyBinder BindAsSingle<TParent, TChild>() where TChild : TParent

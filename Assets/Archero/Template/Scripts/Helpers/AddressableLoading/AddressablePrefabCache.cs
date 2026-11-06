@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -27,10 +29,22 @@ namespace Domain.AddressableLoading
 
         private readonly Dictionary<string, CacheEntry> _entries = new();
 
-        public async UniTask<GameObject> Acquire(string key, bool pin)
+        public async UniTask<GameObject> Acquire(string key, bool pin, CancellationToken ct = default)
         {
-            CacheEntry entry = await AcquireInternal(key, pin);
+            CacheEntry entry = await AcquireInternal(key, pin, ct);
             return entry.Result.Prefab;
+        }
+
+        public bool TryGet(string key, out GameObject prefab)
+        {
+            if (_entries.TryGetValue(key, out CacheEntry entry) && entry.IsLoaded && !entry.Discarded)
+            {
+                prefab = entry.Result.Prefab;
+                return true;
+            }
+
+            prefab = null;
+            return false;
         }
 
         public void Release(string key)
@@ -38,13 +52,16 @@ namespace Domain.AddressableLoading
             if (!_entries.TryGetValue(key, out CacheEntry entry))
                 return;
 
-            entry.Users--;
+            // Защита от Release без парного Acquire
+            if (entry.Users > 0)
+                entry.Users--;
+
             TryDiscard(entry);
         }
 
-        public async UniTask Preload(string key)
+        public async UniTask Preload(string key, CancellationToken ct = default)
         {
-            CacheEntry entry = await AcquireInternal(key, pin: true);
+            CacheEntry entry = await AcquireInternal(key, pin: true, ct);
 
             entry.Users--;
         }
@@ -57,7 +74,7 @@ namespace Domain.AddressableLoading
             entry.Pinned = false;
             TryDiscard(entry);
         }
-        
+
         public void ReleaseAll()
         {
             foreach (CacheEntry entry in new List<CacheEntry>(_entries.Values))
@@ -65,8 +82,13 @@ namespace Domain.AddressableLoading
 
             _entries.Clear();
         }
-        
-        private async UniTask<CacheEntry> AcquireInternal(string key, bool pin)
+
+        public void Dispose()
+        {
+            ReleaseAll();
+        }
+
+        private async UniTask<CacheEntry> AcquireInternal(string key, bool pin, CancellationToken ct)
         {
             if (!_entries.TryGetValue(key, out CacheEntry entry))
             {
@@ -81,13 +103,22 @@ namespace Domain.AddressableLoading
 
             try
             {
-                await entry.LoadTask;
+                await entry.LoadTask.AttachExternalCancellation(ct);
+
+                if (entry.Discarded)
+                    throw new OperationCanceledException($"Prefab '{key}' was released while loading.");
+
                 return entry;
             }
             catch
             {
                 entry.Users--;
-                Discard(entry);
+
+                if (entry.LoadTask.Status == UniTaskStatus.Faulted)
+                    Discard(entry);
+                else
+                    TryDiscard(entry);
+
                 throw;
             }
         }

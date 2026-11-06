@@ -28,14 +28,14 @@ namespace Template.Features.ClassFactory
         public T Create<T>(IEnumerable<object> extraArgs = null)
         {
             extraArgs ??= Array.Empty<object>();
-            
+
             return _container.Instantiate<T>(extraArgs);
         }
 
         public object Create(Type type, IEnumerable<object> extraArgs = null)
         {
             extraArgs ??= Array.Empty<object>();
-            
+
             return _container.Instantiate(type, extraArgs);
         }
 
@@ -51,7 +51,13 @@ namespace Template.Features.ClassFactory
             return CreateMonoBehaviour<T>(prefab.gameObject, parent, dontDestroy);
         }
         
-        public T CreateMonoBehaviour<T>(GameObject prefab, Transform parent, bool dontDestroy = false) where T : Component
+        public T CreateMonoBehaviour<T>(T prefab, Vector3 position, Quaternion quaternion, Transform parent, bool dontDestroy = false) where T : Component
+        {
+            return CreateMonoBehaviour<T>(prefab.gameObject, position, quaternion, parent, dontDestroy);
+        }
+
+        public T CreateMonoBehaviour<T>(GameObject prefab, Transform parent, bool dontDestroy = false)
+            where T : Component
         {
             T instance = _container
                 .InstantiatePrefab(prefab, parent)
@@ -64,11 +70,26 @@ namespace Template.Features.ClassFactory
 
             return instance;
         }
-        
+
+        public T CreateMonoBehaviour<T>(GameObject prefab, Vector3 position, Quaternion quaternion, Transform parent,
+            bool dontDestroy = false) where T : Component
+        {
+            T instance = _container
+                .InstantiatePrefab(prefab, position, quaternion, parent)
+                .GetComponent<T>();
+
+            if (dontDestroy)
+            {
+                Object.DontDestroyOnLoad(instance.gameObject);
+            }
+
+            return instance;
+        }
+
         public T CreateMonoBehaviourAndBind<T>(T prefab, Transform parent, bool dontDestroy = false) where T : Component
         {
             T instance = CreateMonoBehaviour(prefab, parent, dontDestroy);
-            
+
             _container.Bind<T>()
                 .FromInstance(instance)
                 .AsSingle();
@@ -111,12 +132,12 @@ namespace Template.Features.ClassFactory
         }
 
         public T BindFromInstance<T>(T instance)
-        { 
+        {
             _container.Bind<T>().FromInstance(instance).AsSingle();
-            
+
             return instance;
         }
-        
+
         public List<T> CreateByBaseClass<T>(Predicate<T> extraPredicate = null) where T : class
         {
             Type parent = typeof(T);
