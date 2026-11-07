@@ -12,4 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f294acad4a549d0bc75b8bc3e222d22, type: 3}
   m_Name: Config_Gameplay_EntityContainer
   m_EditorClassIdentifier: Assembly-CSharp::Template.Features.PrefabLoader.EntityConfig
-  _entries: []
+  _entries:
+  - _type: 0
+    _prefab:
+      m_AssetGUID: b8f7b88faf933054fa524c0a529061ac
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_SubObjectGUID: 
+      m_EditorAssetChanged: 0

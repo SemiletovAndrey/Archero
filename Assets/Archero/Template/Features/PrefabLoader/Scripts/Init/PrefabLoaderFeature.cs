@@ -6,7 +6,7 @@ namespace Template.Features.PrefabLoader
     {
         protected override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<PrefabProvider>().AsSingle();
+            BindAsSingle<IPrefabLoader, PrefabProvider>();
         }
     }
 }

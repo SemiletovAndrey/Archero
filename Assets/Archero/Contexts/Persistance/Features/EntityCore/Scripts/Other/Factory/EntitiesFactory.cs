@@ -6,17 +6,21 @@ namespace Persistance.Features.EntityCore
 {
     public class EntitiesFactory : IEntitiesFactory
     {
-        private IEntityLifeService _entityLifeService;
+        private readonly IEntityLifeService _entityLifeService;
+        private readonly IMonoEntityFactory _monoEntityFactory;
 
-        public EntitiesFactory(IEntityLifeService entityLifeService)
+        public EntitiesFactory(IEntityLifeService entityLifeService, IMonoEntityFactory monoEntityFactory)
         {
             _entityLifeService = entityLifeService;
+            _monoEntityFactory = monoEntityFactory;
         }
 
-        public Entity CreateTestEntity()
+        public Entity CreateTestEntity(Vector3 position)
         {
             Entity entity = CreateEmpty();
 
+            _monoEntityFactory.Create(entity, position, EntityType.None);
+            
             entity.AddComponent(new MoveDirection() { Value = new ReactiveVariable<Vector3>(Vector3.forward) })
                 .AddComponent(new MoveSpeed() { Value = new ReactiveVariable<float>(10) });
 

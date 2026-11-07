@@ -6,6 +6,7 @@ using Template.Features.LayerUI;
 using Template.Features.Localization;
 using Template.Features.NewInputFeature;
 using Template.Features.Popups;
+using Template.Features.PrefabLoader;
 using Template.Features.ProjectInit;
 using Template.Features.SceneLoader;
 
@@ -30,6 +31,8 @@ namespace Template.Scripts.Init
             AddFeature<LayerUiFeature>();
             
             AddFeature<FirebaseFeature>();
+            
+            AddFeature<PrefabLoaderFeature>();
         }
     }
 }

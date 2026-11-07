@@ -29,7 +29,6 @@ namespace Gameplay.Scripts
             AddFeature<GameplayNavigationFeature>();
             AddFeature<EntityCoreFeature>();
             AddFeature<GameLoopFeature>();
-            AddFeature<PrefabLoaderFeature>();
         }
     }
 }

@@ -5,6 +5,7 @@ using Persistance.Features.EntityCore;
 using Template.Features.Config.Local;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Serialization;
 
 namespace Template.Features.PrefabLoader
 {
@@ -14,36 +15,23 @@ namespace Template.Features.PrefabLoader
         [Serializable]
         public class Entry
         {
-            public EntityType Type;
-            public AssetReferenceGameObject Prefab;
+            [SerializeField] private EntityType _type;
+            [SerializeField] private AssetReferenceGameObject _prefab;
+
+            public EntityType Type => _type;
+            public AssetReferenceGameObject Prefab => _prefab;
         }
 
         [SerializeField] private List<Entry> _entries = new();
 
-        private Dictionary<EntityType, AssetReferenceGameObject> _map;
-        
-        public IEnumerable<AssetReferenceGameObject> AllPrefabs => _entries.Select(e => e.Prefab);
-
-        public AssetReferenceGameObject Get(EntityType type)
-        {
-            _map ??= _entries.ToDictionary(e => e.Type, e => e.Prefab);
-
-            if (!_map.TryGetValue(type, out AssetReferenceGameObject reference))
-                throw new KeyNotFoundException($"EntityConfig has no prefab for type '{type}'.");
-
-            return reference;
-        }
+        public IReadOnlyList<Entry> Entries => _entries;
 
         private void OnValidate()
         {
-            _map = null;
-
             var seen = new HashSet<EntityType>();
             foreach (Entry entry in _entries)
             {
-                if (entry.Type == EntityType.None)
-                    Debug.LogError($"{name}: entry with type None.", this);
-                else if (!seen.Add(entry.Type))
+                if (!seen.Add(entry.Type))
                     Debug.LogError($"{name}: duplicate type '{entry.Type}'.", this);
 
                 if (entry.Prefab == null || !entry.Prefab.RuntimeKeyIsValid())

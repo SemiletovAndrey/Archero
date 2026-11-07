@@ -12,37 +12,25 @@ namespace Template.Features.PrefabLoader
     {
         private readonly AddressablePrefabCache _cache = new();
 
-        public UniTask Preload(IEnumerable<AssetReferenceGameObject> references, CancellationToken ct = default)
-        {
-            var tasks = new List<UniTask>();
-            foreach (AssetReferenceGameObject reference in references)
-                tasks.Add(_cache.Preload(GetKey(reference), ct));
-
-            return UniTask.WhenAll(tasks);
-        }
-
         public async UniTask<T> Acquire<T>(AssetReferenceGameObject reference, CancellationToken ct = default)
             where T : Component
         {
             string key = GetKey(reference);
 
-            GameObject prefab = await _cache.Acquire(key, pin: true, ct);
-            
-            _cache.Release(key);
+            GameObject prefab = await _cache.Acquire(key, pin: false, ct);
 
-            return GetComponent<T>(prefab);
-        }
-
-        public bool TryGet<T>(AssetReferenceGameObject reference, out T prefab) where T : Component
-        {
-            if (_cache.TryGet(GetKey(reference), out GameObject go))
+            if (!prefab.TryGetComponent(out T component))
             {
-                prefab = GetComponent<T>(go);
-                return true;
+                _cache.Release(key);
+                throw new InvalidOperationException($"Prefab '{prefab.name}' has no {typeof(T).Name}.");
             }
 
-            prefab = null;
-            return false;
+            return component;
+        }
+
+        public void Release(AssetReferenceGameObject reference)
+        {
+            _cache.Release(GetKey(reference));
         }
 
         public void Dispose()
@@ -56,14 +44,6 @@ namespace Template.Features.PrefabLoader
                 throw new ArgumentException("Addressable reference is not assigned.");
 
             return reference.AssetGUID;
-        }
-
-        private static T GetComponent<T>(GameObject prefab) where T : Component
-        {
-            if (!prefab.TryGetComponent(out T component))
-                throw new InvalidOperationException($"Prefab '{prefab.name}' has no {typeof(T).Name}.");
-
-            return component;
         }
     }
 }

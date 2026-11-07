@@ -19,7 +19,7 @@ namespace Gameplay.Scripts
         
         public void Run()
         {
-            Entity testEntity = _entitiesFactory.CreateTestEntity();
+            Entity testEntity = _entitiesFactory.CreateTestEntity(Vector3.zero);
             
             Debug.Log($"Direction {testEntity.GetComponent<MoveDirection>().Value.Value};");
             Debug.Log($"Speed {testEntity.GetComponent<MoveSpeed>().Value.Value};");
