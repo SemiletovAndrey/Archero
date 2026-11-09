@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Persistance.Features.EntityCore
 {
-    public class Entity : IDisposable
+    public partial class Entity : IDisposable
     {
         private readonly Dictionary<Type, IEntityComponent> _components = new();
-        
+
         private readonly List<IEntitySystem> _entitySystems = new();
-        
+
         private readonly List<IInitializableSystem> _initializableSystems = new();
         private readonly List<IUpdatableSystem> _updatableSystems = new();
         private readonly List<IDisposableSystem> _disposableSystems = new();
@@ -27,26 +28,26 @@ namespace Persistance.Features.EntityCore
 
         public void OnUpdate(float deltaTime)
         {
-            if(!_isInit)
+            if (!_isInit)
                 return;
-            
+
             foreach (IUpdatableSystem updatableSystem in _updatableSystems)
             {
                 updatableSystem.OnUpdate(deltaTime);
             }
         }
-        
+
         public void Dispose()
         {
             foreach (IDisposableSystem disposableSystem in _disposableSystems)
             {
                 disposableSystem.OnDispose();
             }
-            
+
             _isInit = false;
         }
 
-        public Entity AddComponent<TComponent>(TComponent component)  where TComponent : class, IEntityComponent
+        public Entity AddComponent<TComponent>(TComponent component) where TComponent : class, IEntityComponent
         {
             _components.Add(typeof(TComponent), component);
             return this;
@@ -64,7 +65,7 @@ namespace Persistance.Features.EntityCore
                 component = (TComponent)entityComponent;
                 return true;
             }
-            
+
             component = null;
             return false;
         }
@@ -73,29 +74,29 @@ namespace Persistance.Features.EntityCore
         {
             if (!TryGetComponent(out TComponent component))
                 throw new ArgumentException($"Entity not exist {typeof(TComponent)}");
-            
+
             return component;
         }
 
         public Entity AddSystem(IEntitySystem system)
         {
-            if(_entitySystems.Contains(system))
+            if (_entitySystems.Contains(system))
                 throw new ArgumentException($"{system.GetType()}  is already registered");
-            
+
             _entitySystems.Add(system);
 
             if (system is IInitializableSystem initializableSystem)
             {
                 _initializableSystems.Add(initializableSystem);
-                
-                if(_isInit)
+
+                if (_isInit)
                     initializableSystem.OnInit(this);
             }
-            
-            if(system is IUpdatableSystem updatableSystem)
+
+            if (system is IUpdatableSystem updatableSystem)
                 _updatableSystems.Add(updatableSystem);
-            
-            if(system is IDisposableSystem disposableSystem)
+
+            if (system is IDisposableSystem disposableSystem)
                 _disposableSystems.Add(disposableSystem);
 
             return this;

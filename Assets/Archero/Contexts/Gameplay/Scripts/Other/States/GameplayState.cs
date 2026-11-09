@@ -74,6 +74,8 @@ namespace Template.Gameplay
             {
                 await _sceneLoader.Release(scene);
             }
+            
+            _inputProviderManager.RemoveProvider<ArcheroInputProvider>();
         }
     }
 }
