@@ -7,7 +7,7 @@ namespace Gameplay.Features.MovementFeature
     {
         protected override void InstallBindings()
         {
-            Container.Bind<IEntityRecipe>().To<TestEntityRecipe>().AsSingle();
+            Container.Bind<IEntityRecipe>().To<GhostEntityRecipe>().AsSingle();
         }
     }
 }

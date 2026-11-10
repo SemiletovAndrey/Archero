@@ -1,4 +1,5 @@
 ﻿using System;
+using Gameplay.Features.LifeCycle;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,11 +20,27 @@ namespace Template.Features.NewInputFeature.Scripts.Example
             
             Enable();
         }
+        
+        public void Dispose()
+        {
+            _actions.Player.Move.performed -= OnMoveChanged;
+            _actions.Player.Move.canceled -= OnMoveCanceled;
+            
+            _actions.Player.Attack.performed -= OnAttackPerformed;
+            _actions.Player.Attack.canceled -= OnAttackCanceled;
+            
+            Disable();
+            
+            _actions.Dispose();
+        }
 
         private void BindEvents()
         {
             _actions.Player.Move.performed += OnMoveChanged;
             _actions.Player.Move.canceled += OnMoveCanceled;
+            
+            _actions.Player.Attack.performed += OnAttackPerformed;
+            _actions.Player.Attack.canceled += OnAttackCanceled;
         }
 
         private void OnMoveChanged(InputAction.CallbackContext ctx)
@@ -46,15 +63,15 @@ namespace Template.Features.NewInputFeature.Scripts.Example
         {
             _actions.Player.Disable();
         }
-
-        public void Dispose()
+        
+        private void OnAttackPerformed(InputAction.CallbackContext ctx)
         {
-            _actions.Player.Move.performed -= OnMoveChanged;
-            _actions.Player.Move.canceled -= OnMoveCanceled;
-            
-            Disable();
-            
-            _actions.Dispose();
+            _bus.Publish(new AttackSignal(true));
+        }
+
+        private void OnAttackCanceled(InputAction.CallbackContext ctx)
+        {
+            _bus.Publish(new AttackSignal(false));
         }
     }
 }

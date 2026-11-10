@@ -14,4 +14,16 @@ namespace Gameplay.Features.MovementFeature
         public MoveSpeed() { }
         public MoveSpeed(float value) : base(value) { }
     }
+    
+    public class RotationDirection : ReactiveVariable<Vector3>
+    {
+        public RotationDirection() { }
+        public RotationDirection(Vector3 value) : base(value) { }
+    }
+
+    public class RotationSpeed : ReactiveVariable<float>
+    {
+        public RotationSpeed() { }
+        public RotationSpeed(float value) : base(value) { }
+    }
 }

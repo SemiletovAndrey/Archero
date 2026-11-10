@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 58e22ea8feb8a9042bd48528391063ce
   m_SerializeEntries:
   - m_GUID: b8f7b88faf933054fa524c0a529061ac
-    m_Address: ViewContainer
+    m_Address: Prefab_Entity_Ghost
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

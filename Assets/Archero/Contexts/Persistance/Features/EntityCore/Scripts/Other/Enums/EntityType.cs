@@ -3,6 +3,6 @@
     public enum EntityType
     {
         None = 0,
-        Test = 1,
+        Ghost = 1,
     }
 }
