@@ -42,6 +42,9 @@ namespace Gameplay.Scripts
             _currentMoveDirection.Value = new Vector3(_currentInput.x, 0, _currentInput.y);
         }
 
-        private void OnMovementReceived(MovementSignal signal) => _currentInput = signal.Value;
+        private void OnMovementReceived(MovementSignal signal)
+        {
+            _currentInput = signal.Value;
+        } 
     }
 }

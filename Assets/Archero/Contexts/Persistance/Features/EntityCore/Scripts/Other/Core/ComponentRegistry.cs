@@ -21,7 +21,6 @@ namespace Persistance.Features.EntityCore
         }
     }
 
-    /// <summary>Кэш id для generic-пути: после первого обращения это просто чтение статического поля.</summary>
     internal static class ComponentId<T>
     {
         public static readonly int Value = ComponentRegistry.GetId(typeof(T));
