@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Config_Gameplay_EntityContainer
   m_EditorClassIdentifier: Assembly-CSharp::Template.Features.PrefabLoader.EntityConfig
   _entries:
-  - _type: 0
+  - _type: 1
     _prefab:
       m_AssetGUID: b8f7b88faf933054fa524c0a529061ac
       m_SubObjectName: 

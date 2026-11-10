@@ -1,18 +1,17 @@
 ﻿using Contexts.Scripts.Utilities.Reactive;
-using Persistance.Features.EntityCore;
 using UnityEngine;
 
 namespace Gameplay.Features.MovementFeature
 {
-    public class MoveDirection : IEntityComponent
+    public class MoveDirection : ReactiveVariable<Vector3>
     {
-        public ReactiveVariable<Vector3> Value;
+        public MoveDirection() { }
+        public MoveDirection(Vector3 value) : base(value) { }
     }
 
-    public class MoveSpeed : IEntityComponent
+    public class MoveSpeed : ReactiveVariable<float>
     {
-        public ReactiveVariable<float> Value;
+        public MoveSpeed() { }
+        public MoveSpeed(float value) : base(value) { }
     }
-
-
 }

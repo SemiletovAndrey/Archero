@@ -1,8 +1,8 @@
-﻿using Persistance.Features.EntityCore;
+﻿using Gameplay.Features.MovementFeature;
+using Persistance.Features.EntityCore;
 using Persistance.Features.GameLoopFeature;
 using Template.Features.ClassFactory;
 using Template.Features.GameFlow.Scripts;
-using Template.Features.PrefabLoader;
 using Template.Features.ProjectInit;
 using UnityEngine;
 
@@ -29,6 +29,7 @@ namespace Gameplay.Scripts
             AddFeature<GameplayNavigationFeature>();
             AddFeature<EntityCoreFeature>();
             AddFeature<GameLoopFeature>();
+            AddFeature<MovementFeature>();
         }
     }
 }

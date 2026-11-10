@@ -26,12 +26,12 @@ namespace Contexts.Scripts.Utilities.Reactive
             get => _value;
             set 
             {
+                if (EqualityComparer<T>.Default.Equals(_value, value))
+                    return;
+
                 T oldValue = _value;
-                
                 _value = value;
-                
-                if(_value.Equals(oldValue))
-                    Invoke(oldValue, value);
+                Invoke(oldValue, value);
             }
         }
 
@@ -58,10 +58,9 @@ namespace Contexts.Scripts.Utilities.Reactive
             if (_toRemove.Count > 0)
             {
                 foreach (Subscriber<T, T> subscriber in _toRemove)
-                {
                     _subscribers.Remove(subscriber);
-                    _toRemove.Clear();
-                }
+
+                _toRemove.Clear();
             }
 
             foreach (Subscriber<T, T> subscriber in _subscribers)

@@ -1,7 +1,6 @@
-﻿namespace Persistance.Features.EntityCore
+namespace Persistance.Features.EntityCore
 {
     public interface IEntitySystem
     {
-        
     }
 }

@@ -10,45 +10,38 @@ namespace Gameplay.Scripts
 {
     public class TestGameplay : MonoBehaviour
     {
-        private IEntitiesFactory _entitiesFactory;
+        private IEntityFactory _entityFactory;
         private IInputBus _bus;
-        
+
         private bool _isRunning;
         private Entity _testEntity;
-        
         private Vector2 _currentInput;
-        
         private MoveDirection _currentMoveDirection;
 
         [Inject]
-        private void Construct(IEntitiesFactory entitiesFactory, IInputBus bus)
+        private void Construct(IEntityFactory entityFactory, IInputBus bus)
         {
-            _entitiesFactory = entitiesFactory;
+            _entityFactory = entityFactory;
             _bus = bus;
         }
 
         public void Run()
         {
-            _testEntity = _entitiesFactory.CreateTestEntity(Vector3.zero);
-            
-            _isRunning = true;
-            
+            _testEntity = _entityFactory.Create(EntityType.Test, Vector3.zero);
+            _currentMoveDirection = _testEntity.Get<MoveDirection>();
+
             _bus.Subscribe<MovementSignal>(OnMovementReceived);
-            _currentMoveDirection = _testEntity.MoveDirectionC;
+            _isRunning = true;
         }
 
         private void Update()
         {
             if (!_isRunning)
                 return;
-            
-            Vector3 input = new Vector3(_currentInput.x, 0, _currentInput.y);
-            _currentMoveDirection.Value.Value = input;
+
+            _currentMoveDirection.Value = new Vector3(_currentInput.x, 0, _currentInput.y);
         }
-        
-        private void OnMovementReceived(MovementSignal signal)
-        {
-            _currentInput = signal.Value;
-        }
+
+        private void OnMovementReceived(MovementSignal signal) => _currentInput = signal.Value;
     }
 }

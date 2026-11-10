@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Template.Features.ProjectInit;
 
 namespace Persistance.Features.EntityCore
@@ -7,8 +7,8 @@ namespace Persistance.Features.EntityCore
     {
         protected override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<EntityLifeService>().AsSingle();
-            BindAsSingle<IEntitiesFactory, EntitiesFactory>();
+            Container.BindInterfacesAndSelfTo<EntityWorld>().AsSingle();
+            BindAsSingle<IEntityFactory, EntityFactory>();
             BindAsSingle<IMonoEntityFactory, MonoEntityFactory>();
         }
 

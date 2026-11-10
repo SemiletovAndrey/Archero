@@ -99,9 +99,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 420277357845452363}
-  - component: {fileID: 2236395815919208287}
-  - component: {fileID: 5541075821711486520}
   - component: {fileID: 7402486671902662177}
+  - component: {fileID: 2926521064462333726}
   m_Layer: 0
   m_Name: ViewContainer
   m_TagString: Untagged
@@ -125,30 +124,6 @@ Transform:
   - {fileID: 7262926908812488086}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2236395815919208287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7297417791870100235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e55a7feb5113445abf74acfcf6af2dd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.EntityCore.MonoEntity
---- !u!114 &5541075821711486520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7297417791870100235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c96367aea95040ff82446c11379d9e83, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.EntityCore.RigidbodyEntityRegistrator
 --- !u!54 &7402486671902662177
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -176,6 +151,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
+--- !u!114 &2926521064462333726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297417791870100235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b90d34c11ed60804a96a86694113d201, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.EntityCore.MonoEntity
+  _exposed:
+  - {fileID: 7402486671902662177}
+  _registrators: []
 --- !u!1 &8439736906810580371
 GameObject:
   m_ObjectHideFlags: 0

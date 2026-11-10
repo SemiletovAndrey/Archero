@@ -4,24 +4,23 @@ using UnityEngine;
 
 namespace Gameplay.Features.MovementFeature
 {
-    public class RigidbodyMovementSystem : IInitializableSystem, IUpdatableSystem
+    public class RigidbodyMovementSystem : IInitializableSystem, IFixedUpdatableSystem
     {
-        private ReactiveVariable<Vector3> _moveDirection;
-        private ReactiveVariable<float> _moveSpeed;
         private Rigidbody _rigidbody;
+        private ReactiveVariable<Vector3> _direction;
+        private ReactiveVariable<float> _speed;
 
         public void OnInit(Entity entity)
         {
-            _moveDirection = entity.MoveDirection;
-            _moveSpeed = entity.MoveSpeed;
-            _rigidbody = entity.Rigidbody;
+            _rigidbody = entity.Get<Rigidbody>();
+            _direction = entity.Get<MoveDirection>();
+            _speed = entity.Get<MoveSpeed>();
         }
 
-        public void OnUpdate(float deltaTime)
+        public void OnFixedUpdate(float fixedDeltaTime)
         {
-            Vector3 velocity = _moveDirection.Value.normalized * _moveSpeed.Value;
-            
-            _rigidbody.linearVelocity = velocity;
+            Vector3 step = _direction.Value * (_speed.Value * fixedDeltaTime);
+            _rigidbody.MovePosition(_rigidbody.position + step);
         }
     }
 }
