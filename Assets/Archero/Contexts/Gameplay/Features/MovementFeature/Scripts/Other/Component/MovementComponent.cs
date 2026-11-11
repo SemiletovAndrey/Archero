@@ -1,4 +1,7 @@
-﻿using Contexts.Scripts.Utilities.Reactive;
+﻿using System;
+using System.Collections.Generic;
+using Contexts.Scripts.Utilities.Reactive;
+using Template.Scripts.Utils;
 using UnityEngine;
 
 namespace Gameplay.Features.MovementFeature
@@ -25,5 +28,17 @@ namespace Gameplay.Features.MovementFeature
     {
         public RotationSpeed() { }
         public RotationSpeed(float value) : base(value) { }
+    }
+
+    public class CanMove : CompositeCondition
+    {
+        public CanMove() { }
+        public CanMove(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
+    }
+    
+    public class CanRotate : CompositeCondition
+    {
+        public CanRotate() { }
+        public CanRotate(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
     }
 }

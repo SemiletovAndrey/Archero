@@ -9,6 +9,7 @@ namespace Persistance.Features.EntityCore
         public int Id { get; }
         public EntityType Type { get; }
         public EntityState State { get; internal set; }
+        public bool IsAlive => State == EntityState.Active;
 
         internal int WorldIndex = -1;
 

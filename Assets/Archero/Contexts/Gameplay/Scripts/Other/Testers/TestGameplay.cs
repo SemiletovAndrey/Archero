@@ -1,5 +1,4 @@
-﻿using System;
-using Gameplay.Features.LifeCycle;
+﻿using Gameplay.Features.LifeCycle;
 using Gameplay.Features.MovementFeature;
 using Persistance.Features.EntityCore;
 using Template.Features.NewInputFeature;
