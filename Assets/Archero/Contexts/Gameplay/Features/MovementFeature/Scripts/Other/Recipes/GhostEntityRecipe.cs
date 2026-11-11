@@ -30,16 +30,26 @@ namespace Gameplay.Features.MovementFeature
                 .AddSystem(new DeathProcessTimerSystem());
             
             var isDead = entity.Get<IsDead>();
+            var currentHealth = entity.Get<CurrentHealth>();
 
             CanMove canMove = new CanMove();
             canMove.Add(new FuncCondition(() => !isDead.Value));
 
             CanRotate canRotate = new CanRotate();
             canRotate.Add(new FuncCondition(() => !isDead.Value));
+            
+            MustDie mustDie = new MustDie();
+            mustDie.Add(new FuncCondition(() => currentHealth.Value <= 0));
+            
+            MustSelfRelease mustSelfRelease = new MustSelfRelease();
+            mustSelfRelease.Add(new FuncCondition(() => isDead.Value))
+                .Add(new FuncCondition(() => entity.Get<InDeathProcess>().Value == false));
 
             entity
                 .Add(canMove)
-                .Add(canRotate);
+                .Add(canRotate)
+                .Add(mustDie)
+                .Add(mustSelfRelease);
         }
     }
 }

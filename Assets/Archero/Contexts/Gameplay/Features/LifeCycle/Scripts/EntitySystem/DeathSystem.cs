@@ -10,6 +10,8 @@ namespace Gameplay.Features.LifeCycle
         private ReactiveVariable<bool> _isDead;
         
         private ReactiveVariable<float> _currentHealth;
+
+        private MustDie _mustDie;
         
         private IDisposable _healthChangeSubscription; 
         
@@ -17,6 +19,7 @@ namespace Gameplay.Features.LifeCycle
         {
             _isDead = entity.Get<IsDead>();
             _currentHealth = entity.Get<CurrentHealth>();
+            _mustDie = entity.Get<MustDie>();
 
             _healthChangeSubscription = _currentHealth.Subscribe(OnHealthChanged);
         }
@@ -31,10 +34,9 @@ namespace Gameplay.Features.LifeCycle
             if(_isDead.Value)
                 return;
             
-            if (newValue <= 0)
+            if (_mustDie.Evaluate())
             {
                 _isDead.Value = true;
-                Debug.Log("YOU DEAD");
             }
         }
     }

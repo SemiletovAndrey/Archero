@@ -1,4 +1,6 @@
-﻿using Contexts.Scripts.Utilities.Reactive;
+﻿using System;
+using Contexts.Scripts.Utilities.Reactive;
+using Template.Scripts.Utils;
 
 namespace Gameplay.Features.LifeCycle
 {
@@ -36,5 +38,17 @@ namespace Gameplay.Features.LifeCycle
     {
         public InDeathProcess() { }
         public InDeathProcess(bool value) : base(value) {}  
+    }
+    
+    public class MustDie : CompositeCondition
+    {
+        public MustDie() { }
+        public MustDie(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
+    }
+    
+    public class MustSelfRelease : CompositeCondition
+    {
+        public MustSelfRelease() { }
+        public MustSelfRelease(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
     }
 }
