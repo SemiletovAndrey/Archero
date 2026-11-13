@@ -101,7 +101,10 @@ GameObject:
   - component: {fileID: 420277357845452363}
   - component: {fileID: 7402486671902662177}
   - component: {fileID: 2926521064462333726}
-  m_Layer: 0
+  - component: {fileID: 8754756166962922545}
+  - component: {fileID: 3818484156997395414}
+  - component: {fileID: 269340606290714143}
+  m_Layer: 6
   m_Name: Prefab_Entity_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -165,7 +168,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.EntityCore.MonoEntity
   _exposed:
   - {fileID: 7402486671902662177}
-  _registrators: []
+  - {fileID: 3818484156997395414}
+  _registrators:
+  - {fileID: 269340606290714143}
+--- !u!136 &8754756166962922545
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297417791870100235}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2.4
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.2, z: 0}
+--- !u!114 &3818484156997395414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297417791870100235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751e0e75a0e84a8384199e493686b903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Features.Sensers.BodyCollider
+  Collider: {fileID: 8754756166962922545}
+--- !u!114 &269340606290714143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297417791870100235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ab956ddaa5e4ad1a23f17cb5c93a19b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.EntityCore.EntityColliders
+  _items:
+  - {fileID: 8754756166962922545}
 --- !u!1 &8439736906810580371
 GameObject:
   m_ObjectHideFlags: 0

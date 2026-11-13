@@ -10,6 +10,7 @@ namespace Persistance.Features.EntityCore
             Container.BindInterfacesAndSelfTo<EntityWorld>().AsSingle();
             BindAsSingle<IEntityFactory, EntityFactory>();
             BindAsSingle<IMonoEntityFactory, MonoEntityFactory>();
+            Container.BindInterfacesAndSelfTo<ColliderRegistryService>().AsSingle().NonLazy();
         }
 
         protected override async UniTask InitSystems()

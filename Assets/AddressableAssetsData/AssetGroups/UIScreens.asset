@@ -25,11 +25,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ddb1ab933107fe547802686534f37e9d
-    m_Address: Prefab_Screen_Hud2
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e861bec8da27ea14a8bfa460a95a1b8c
     m_Address: Prefab_Screen_ChoiceLevel
     m_ReadOnly: 0

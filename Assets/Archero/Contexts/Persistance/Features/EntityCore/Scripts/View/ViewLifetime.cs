@@ -6,16 +6,18 @@ namespace Persistance.Features.EntityCore
 {
     public sealed class ViewLifetime : IDisposable
     {
-        private GameObject _gameObject;
+        private MonoEntity _view;
 
-        public ViewLifetime(GameObject gameObject) => _gameObject = gameObject;
+        public ViewLifetime(MonoEntity monoEntity) => _view = monoEntity;
 
         public void Dispose()
         {
-            if (_gameObject != null)
-                Object.Destroy(_gameObject);
+            if (_view == null)
+                return;
 
-            _gameObject = null;
+            _view.Cleanup();
+            Object.Destroy(_view.gameObject);
+            _view = null;
         }
     }
 }

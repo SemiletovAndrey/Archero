@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Contexts.Scripts.Utilities.Reactive;
 using Template.Scripts.Utils;
 using UnityEngine;

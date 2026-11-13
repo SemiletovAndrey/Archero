@@ -11,8 +11,14 @@ namespace Persistance.Features.EntityCore
         [Tooltip("Заполняется автоматически в редакторе")]
         [SerializeField] private MonoEntityRegistrator[] _registrators;
 
+        private Entity _linkedEntity;
+        
+        public Entity LinkedEntity => _linkedEntity;
+        
         public void Setup(Entity entity)
         {
+            _linkedEntity = entity;
+            
             entity.Add(this);
             entity.Add(transform);
 
@@ -32,6 +38,11 @@ namespace Persistance.Features.EntityCore
                 foreach (MonoEntityRegistrator registrator in _registrators)
                     registrator.Register(entity);
             }
+        }
+
+        public void Cleanup()
+        {
+            _linkedEntity = null;
         }
 
 #if UNITY_EDITOR

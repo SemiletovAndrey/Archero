@@ -50,7 +50,7 @@ namespace Persistance.Features.EntityCore
             MonoEntity view =
                 _classFactory.CreateMonoBehaviour<MonoEntity>(prefab, position, Quaternion.identity, null);
 
-            entity.Add(new ViewLifetime(view.gameObject));
+            entity.Add(new ViewLifetime(view));
             view.Setup(entity);
 
             return view;
