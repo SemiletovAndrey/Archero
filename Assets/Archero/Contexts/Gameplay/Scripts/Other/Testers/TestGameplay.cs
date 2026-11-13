@@ -30,7 +30,7 @@ namespace Gameplay.Scripts
 
         public void Run()
         {
-            _testEntity = _entityFactory.Create(EntityType.Ghost, Vector3.zero);
+            _testEntity = _entityFactory.Create(EntityType.Hero, Vector3.zero);
             _entityFactory.Create(EntityType.Ghost, Vector3.zero + Vector3.forward * 5);
             
             _currentMoveDirection = _testEntity.Get<MoveDirection>();
