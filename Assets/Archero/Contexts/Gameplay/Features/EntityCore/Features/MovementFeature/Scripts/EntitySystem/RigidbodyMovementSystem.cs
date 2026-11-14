@@ -11,6 +11,7 @@ namespace Gameplay.Features.MovementFeature
         private Rigidbody _rigidbody;
         private ReactiveVariable<Vector3> _direction;
         private ReactiveVariable<float> _speed;
+        private ReactiveVariable<bool> _isMoving;
         private ICompositeCondition  _canMove;
 
         public void OnInit(Entity entity)
@@ -18,6 +19,7 @@ namespace Gameplay.Features.MovementFeature
             _rigidbody = entity.Get<Rigidbody>();
             _direction = entity.Get<MoveDirection>();
             _speed = entity.Get<MoveSpeed>();
+            _isMoving = entity.Get<IsMoving>();
             _canMove = entity.Get<CanMove>();
         }
 
@@ -30,6 +32,9 @@ namespace Gameplay.Features.MovementFeature
             }
             
             Vector3 step = _direction.Value * (_speed.Value * fixedDeltaTime);
+            
+            _isMoving.Value = step.magnitude > 0;
+            
             _rigidbody.MovePosition(_rigidbody.position + step);
         }
     }

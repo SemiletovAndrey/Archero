@@ -27,6 +27,7 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new MoveSpeed(10))
                 .Add(new RotationDirection())
                 .Add(new RotationSpeed(900))
+                .Add(new IsMoving())
                 .AddSystem(new RigidbodyMovementSystem())
                 .AddSystem(new RigidbodyRotationSystem())
                 .AddSystem(new BodyContactsDetectingSystem())

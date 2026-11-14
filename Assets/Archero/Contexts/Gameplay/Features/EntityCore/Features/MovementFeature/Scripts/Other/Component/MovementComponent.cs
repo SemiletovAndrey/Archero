@@ -40,4 +40,10 @@ namespace Gameplay.Features.MovementFeature
         public CanRotate() { }
         public CanRotate(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
     }
+
+    public class IsMoving : ReactiveVariable<bool>
+    {
+        public IsMoving() { }
+        public IsMoving(bool value) : base(value) { }
+    }
 }

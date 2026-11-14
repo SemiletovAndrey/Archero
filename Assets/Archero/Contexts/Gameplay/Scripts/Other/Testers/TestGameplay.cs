@@ -1,4 +1,5 @@
 ﻿using Gameplay.Features.ApplyDamage;
+using Gameplay.Features.EntityCore.Features.Attack;
 using Gameplay.Features.LifeCycle;
 using Gameplay.Features.MovementFeature;
 using Persistance.Features.EntityCore;
@@ -19,7 +20,6 @@ namespace Gameplay.Scripts
         private Vector2 _currentInput;
         private MoveDirection _currentMoveDirection;
         private RotationDirection _currentRotationDirection;
-        private CurrentHealth _currentHealth;
 
         [Inject]
         private void Construct(IEntityFactory entityFactory, IInputBus bus)
@@ -35,7 +35,6 @@ namespace Gameplay.Scripts
             
             _currentMoveDirection = _testEntity.Get<MoveDirection>();
             _currentRotationDirection = _testEntity.Get<RotationDirection>();
-            _currentHealth = _testEntity.Get<CurrentHealth>();
 
             _bus.Subscribe<MovementSignal>(OnMovementReceived);
             _bus.Subscribe<AttackSignal>(OnAttackReceived);
@@ -66,7 +65,7 @@ namespace Gameplay.Scripts
         private void OnAttackReceived(AttackSignal signal)
         {
             if (signal.IsPressed) 
-                _testEntity.Get<TakeDamageRequest>().Invoke(50);
+                _testEntity.Get<StartAttackRequest>().Invoke();
         }
     }
 }

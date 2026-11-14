@@ -181,6 +181,51 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5858620222725866743
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7975183022680293494}
+  - component: {fileID: 5547004971460118453}
+  m_Layer: 6
+  m_Name: ShootPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7975183022680293494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5858620222725866743}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.74, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8468486764464170444}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5547004971460118453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5858620222725866743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c1545a1b8fd4045892138b499bef429, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Features.EntityCore.Features.Attack.ShootPoint
+  Value: {fileID: 7975183022680293494}
 --- !u!1001 &9199806502622865232
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -231,7 +276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       propertyPath: _exposed.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       propertyPath: '_exposed.Array.data[0]'
@@ -241,6 +286,10 @@ PrefabInstance:
       propertyPath: '_exposed.Array.data[1]'
       value: 
       objectReference: {fileID: 8302828274096695094}
+    - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
+      propertyPath: '_exposed.Array.data[2]'
+      value: 
+      objectReference: {fileID: 5547004971460118453}
     - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       propertyPath: _registrators.Array.size
       value: 2
@@ -260,6 +309,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 732499720321221276, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7975183022680293494}
     - targetCorrespondingSourceObject: {fileID: 7216010066672326998, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1709440961343555595}
@@ -381,3 +433,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Features.LifeCycle.CollidersDisabledOnDeath
   _items:
   - {fileID: 24845905686792942}
+--- !u!4 &8468486764464170444 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 732499720321221276, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
+  m_PrefabInstance: {fileID: 9199806502622865232}
+  m_PrefabAsset: {fileID: 0}
