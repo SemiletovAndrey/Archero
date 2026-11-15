@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Persistance.Features.EntityCore
 {
@@ -8,25 +9,34 @@ namespace Persistance.Features.EntityCore
     {
         private readonly IEntityWorld _world;
         private readonly IMonoEntityFactory _views;
-        private readonly Dictionary<EntityType, IEntityRecipe> _recipes = new();
+        private readonly DiContainer _container;
+        private Dictionary<EntityType, IEntityRecipeBase> _recipes;
 
-        public EntityFactory(IEntityWorld world, IMonoEntityFactory views, List<IEntityRecipe> recipes)
+        public EntityFactory(IEntityWorld world, IMonoEntityFactory views, DiContainer container)
         {
             _world = world;
             _views = views;
+            _container = container;
+        }
 
-            foreach (IEntityRecipe recipe in recipes)
+        private Dictionary<EntityType, IEntityRecipeBase> Recipes => _recipes ??= BuildRecipeMap();
+
+        private Dictionary<EntityType, IEntityRecipeBase> BuildRecipeMap()
+        {
+            var map = new Dictionary<EntityType, IEntityRecipeBase>();
+
+            foreach (IEntityRecipeBase recipe in _container.ResolveAll<IEntityRecipeBase>())
             {
-                if (!_recipes.TryAdd(recipe.Type, recipe))
+                if (!map.TryAdd(recipe.Type, recipe))
                     throw new InvalidOperationException($"Duplicate recipe for {recipe.Type}");
             }
+
+            return map;
         }
 
         public Entity Create(EntityType type, Vector3 position)
         {
-            if (!_recipes.TryGetValue(type, out IEntityRecipe recipe))
-                throw new InvalidOperationException($"No recipe for {type}");
-
+            IEntityRecipe recipe = GetRecipe<IEntityRecipe>(type);
             Entity entity = _world.Create(type);
 
             try
@@ -42,6 +52,38 @@ namespace Persistance.Features.EntityCore
             }
 
             return entity;
+        }
+
+        public Entity Create<TArgs>(EntityType type, Vector3 position, TArgs args)
+        {
+            IEntityRecipe<TArgs> recipe = GetRecipe<IEntityRecipe<TArgs>>(type);
+            Entity entity = _world.Create(type);
+
+            try
+            {
+                _views.Create(entity, position, type);
+                recipe.Build(entity, args);
+                _world.Add(entity);
+            }
+            catch
+            {
+                entity.Deactivate();
+                throw;
+            }
+
+            return entity;
+        }
+
+        private T GetRecipe<T>(EntityType type) where T : class, IEntityRecipeBase
+        {
+            if (!Recipes.TryGetValue(type, out IEntityRecipeBase recipe))
+                throw new InvalidOperationException($"No recipe for {type}");
+
+            if (recipe is not T typed)
+                throw new InvalidOperationException(
+                    $"Recipe for {type} is {recipe.GetType().Name}, which does not implement {typeof(T).Name}");
+
+            return typed;
         }
     }
 }

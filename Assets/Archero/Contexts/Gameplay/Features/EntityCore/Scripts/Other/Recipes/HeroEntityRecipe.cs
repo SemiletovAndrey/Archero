@@ -1,13 +1,21 @@
 ﻿using Gameplay.Features.ApplyDamage;
 using Gameplay.Features.EntityCore.Features.Attack;
 using Gameplay.Features.LifeCycle;
+using Gameplay.Features.MovementFeature;
 using Persistance.Features.EntityCore;
 using Template.Scripts.Utils;
 
-namespace Gameplay.Features.MovementFeature
+namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
 {
     public class HeroEntityRecipe : IEntityRecipe
     {
+        private readonly IEntityFactory _entityFactory;
+
+        public HeroEntityRecipe(IEntityFactory entityFactory)
+        {
+            _entityFactory = entityFactory;
+        }
+
         public EntityType Type => EntityType.Hero;
 
         public void Build(Entity entity)
@@ -57,7 +65,7 @@ namespace Gameplay.Features.MovementFeature
                 .AddSystem(new AttackProcessTimerSystem())
                 .AddSystem(new EndAttackSystem())
                 .AddSystem(new AttackDelayEndTriggerSystem())
-                .AddSystem(new InstantsShootSystem())
+                .AddSystem(new InstantsShootSystem(_entityFactory))
                 .AddSystem(new AttackCancelSystem())
                 .AddSystem(new AttackCooldownTimerSystem());
             
@@ -66,6 +74,7 @@ namespace Gameplay.Features.MovementFeature
             CurrentHealth currentHealth = entity.Get<CurrentHealth>();
             InAttackProcess inAttackProcess = entity.Get<InAttackProcess>();
             InAttackCooldown inAttackCooldown = entity.Get<InAttackCooldown>();
+            InDeathProcess inDeathProcess = entity.Get<InDeathProcess>();
 
             CanMove canMove = new CanMove();
             canMove.Add(new FuncCondition(() => !isDead.Value));
@@ -78,7 +87,7 @@ namespace Gameplay.Features.MovementFeature
             
             MustSelfRelease mustSelfRelease = new MustSelfRelease();
             mustSelfRelease.Add(new FuncCondition(() => isDead.Value))
-                .Add(new FuncCondition(() => entity.Get<InDeathProcess>().Value == false));
+                .Add(new FuncCondition(() => inDeathProcess.Value == false));
             
             CanApplyDamage canApplyDamage = new CanApplyDamage();
             canApplyDamage.Add(new FuncCondition(() => !isDead.Value));

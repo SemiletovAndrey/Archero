@@ -13,6 +13,13 @@ namespace Gameplay.Features.EntityCore.Features.Attack
 
         private IDisposable _attackEndDisposable;
         
+        private readonly IEntityFactory _entityFactory;
+
+        public InstantsShootSystem(IEntityFactory entityFactory)
+        {
+            _entityFactory = entityFactory;
+        }
+
         public void OnInit(Entity entity)
         {
             _attackDelayEndEvent = entity.Get<AttackDelayEndEvent>();
@@ -29,7 +36,8 @@ namespace Gameplay.Features.EntityCore.Features.Attack
 
         private void OnAttackDelayEnd()
         {
-            Debug.Log($"SHOOT {_instantAttackDamage.Value}, point: {_shootPoint.position}");
+            ProjectileArgs projectileArgs = new ProjectileArgs(_shootPoint.forward, _instantAttackDamage.Value);
+            _entityFactory.Create(EntityType.Projectile, _shootPoint.position, projectileArgs);
         }
     }
 }

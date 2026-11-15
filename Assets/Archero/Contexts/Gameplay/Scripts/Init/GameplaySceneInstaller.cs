@@ -1,4 +1,4 @@
-﻿using Gameplay.Features.MovementFeature;
+﻿using Gameplay.Features.EntityCore;
 using Persistance.Features.EntityCore;
 using Persistance.Features.GameLoopFeature;
 using Template.Features.ClassFactory;
@@ -29,7 +29,7 @@ namespace Gameplay.Scripts
             AddFeature<GameplayNavigationFeature>();
             AddFeature<EntityCoreFeature>();
             AddFeature<GameLoopFeature>();
-            AddFeature<MovementFeature>();
+            AddFeature<GameplayEntityCoreFeature>();
         }
     }
 }

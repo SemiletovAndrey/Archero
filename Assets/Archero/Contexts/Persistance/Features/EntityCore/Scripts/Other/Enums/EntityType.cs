@@ -5,5 +5,6 @@
         None = 0,
         Ghost = 1,
         Hero = 2,
+        Projectile = 3,
     }
 }

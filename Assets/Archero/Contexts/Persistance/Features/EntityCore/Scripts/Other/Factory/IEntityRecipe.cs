@@ -1,9 +1,12 @@
 namespace Persistance.Features.EntityCore
 {
-    public interface IEntityRecipe
+    public interface IEntityRecipe : IEntityRecipeBase
     {
-        public EntityType Type { get; }
-        
         public void Build(Entity entity);
+    }
+    
+    public interface IEntityRecipe<TArgs> : IEntityRecipeBase
+    {
+        public void Build(Entity entity, TArgs args);
     }
 }
