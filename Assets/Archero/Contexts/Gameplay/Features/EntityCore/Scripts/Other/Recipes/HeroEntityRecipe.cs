@@ -49,16 +49,23 @@ namespace Gameplay.Features.MovementFeature
                 .Add(new StartAttackEvent())
                 .Add(new EndAttackEvent())
                 .Add(new AttackDelayEndEvent())
+                .Add(new AttackCancelEvent())
+                .Add(new AttackCooldownInitialTime(2))
+                .Add(new AttackCooldownCurrentTime())
+                .Add(new InAttackCooldown())
                 .AddSystem(new StartAttackSystem())
                 .AddSystem(new AttackProcessTimerSystem())
                 .AddSystem(new EndAttackSystem())
                 .AddSystem(new AttackDelayEndTriggerSystem())
-                .AddSystem(new InstantsShootSystem());
+                .AddSystem(new InstantsShootSystem())
+                .AddSystem(new AttackCancelSystem())
+                .AddSystem(new AttackCooldownTimerSystem());
             
             IsDead isDead = entity.Get<IsDead>();
             IsMoving isMoving = entity.Get<IsMoving>();
             CurrentHealth currentHealth = entity.Get<CurrentHealth>();
             InAttackProcess inAttackProcess = entity.Get<InAttackProcess>();
+            InAttackCooldown inAttackCooldown = entity.Get<InAttackCooldown>();
 
             CanMove canMove = new CanMove();
             canMove.Add(new FuncCondition(() => !isDead.Value));
@@ -80,6 +87,11 @@ namespace Gameplay.Features.MovementFeature
             canStartAttack.Add(new FuncCondition(() => !isDead.Value));
             canStartAttack.Add(new FuncCondition(() => !inAttackProcess.Value));
             canStartAttack.Add(new FuncCondition(() => !isMoving.Value));
+            canStartAttack.Add(new FuncCondition(() => !inAttackCooldown.Value));
+            
+            MustCancelAttack mustCancelAttack = new MustCancelAttack(LogicOperation.Or);
+            mustCancelAttack.Add(new FuncCondition(() => isDead.Value));
+            mustCancelAttack.Add(new FuncCondition(() => isMoving.Value));
 
             entity
                 .Add(canMove)
@@ -87,7 +99,8 @@ namespace Gameplay.Features.MovementFeature
                 .Add(mustDie)
                 .Add(mustSelfRelease)
                 .Add(canApplyDamage)
-                .Add(canStartAttack);
+                .Add(canStartAttack)
+                .Add(mustCancelAttack);
         }
     }
 }

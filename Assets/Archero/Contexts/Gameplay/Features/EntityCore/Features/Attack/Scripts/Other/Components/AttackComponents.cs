@@ -47,4 +47,30 @@ namespace Gameplay.Features.EntityCore.Features.Attack
         public InstantAttackDamage() { }
         public InstantAttackDamage(float value) : base(value) { }
     }
+    
+    public class MustCancelAttack : CompositeCondition
+    {
+        public MustCancelAttack() { }
+        public MustCancelAttack(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
+    }
+    
+    public class AttackCancelEvent : ReactiveEvent { }
+
+    public class AttackCooldownInitialTime : ReactiveVariable<float>
+    {
+        public AttackCooldownInitialTime() { }
+        public AttackCooldownInitialTime(float value) : base(value) { }
+    }
+    
+    public class AttackCooldownCurrentTime : ReactiveVariable<float>
+    {
+        public AttackCooldownCurrentTime() { }
+        public AttackCooldownCurrentTime(float value) : base(value) { }
+    }
+    
+    public class InAttackCooldown : ReactiveVariable<bool>
+    {
+        public InAttackCooldown() { }
+        public InAttackCooldown(bool value) : base(value) { }
+    }
 }
