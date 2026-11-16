@@ -48,10 +48,10 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new BodyContactDamage(50))
                 .AddSystem(new ApplyDamageSystem())
                 .AddSystem(new DeathSystem())
-                .AddSystem(new SelfReleaseSystem())
                 .AddSystem(new DeathProcessTimerSystem())
                 .AddSystem(new DealDamageContactSystem())
-                .AddSystem(new DisableCollidersOnDeathSystem());
+                .AddSystem(new DisableCollidersOnDeathSystem())
+                .AddSystem(new SelfReleaseSystem());
             
             IsDead isDead = entity.Get<IsDead>();
             CurrentHealth currentHealth = entity.Get<CurrentHealth>();
@@ -72,13 +72,22 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             
             CanApplyDamage canApplyDamage = new CanApplyDamage();
             canApplyDamage.Add(new FuncCondition(() => !isDead.Value));
+            
+            MustDieTriggers mustDieTriggers = new MustDieTriggers();
+            mustDieTriggers.On(currentHealth);
+
+            MustSelfReleaseTriggers mustSelfReleaseTriggers = new MustSelfReleaseTriggers();
+            mustSelfReleaseTriggers.On(isDead);
+            mustSelfReleaseTriggers.On(inDeathProcess);
 
             entity
                 .Add(canMove)
                 .Add(canRotate)
                 .Add(mustDie)
                 .Add(mustSelfRelease)
-                .Add(canApplyDamage);
+                .Add(canApplyDamage)
+                .Add(mustDieTriggers)
+                .Add(mustSelfReleaseTriggers);
         }
     }
 }

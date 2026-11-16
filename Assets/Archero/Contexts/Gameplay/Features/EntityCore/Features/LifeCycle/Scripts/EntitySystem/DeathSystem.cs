@@ -4,19 +4,28 @@ using Persistance.Features.EntityCore;
 
 namespace Gameplay.Features.LifeCycle
 {
-    public class DeathSystem : IInitializableSystem, IUpdatableSystem
+    public class DeathSystem : IInitializableSystem, IDisposableSystem
     {
         private ReactiveVariable<bool> _isDead;
         
         private MustDie _mustDie;
+
+        private IDisposable _triggersDisposable;
         
         public void OnInit(Entity entity)
         {
             _isDead = entity.Get<IsDead>();
             _mustDie = entity.Get<MustDie>();
+
+            _triggersDisposable = entity.Get<MustDieTriggers>().Subscribe(Evaluate);
+        }
+
+        public void OnDispose()
+        {
+            _triggersDisposable?.Dispose();
         }
         
-        public void OnUpdate(float deltaTime)
+        private void Evaluate()
         {
             if(_isDead.Value)
                 return;

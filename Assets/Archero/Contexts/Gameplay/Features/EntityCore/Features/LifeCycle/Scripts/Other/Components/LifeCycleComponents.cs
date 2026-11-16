@@ -51,4 +51,8 @@ namespace Gameplay.Features.LifeCycle
         public MustSelfRelease() { }
         public MustSelfRelease(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
     }
+    
+    public sealed class MustDieTriggers : EvaluationTriggers { }
+
+    public sealed class MustSelfReleaseTriggers : EvaluationTriggers { }
 }

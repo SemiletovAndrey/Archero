@@ -42,10 +42,10 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new DeathMask(1 << LayerMask.NameToLayer("Characters")))
                 .Add(new IsTouchDeathMask())
                 .AddSystem(new DeathSystem())
-                .AddSystem(new SelfReleaseSystem())
-                .AddSystem(new DeathMaskTouchDetectorSystem())
                 .AddSystem(new DealDamageContactSystem())
-                .AddSystem(new DisableCollidersOnDeathSystem());
+                .AddSystem(new DeathMaskTouchDetectorSystem())
+                .AddSystem(new DisableCollidersOnDeathSystem())
+                .AddSystem(new SelfReleaseSystem());
             
             IsDead isDead = entity.Get<IsDead>();
             IsTouchDeathMask isTouchDeathMask = entity.Get<IsTouchDeathMask>();
@@ -61,12 +61,20 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             
             MustSelfRelease mustSelfRelease = new MustSelfRelease();
             mustSelfRelease.Add(new FuncCondition(() => isDead.Value));
+            
+            MustDieTriggers mustDieTriggers = new MustDieTriggers();
+            mustDieTriggers.On(isTouchDeathMask);
+
+            MustSelfReleaseTriggers mustSelfReleaseTriggers = new MustSelfReleaseTriggers();
+            mustSelfReleaseTriggers.On(isDead);
 
             entity
                 .Add(canMove)
                 .Add(canRotate)
                 .Add(mustDie)
-                .Add(mustSelfRelease);
+                .Add(mustSelfRelease)
+                .Add(mustDieTriggers)
+                .Add(mustSelfReleaseTriggers);
         }
     }
 }

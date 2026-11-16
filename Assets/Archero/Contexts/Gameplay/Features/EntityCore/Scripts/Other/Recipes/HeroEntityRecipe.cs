@@ -42,9 +42,9 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new TakeDamageEvent())
                 .AddSystem(new ApplyDamageSystem())
                 .AddSystem(new DeathSystem())
-                .AddSystem(new SelfReleaseSystem())
                 .AddSystem(new DeathProcessTimerSystem())
-                .AddSystem(new DisableCollidersOnDeathSystem());
+                .AddSystem(new DisableCollidersOnDeathSystem())
+                .AddSystem(new SelfReleaseSystem());
             
             //Attack
             entity
@@ -101,6 +101,13 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             MustCancelAttack mustCancelAttack = new MustCancelAttack(LogicOperation.Or);
             mustCancelAttack.Add(new FuncCondition(() => isDead.Value));
             mustCancelAttack.Add(new FuncCondition(() => isMoving.Value));
+            
+            MustDieTriggers mustDieTriggers = new MustDieTriggers();
+            mustDieTriggers.On(currentHealth);
+
+            MustSelfReleaseTriggers mustSelfReleaseTriggers = new MustSelfReleaseTriggers();
+            mustSelfReleaseTriggers.On(isDead);
+            mustSelfReleaseTriggers.On(inDeathProcess);
 
             entity
                 .Add(canMove)
@@ -109,7 +116,9 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(mustSelfRelease)
                 .Add(canApplyDamage)
                 .Add(canStartAttack)
-                .Add(mustCancelAttack);
+                .Add(mustCancelAttack)
+                .Add(mustDieTriggers)
+                .Add(mustSelfReleaseTriggers);
         }
     }
 }
