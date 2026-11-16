@@ -41,6 +41,7 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new BodyContactDamage(args.Damage))
                 .Add(new DeathMask(1 << LayerMask.NameToLayer("Characters")))
                 .Add(new IsTouchDeathMask())
+                .AddSystem(new DeathSystem())
                 .AddSystem(new SelfReleaseSystem())
                 .AddSystem(new DeathMaskTouchDetectorSystem())
                 .AddSystem(new DealDamageContactSystem())

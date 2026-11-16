@@ -53,8 +53,9 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .AddSystem(new DealDamageContactSystem())
                 .AddSystem(new DisableCollidersOnDeathSystem());
             
-            var isDead = entity.Get<IsDead>();
-            var currentHealth = entity.Get<CurrentHealth>();
+            IsDead isDead = entity.Get<IsDead>();
+            CurrentHealth currentHealth = entity.Get<CurrentHealth>();
+            InDeathProcess inDeathProcess = entity.Get<InDeathProcess>();
 
             CanMove canMove = new CanMove();
             canMove.Add(new FuncCondition(() => !isDead.Value));
@@ -67,7 +68,7 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             
             MustSelfRelease mustSelfRelease = new MustSelfRelease();
             mustSelfRelease.Add(new FuncCondition(() => isDead.Value))
-                .Add(new FuncCondition(() => entity.Get<InDeathProcess>().Value == false));
+                .Add(new FuncCondition(() => inDeathProcess.Value == false));
             
             CanApplyDamage canApplyDamage = new CanApplyDamage();
             canApplyDamage.Add(new FuncCondition(() => !isDead.Value));
