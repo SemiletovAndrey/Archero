@@ -12,6 +12,13 @@ namespace Gameplay.Features.GameplayStateMachine
         private StateNode<TState> _currentState;
 
         private bool _isRunning;
+        
+        private List<IDisposable> _disposables;
+
+        protected StateMachine(List<IDisposable> disposables)
+        {
+            _disposables = new List<IDisposable>(disposables);
+        }
 
         protected TState CurrentState => _currentState.State;
         
@@ -25,6 +32,11 @@ namespace Gameplay.Features.GameplayStateMachine
             }
             
             _states.Clear();
+            
+            foreach (var disposable in _disposables)
+                disposable.Dispose();
+            
+            _disposables.Clear();
         }
 
         public void AddState(TState state)
@@ -53,7 +65,11 @@ namespace Gameplay.Features.GameplayStateMachine
                     break;
                 }
             }
+
+            UpdateLogic(deltaTime);
         }
+
+        protected virtual void UpdateLogic(float deltaTime) { }
 
         public void Enter()
         {
