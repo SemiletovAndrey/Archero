@@ -1,4 +1,5 @@
-﻿using Gameplay.Features.EntityCore;
+﻿using Gameplay.Features.AI;
+using Gameplay.Features.EntityCore;
 using Persistance.Features.EntityCore;
 using Persistance.Features.GameLoopFeature;
 using Template.Features.ClassFactory;
@@ -11,6 +12,7 @@ namespace Gameplay.Scripts
     public class GameplaySceneInstaller : BaseInstaller
     {
         [SerializeField] private TestGameplay _testGameplay;
+
         public override void InstallBindings()
         {
             Container.Bind<IClassFactory>().To<ClassFactory>().AsSingle();
@@ -18,7 +20,7 @@ namespace Gameplay.Scripts
             base.InstallBindings();
 
             Container.BindInstance(new SceneFeatureSet(GetFeatures())).AsSingle();
-            
+
             Container.Bind<TestGameplay>().FromInstance(_testGameplay).AsSingle();
 
             Container.BindInterfacesAndSelfTo<GameplaySceneEntryPoint>().AsSingle().NonLazy();
@@ -30,6 +32,7 @@ namespace Gameplay.Scripts
             AddFeature<EntityCoreFeature>();
             AddFeature<GameLoopFeature>();
             AddFeature<GameplayEntityCoreFeature>();
+            AddFeature<AiBrainFeature>();
         }
     }
 }

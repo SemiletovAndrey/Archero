@@ -48,6 +48,7 @@ namespace Gameplay.Features.AI
             if (_time >= _coolDownBetweenDirectionGeneration)
             {
                 GenerateNewDirection();
+                _time = 0;
             }
         }
 

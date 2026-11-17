@@ -122,7 +122,6 @@ namespace Persistance.Features.EntityCore
 
         public void Release() => _world.Release(this);
 
-        // ---------------- Lifecycle (вызывает EntityWorld) ----------------
 
         internal void Activate()
         {
@@ -131,7 +130,6 @@ namespace Persistance.Features.EntityCore
 
             State = EntityState.Initializing;
 
-            // индексный цикл: OnInit может добавить ещё систем
             for (int i = 0; i < _systems.Count; i++)
                 InitSystem(_systems[i]);
 
@@ -157,7 +155,6 @@ namespace Persistance.Features.EntityCore
                 }
             }
 
-            // Компоненты, реализующие IDisposable (подписки, view и т.п.), освобождаются автоматически.
             for (int i = 0; i < _components.Length; i++)
             {
                 if (_components[i] is IDisposable disposable)

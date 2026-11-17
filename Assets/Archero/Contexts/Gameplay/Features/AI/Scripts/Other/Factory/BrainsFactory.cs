@@ -6,9 +6,26 @@ using Template.Scripts.Utils;
 
 namespace Gameplay.Features.AI
 {
-    public class BrainsFactory
+    public class BrainsFactory : IBrainsFactory
     {
-        public AiStateMachine CreateRandomMovementStateMachine(Entity entity)
+        private readonly IAiBrainContext _aiBrainContext;
+
+        public BrainsFactory(IAiBrainContext aiBrainContext)
+        {
+            _aiBrainContext = aiBrainContext;
+        }
+
+        public StateMachineBrain CreateGhostBrain(Entity entity)
+        {
+            AiStateMachine stateMachine = CreateRandomMovementStateMachine(entity);
+            StateMachineBrain brain = new StateMachineBrain(stateMachine);
+            
+            _aiBrainContext.SetFor(entity, brain);
+            
+            return brain;
+        }
+        
+        private AiStateMachine CreateRandomMovementStateMachine(Entity entity)
         {
             List<IDisposable> disposables = new List<IDisposable>();
             
