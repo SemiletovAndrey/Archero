@@ -26,6 +26,9 @@ namespace Template.Features.NewInputFeature.Scripts.Example
             _actions.Player.Move.performed -= OnMoveChanged;
             _actions.Player.Move.canceled -= OnMoveCanceled;
             
+            _actions.Player.Attack.performed -= OnAttackPerformed;
+            _actions.Player.Attack.canceled -= OnAttackCanceled;
+            
             Disable();
             
             _actions.Dispose();
@@ -35,6 +38,9 @@ namespace Template.Features.NewInputFeature.Scripts.Example
         {
             _actions.Player.Move.performed += OnMoveChanged;
             _actions.Player.Move.canceled += OnMoveCanceled;
+            
+            _actions.Player.Attack.performed += OnAttackPerformed;
+            _actions.Player.Attack.canceled += OnAttackCanceled;
         }
 
         private void OnMoveChanged(InputAction.CallbackContext ctx)
@@ -51,6 +57,16 @@ namespace Template.Features.NewInputFeature.Scripts.Example
         public void Enable()
         {
             _actions.Player.Enable();
+        }
+        
+        private void OnAttackPerformed(InputAction.CallbackContext ctx)
+        {
+            _bus.Publish(new AttackSignal(true));
+        }
+
+        private void OnAttackCanceled(InputAction.CallbackContext ctx)
+        {
+            _bus.Publish(new AttackSignal(false));
         }
 
         public void Disable()

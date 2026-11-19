@@ -10,6 +10,7 @@ namespace Gameplay.Features.EntityCore
             Container.BindInterfacesTo<GhostEntityRecipe>().AsSingle();
             Container.BindInterfacesTo<HeroEntityRecipe>().AsSingle();
             Container.BindInterfacesTo<ProjectileEntityRecipe>().AsSingle();
+            Container.BindInterfacesTo<TeleportatorEntityRecipe>().AsSingle();
         }
     }
 }

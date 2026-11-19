@@ -37,9 +37,6 @@ namespace Gameplay.Features.EntityCore.Features.Attack
                 _inAttackProcess.Value = true;
                 _startAttackEvent?.Invoke();
             }
-            else
-            {
-            }
         }
     }
 }

@@ -46,4 +46,19 @@ namespace Gameplay.Features.MovementFeature
         public IsMoving() { }
         public IsMoving(bool value) : base(value) { }
     }
+    
+    public class TeleportRadius : ReactiveVariable<float>
+    {
+        public TeleportRadius() { }
+        public TeleportRadius(float value) : base(value) { }
+    }
+    
+    public class TeleportRequest : ReactiveEvent { }
+    public class TeleportEvent : ReactiveEvent { }
+    
+    public class CanTeleport : CompositeCondition
+    {
+        public CanTeleport() { }
+        public CanTeleport(Func<bool, bool, bool> logicOperation) : base(logicOperation) { }
+    }
 }

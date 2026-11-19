@@ -15,34 +15,48 @@ namespace Gameplay.Scripts
     {
         private IEntityFactory _entityFactory;
         private IBrainsFactory _brainsFactory;
+        private IInputBus _inputBus;
 
         private bool _isRunning;
         private Entity _testEntity;
         private Entity _ghost;
+        private Entity _teleportator;
 
         [Inject]
-        private void Construct(IEntityFactory entityFactory, IBrainsFactory brainsFactory)
+        private void Construct(IEntityFactory entityFactory, IBrainsFactory brainsFactory, IInputBus inputBus)
         {
             _entityFactory = entityFactory;
             _brainsFactory = brainsFactory;
+            _inputBus = inputBus;
         }
 
         public void Run()
         {
             _testEntity = _entityFactory.Create(EntityType.Hero, Vector3.zero);
             _ghost = _entityFactory.Create(EntityType.Ghost, Vector3.zero + Vector3.forward * 5);
+            _teleportator = _entityFactory.Create(EntityType.Teleportator, Vector3.zero + Vector3.forward * 2);
             _testEntity.Add<CurrentTarget>(new CurrentTarget());
-            _brainsFactory.CreateMainHeroBrain(_testEntity, new NearestDamageableTargetSelector(_testEntity));
+            //_brainsFactory.CreateMainHeroBrain(_testEntity, new NearestDamageableTargetSelector(_testEntity));
 
+            _inputBus.Subscribe<AttackSignal>(OnAttackSignal);
             _isRunning = true;
         }
 
         private void OnDestroy()
         {
+            _inputBus.Unsubscribe<AttackSignal>(OnAttackSignal);
         }
 
         private void Update()
         {
+        }
+
+        private void OnAttackSignal(AttackSignal signal)
+        {
+            if (signal.IsPressed)
+            {
+                _teleportator.Get<TeleportRequest>().Invoke();
+            }
         }
 
         [ContextMenu("AddBrainFor Ghost")]

@@ -6,5 +6,6 @@
         Ghost = 1,
         Hero = 2,
         Projectile = 3,
+        Teleportator = 4,
     }
 }
