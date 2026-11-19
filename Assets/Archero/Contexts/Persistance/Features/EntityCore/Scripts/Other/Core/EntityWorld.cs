@@ -18,6 +18,8 @@ namespace Persistance.Features.EntityCore
 
         public int Count => _entities.Count;
 
+        public IReadOnlyList<Entity> Entities => _entities;
+
         public Entity Create(EntityType type)
         {
             ThrowIfDisposed();
@@ -97,7 +99,7 @@ namespace Persistance.Features.EntityCore
         {
             if (_releaseQueue.Count == 0)
                 return;
-            
+
             for (int i = 0; i < _releaseQueue.Count; i++)
             {
                 Entity entity = _releaseQueue[i];
@@ -108,7 +110,7 @@ namespace Persistance.Features.EntityCore
             }
 
             _releaseQueue.Clear();
-            
+
             Compact(_update);
             Compact(_fixedUpdate);
         }

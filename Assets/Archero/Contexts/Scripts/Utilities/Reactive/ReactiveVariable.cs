@@ -3,35 +3,40 @@ using System.Collections.Generic;
 
 namespace Contexts.Scripts.Utilities.Reactive
 {
-    public class ReactiveVariable<T> : IReadOnlyVariable<T> where T : IEquatable<T>
+    public class ReactiveVariable<T> : IReadOnlyVariable<T>
     {
-        private readonly List<Subscriber<T,T>> _subscribers = new();
-        private readonly List<Subscriber<T,T>> _toAdd = new();
-        private readonly List<Subscriber<T,T>> _toRemove = new();
-        
-        private T _value;
+        private readonly List<Subscriber<T, T>> _subscribers = new();
+        private readonly List<Subscriber<T, T>> _toAdd = new();
+        private readonly List<Subscriber<T, T>> _toRemove = new();
 
-        public ReactiveVariable()
+        private T _value;
+        private IEqualityComparer<T> _equalityComparer;
+
+        public ReactiveVariable() : this(default)
         {
-            _value = default;
         }
-        
-        public ReactiveVariable(T value)
+
+        public ReactiveVariable(T value) : this(value, EqualityComparer<T>.Default)
         {
             _value = value;
+        }
+
+        public ReactiveVariable(T value, EqualityComparer<T> equalityComparer)
+        {
+            _value = value;
+            _equalityComparer = equalityComparer;
         }
 
         public T Value
         {
             get => _value;
-            set 
+            set
             {
-                if (EqualityComparer<T>.Default.Equals(_value, value))
-                    return;
-
                 T oldValue = _value;
                 _value = value;
-                Invoke(oldValue, value);
+
+                if (_equalityComparer.Equals(oldValue, value) == false)
+                    Invoke(oldValue, value);
             }
         }
 

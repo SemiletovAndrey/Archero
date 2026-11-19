@@ -26,7 +26,6 @@ namespace Gameplay.Features.EntityCore.Features.Attack
             
             if (_mustCancelAttack.Evaluate())
             {
-                Debug.Log($"Attack canceled");
                 _inAttackProcess.Value = false;
                 _attackCanceledEvent?.Invoke();
             }

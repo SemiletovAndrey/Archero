@@ -35,7 +35,6 @@ namespace Gameplay.Features.EntityCore.Features.Attack
             if (ColdownIsOver())
             {
                 _inAttackCoolDown.Value = false;
-                Debug.Log($"Cooldown End");
             }
         }
 
@@ -46,7 +45,6 @@ namespace Gameplay.Features.EntityCore.Features.Attack
 
         private void OnEndAttackEvent()
         {
-            Debug.Log($"Cooldown Start");
             _currentTime.Value = _initialTime.Value;
             _inAttackCoolDown.Value = true;
         }

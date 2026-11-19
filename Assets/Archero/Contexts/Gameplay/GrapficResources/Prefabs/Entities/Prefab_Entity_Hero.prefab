@@ -276,7 +276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       propertyPath: _exposed.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       propertyPath: '_exposed.Array.data[0]'
@@ -290,6 +290,10 @@ PrefabInstance:
       propertyPath: '_exposed.Array.data[2]'
       value: 
       objectReference: {fileID: 5547004971460118453}
+    - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
+      propertyPath: '_exposed.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1863980999231208599}
     - target: {fileID: 4838010239395573067, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
       propertyPath: _registrators.Array.size
       value: 2
@@ -332,6 +336,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: -5096658917209340349}
   m_SourcePrefab: {fileID: 100100000, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
+--- !u!114 &1863980999231208599 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -1841277825732387897, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}
+  m_PrefabInstance: {fileID: 9199806502622865232}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3847784621037209593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 080d56ef34d4455c8c1cb8a33bef06a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Features.Sensers.BodyTransform
 --- !u!4 &1983885840007282182 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7216010066672326998, guid: 3181d85784d49ed4ca1ef04b0ccd3f47, type: 3}

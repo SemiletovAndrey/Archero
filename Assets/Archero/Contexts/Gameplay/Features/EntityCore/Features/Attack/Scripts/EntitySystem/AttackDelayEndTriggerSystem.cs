@@ -41,7 +41,6 @@ namespace Gameplay.Features.EntityCore.Features.Attack
             
             if (timerValue > _delay.Value)
             {
-                Debug.Log("Delay End");
                 _attackDelayEndEvent?.Invoke();
                 _alreadyAttack = true;
             }

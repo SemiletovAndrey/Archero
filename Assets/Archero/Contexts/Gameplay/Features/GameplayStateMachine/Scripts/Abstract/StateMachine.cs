@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Template.Scripts.Utils;
+using UnityEngine;
 
 namespace Gameplay.Features.GameplayStateMachine
 {
-    public abstract class StateMachine<TState> : IDisposable where TState : class, IState
+    public abstract class StateMachine<TState> : State, IUpdatableState, IDisposable where TState : class, IState
     {
         private List<StateNode<TState>> _states = new();
 
@@ -71,16 +72,20 @@ namespace Gameplay.Features.GameplayStateMachine
 
         protected virtual void UpdateLogic(float deltaTime) { }
 
-        public void Enter()
+        public override void Enter()
         {
+            base.Enter();
+            
             if(_currentState == null)
                 SwitchState(_states[0]);
             
             _isRunning = true;
         }
 
-        public void Exit()
+        public override void Exit()
         {
+            base.Exit();
+            
             _currentState?.State?.Exit();
             
             _isRunning = false;

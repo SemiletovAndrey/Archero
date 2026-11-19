@@ -14,22 +14,16 @@ namespace Gameplay.Scripts
     public class TestGameplay : MonoBehaviour
     {
         private IEntityFactory _entityFactory;
-        private IInputBus _bus;
         private IBrainsFactory _brainsFactory;
 
         private bool _isRunning;
         private Entity _testEntity;
         private Entity _ghost;
-        
-        private Vector2 _currentInput;
-        private MoveDirection _currentMoveDirection;
-        private RotationDirection _currentRotationDirection;
 
         [Inject]
-        private void Construct(IEntityFactory entityFactory, IInputBus bus, IBrainsFactory brainsFactory)
+        private void Construct(IEntityFactory entityFactory, IBrainsFactory brainsFactory)
         {
             _entityFactory = entityFactory;
-            _bus = bus;
             _brainsFactory = brainsFactory;
         }
 
@@ -37,40 +31,18 @@ namespace Gameplay.Scripts
         {
             _testEntity = _entityFactory.Create(EntityType.Hero, Vector3.zero);
             _ghost = _entityFactory.Create(EntityType.Ghost, Vector3.zero + Vector3.forward * 5);
-            
-            _currentMoveDirection = _testEntity.Get<MoveDirection>();
-            _currentRotationDirection = _testEntity.Get<RotationDirection>();
+            _testEntity.Add<CurrentTarget>(new CurrentTarget());
+            _brainsFactory.CreateMainHeroBrain(_testEntity, new NearestDamageableTargetSelector(_testEntity));
 
-            _bus.Subscribe<MovementSignal>(OnMovementReceived);
-            _bus.Subscribe<AttackSignal>(OnAttackReceived);
             _isRunning = true;
         }
 
         private void OnDestroy()
         {
-            _bus.Unsubscribe<MovementSignal>(OnMovementReceived);
-            _bus.Unsubscribe<AttackSignal>(OnAttackReceived);
         }
 
         private void Update()
         {
-            if (!_isRunning)
-                return;
-
-            Vector3 input = new Vector3(_currentInput.x, 0, _currentInput.y);
-            _currentMoveDirection.Value = input;
-            _currentRotationDirection.Value = input;
-        }
-
-        private void OnMovementReceived(MovementSignal signal)
-        {
-            _currentInput = signal.Value;
-        }
-
-        private void OnAttackReceived(AttackSignal signal)
-        {
-            if (signal.IsPressed) 
-                _testEntity.Get<StartAttackRequest>().Invoke();
         }
 
         [ContextMenu("AddBrainFor Ghost")]

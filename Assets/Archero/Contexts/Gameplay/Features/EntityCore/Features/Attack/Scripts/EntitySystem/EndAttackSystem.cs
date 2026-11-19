@@ -34,7 +34,6 @@ namespace Gameplay.Features.EntityCore.Features.Attack
         {
             if (TimeIsDone(currentTime))
             {
-                Debug.Log("End Attack");
                 _inAttackProcess.Value = false;
                 _endAttackEvent?.Invoke();
             }

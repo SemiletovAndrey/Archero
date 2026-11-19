@@ -36,11 +36,9 @@ namespace Gameplay.Features.EntityCore.Features.Attack
             {
                 _inAttackProcess.Value = true;
                 _startAttackEvent?.Invoke();
-                Debug.Log($"Start Attack");
             }
             else
             {
-                Debug.Log($"Can't Start Attack");
             }
         }
     }

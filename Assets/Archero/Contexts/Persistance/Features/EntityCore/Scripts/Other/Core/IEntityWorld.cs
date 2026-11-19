@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Persistance.Features.GameLoopFeature;
 
 namespace Persistance.Features.EntityCore
@@ -9,6 +10,7 @@ namespace Persistance.Features.EntityCore
         public event Action<Entity> Released;
 
         public int Count { get; }
+        public IReadOnlyList<Entity> Entities { get; }
 
         public Entity Create(EntityType type);
 
