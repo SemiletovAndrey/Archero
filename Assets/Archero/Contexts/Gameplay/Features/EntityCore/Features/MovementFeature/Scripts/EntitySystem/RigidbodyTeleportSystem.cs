@@ -38,7 +38,7 @@ namespace Gameplay.Features.MovementFeature
             if (!_canTeleport.Evaluate())
                 return;
             
-            Vector3 targetPosition = GetRandomPointInRadius(_rigidbody.position, _teleportRadius.Value);
+            Vector3 targetPosition = GetRandomPointInRadius(Vector3.zero, _teleportRadius.Value);
 
             if (!_rigidbody.isKinematic)
                 _rigidbody.linearVelocity = Vector3.zero;
