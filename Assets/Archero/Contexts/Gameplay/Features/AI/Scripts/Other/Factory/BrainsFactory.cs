@@ -137,7 +137,7 @@ namespace Gameplay.Features.AI
                     float angelTarget = Quaternion.Angle(transform.rotation,
                         Quaternion.LookRotation(targetTransform.position - transform.position));
 
-                    return angelTarget < 1f;
+                    return angelTarget < 3f;
                 }));
 
             ReactiveVariable<bool> inAttackProcess = entity.Get<InAttackProcess>();

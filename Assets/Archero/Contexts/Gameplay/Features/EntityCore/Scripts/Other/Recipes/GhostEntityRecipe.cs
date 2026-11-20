@@ -1,9 +1,11 @@
-﻿using Gameplay.Features.ApplyDamage;
+﻿using Contexts.Scripts.Utilities;
+using Gameplay.Features.ApplyDamage;
 using Gameplay.Features.ContactTakeDamage;
 using Gameplay.Features.LifeCycle;
 using Gameplay.Features.MovementFeature;
 using Gameplay.Features.Sensers;
 using Persistance.Features.EntityCore;
+using Template.Features.Config.Local;
 using Template.Scripts.Utils;
 using UnityEngine;
 
@@ -11,22 +13,28 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
 {
     public sealed class GhostEntityRecipe : IEntityRecipe
     {
-        public EntityType Type => EntityType.Ghost;
-        
         private IColliderRegistryService _colliderRegistryService;
+        private readonly ILocalConfigService _localConfigService;
 
-        public GhostEntityRecipe(IColliderRegistryService colliderRegistryService)
+        private GhostEntityConfig _ghostEntityConfig;
+
+        public GhostEntityRecipe(IColliderRegistryService colliderRegistryService, ILocalConfigService localConfigService)
         {
             _colliderRegistryService = colliderRegistryService;
+            _localConfigService = localConfigService;
+            
+            _ghostEntityConfig = _localConfigService.GetConfig<EntityDataConfig>().GetConfig<GhostEntityConfig>(Type);
         }
 
+        public EntityType Type => EntityType.Ghost;
+        
         public void Build(Entity entity)
         {
             entity
                 .Add(new MoveDirection())
-                .Add(new MoveSpeed(10))
+                .Add(new MoveSpeed(_ghostEntityConfig.MoveSpeed))
                 .Add(new RotationDirection())
-                .Add(new RotationSpeed(900))
+                .Add(new RotationSpeed(_ghostEntityConfig.RotationSpeed))
                 .Add(new IsMoving())
                 .AddSystem(new RigidbodyMovementSystem())
                 .AddSystem(new RigidbodyRotationSystem())
@@ -34,18 +42,18 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .AddSystem(new BodyContactsEntitiesFilterSystem(_colliderRegistryService));
             
             entity
-                .Add(new MaxHealth(100))
-                .Add(new CurrentHealth(100))
+                .Add(new MaxHealth(_ghostEntityConfig.MaxHealth))
+                .Add(new CurrentHealth(_ghostEntityConfig.MaxHealth))
                 .Add(new IsDead(false))
                 .Add(new InDeathProcess())
-                .Add(new DeathProcessInitialTime(2))
+                .Add(new DeathProcessInitialTime(_ghostEntityConfig.DeathProcessTime))
                 .Add(new DeathProcessCurrentTime())
                 .Add(new TakeDamageRequest())
                 .Add(new TakeDamageEvent())
-                .Add(new ContactDetectingMask(1 << LayerMask.NameToLayer("Characters")))
+                .Add(new ContactDetectingMask(Layers.CharactersMask))
                 .Add(new ContactCollidersBuffer(64))
                 .Add(new ContactEntitiesBuffer(64))
-                .Add(new BodyContactDamage(50))
+                .Add(new BodyContactDamage(_ghostEntityConfig.BodyContactDamage))
                 .AddSystem(new ApplyDamageSystem())
                 .AddSystem(new DeathSystem())
                 .AddSystem(new DeathProcessTimerSystem())

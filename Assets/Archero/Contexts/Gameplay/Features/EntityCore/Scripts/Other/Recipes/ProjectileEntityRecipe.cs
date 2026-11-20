@@ -1,4 +1,5 @@
-﻿using Gameplay.Features.ContactTakeDamage;
+﻿using Contexts.Scripts.Utilities;
+using Gameplay.Features.ContactTakeDamage;
 using Gameplay.Features.LifeCycle;
 using Gameplay.Features.MovementFeature;
 using Gameplay.Features.Sensers;
@@ -35,11 +36,11 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             entity
                 .Add(new IsDead(false))
                 .Add(new InDeathProcess())
-                .Add(new ContactDetectingMask(1 << LayerMask.NameToLayer("Characters")))
+                .Add(new ContactDetectingMask(Layers.CharactersMask))
                 .Add(new ContactCollidersBuffer(64))
                 .Add(new ContactEntitiesBuffer(64))
                 .Add(new BodyContactDamage(args.Damage))
-                .Add(new DeathMask(1 << LayerMask.NameToLayer("Characters")))
+                .Add(new DeathMask(Layers.CharactersMask))
                 .Add(new IsTouchDeathMask())
                 .AddSystem(new DeathSystem())
                 .AddSystem(new DealDamageContactSystem())

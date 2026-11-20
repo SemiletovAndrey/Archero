@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03effd6649134339b2bc20db855c3a46, type: 3}
+  m_Name: Config_Gameplay_EntityDataContainer
+  m_EditorClassIdentifier: Assembly-CSharp::Persistance.Features.EntityCore.EntityDataConfig
+  _entries:
+  - _type: 1
+    _config: {fileID: 11400000, guid: ce35ad2c7909c934e8a75dd5bfd11838, type: 2}
+  - _type: 2
+    _config: {fileID: 11400000, guid: 3bd5ad3d7c7e07c48b02626be1b249a8, type: 2}
+  - _type: 4
+    _config: {fileID: 11400000, guid: cf5a96e9dff299f4b9497a2bed1fa0b8, type: 2}

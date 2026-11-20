@@ -3,6 +3,7 @@ using Gameplay.Features.EntityCore.Features.Attack;
 using Gameplay.Features.LifeCycle;
 using Gameplay.Features.MovementFeature;
 using Persistance.Features.EntityCore;
+using Template.Features.Config.Local;
 using Template.Scripts.Utils;
 
 namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
@@ -10,10 +11,16 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
     public class HeroEntityRecipe : IEntityRecipe
     {
         private readonly IEntityFactory _entityFactory;
+        private readonly ILocalConfigService _localConfigService;
 
-        public HeroEntityRecipe(IEntityFactory entityFactory)
+        private HeroEntityConfig _heroEntityConfig;
+        
+        public HeroEntityRecipe(IEntityFactory entityFactory, ILocalConfigService localConfigService)
         {
             _entityFactory = entityFactory;
+            _localConfigService = localConfigService;
+            
+            _heroEntityConfig = _localConfigService.GetConfig<EntityDataConfig>().GetConfig<HeroEntityConfig>(Type);
         }
 
         public EntityType Type => EntityType.Hero;
@@ -23,20 +30,20 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             //Movement
             entity
                 .Add(new MoveDirection())
-                .Add(new MoveSpeed(10))
+                .Add(new MoveSpeed(_heroEntityConfig.MoveSpeed))
                 .Add(new RotationDirection())
-                .Add(new RotationSpeed(900))
+                .Add(new RotationSpeed(_heroEntityConfig.RotationSpeed))
                 .Add(new IsMoving())
                 .AddSystem(new RigidbodyMovementSystem())
                 .AddSystem(new RigidbodyRotationSystem());
             
             //Health
             entity
-                .Add(new MaxHealth(100))
-                .Add(new CurrentHealth(100))
+                .Add(new MaxHealth(_heroEntityConfig.MaxHealth))
+                .Add(new CurrentHealth(_heroEntityConfig.MaxHealth))
                 .Add(new IsDead(false))
                 .Add(new InDeathProcess())
-                .Add(new DeathProcessInitialTime(2))
+                .Add(new DeathProcessInitialTime(_heroEntityConfig.DeathProcessInitialTime))
                 .Add(new DeathProcessCurrentTime())
                 .Add(new TakeDamageRequest())
                 .Add(new TakeDamageEvent())
@@ -48,17 +55,17 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             
             //Attack
             entity
-                .Add(new AttackProcessInitialTime(3))
+                .Add(new AttackProcessInitialTime(_heroEntityConfig.AttackProcessTime))
                 .Add(new AttackProcessCurrentTime())
                 .Add(new InAttackProcess())
-                .Add(new AttackDelayTime(1))
+                .Add(new AttackDelayTime(_heroEntityConfig.AttackDelayTime))
                 .Add(new StartAttackRequest())
-                .Add(new InstantAttackDamage(1))
+                .Add(new InstantAttackDamage(_heroEntityConfig.InstantAttackDamage))
                 .Add(new StartAttackEvent())
                 .Add(new EndAttackEvent())
                 .Add(new AttackDelayEndEvent())
                 .Add(new AttackCancelEvent())
-                .Add(new AttackCooldownInitialTime(2))
+                .Add(new AttackCooldownInitialTime(_heroEntityConfig.AttackCooldown))
                 .Add(new AttackCooldownCurrentTime())
                 .Add(new InAttackCooldown())
                 .AddSystem(new StartAttackSystem())
