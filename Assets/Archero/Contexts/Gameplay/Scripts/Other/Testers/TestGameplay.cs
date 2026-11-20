@@ -32,11 +32,11 @@ namespace Gameplay.Scripts
 
         public void Run()
         {
-            _testEntity = _entityFactory.Create(EntityType.Hero, Vector3.zero);
+            _testEntity = _entityFactory.Create(EntityType.Hero, Vector3.zero - Vector3.forward * 10);
             _ghost = _entityFactory.Create(EntityType.Ghost, Vector3.zero + Vector3.forward * 5);
             _teleportator = _entityFactory.Create(EntityType.Teleportator, Vector3.zero + Vector3.forward * 2);
-            _testEntity.Add<CurrentTarget>(new CurrentTarget());
-            //_brainsFactory.CreateMainHeroBrain(_testEntity, new NearestDamageableTargetSelector(_testEntity));
+            _testEntity.Add(new CurrentTarget());
+            _teleportator.Add(new CurrentTarget());
 
             _inputBus.Subscribe<AttackSignal>(OnAttackSignal);
             _isRunning = true;
@@ -53,16 +53,24 @@ namespace Gameplay.Scripts
 
         private void OnAttackSignal(AttackSignal signal)
         {
-            if (signal.IsPressed)
-            {
-                _teleportator.Get<TeleportRequest>().Invoke();
-            }
         }
 
         [ContextMenu("AddBrainFor Ghost")]
         private void AddBrainForGhost()
         {
             _brainsFactory.CreateGhostBrain(_ghost);
+        }
+        
+        [ContextMenu("AddBrainFor Teleportator")]
+        private void AddBrainForTeleportator()
+        {
+            _brainsFactory.CreateTeleportatorBrain(_teleportator);
+        }
+        
+        [ContextMenu("AddBrainFor Main hero")]
+        private void AddBrainForMainHero()
+        {
+            _brainsFactory.CreateMainHeroBrain(_testEntity, new NearestDamageableTargetSelector(_testEntity));
         }
     }
 }

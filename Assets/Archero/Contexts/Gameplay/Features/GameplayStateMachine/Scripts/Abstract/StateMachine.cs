@@ -93,9 +93,11 @@ namespace Gameplay.Features.GameplayStateMachine
 
         private void SwitchState(StateNode<TState> nextState)
         {
+            Debug.Log($"Switch state from {_currentState?.State} to {nextState.State}");
             _currentState?.State.Exit();
             _currentState = nextState;
             _currentState.State.Enter();
+            
         }
     }
 }

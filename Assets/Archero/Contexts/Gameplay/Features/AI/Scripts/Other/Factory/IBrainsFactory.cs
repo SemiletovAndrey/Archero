@@ -6,5 +6,6 @@ namespace Gameplay.Features.AI
     {
         public StateMachineBrain CreateGhostBrain(Entity entity);
         StateMachineBrain CreateMainHeroBrain(Entity entity, ITargetSelector targetSelector);
+        StateMachineBrain CreateTeleportatorBrain(Entity entity);
     }
 }

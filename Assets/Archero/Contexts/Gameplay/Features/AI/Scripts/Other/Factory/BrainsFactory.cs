@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Archero.Template.Scripts.Utils;
 using Contexts.Scripts.Utilities.Reactive;
 using Gameplay.Features.EntityCore.Features.Attack;
+using Gameplay.Features.EntityCore.Features.Energy;
 using Gameplay.Features.MovementFeature;
 using Gameplay.Features.Sensers;
 using Persistance.Features.EntityCore;
@@ -28,6 +29,16 @@ namespace Gameplay.Features.AI
         public StateMachineBrain CreateGhostBrain(Entity entity)
         {
             AiStateMachine stateMachine = CreateRandomMovementStateMachine(entity);
+            StateMachineBrain brain = new StateMachineBrain(stateMachine);
+
+            _aiBrainContext.SetFor(entity, brain);
+
+            return brain;
+        }
+        
+        public StateMachineBrain CreateTeleportatorBrain(Entity entity)
+        {
+            AiStateMachine stateMachine = CreateLowHpEnemyTeleportStateMachine(entity);
             StateMachineBrain brain = new StateMachineBrain(stateMachine);
 
             _aiBrainContext.SetFor(entity, brain);
@@ -140,6 +151,69 @@ namespace Gameplay.Features.AI
 
             stateMachine.AddTransition(rotateToTargetState, attackTriggerState, fromRotateToAttackCondition);
             stateMachine.AddTransition(attackTriggerState, rotateToTargetState, fromAttackToRotateStateCondition);
+
+            return stateMachine;
+        }
+
+        private AiStateMachine CreateRandomTeleportStateMachine(Entity entity)
+        {
+            List<IDisposable> disposables = new List<IDisposable>();
+            
+            EmptyState idleState = new EmptyState();
+            RandomTeleportState teleportState = new RandomTeleportState(entity);
+
+            CompositeCondition canTeleport = entity.Get<CanTeleport>();
+            CompositeCondition canSpendEnergy = entity.Get<CanSpendEnergy>();
+
+            TimerService idleTimer = new TimerService(4f);
+            disposables.Add(idleTimer);
+            disposables.Add(idleState.Entered.Subscribe(idleTimer.Restart));
+
+            FuncCondition idleToTeleport = new FuncCondition(() => idleTimer.IsOver && canTeleport.Evaluate() && canSpendEnergy.Evaluate());
+            FuncCondition teleportToIdle = new FuncCondition(() => true);
+
+            AiStateMachine stateMachine = new AiStateMachine(disposables);
+
+            stateMachine.AddState(idleState);
+            stateMachine.AddState(teleportState);
+
+            stateMachine.AddTransition(idleState, teleportState, idleToTeleport);
+            stateMachine.AddTransition(teleportState, idleState, teleportToIdle);
+
+            return stateMachine;
+        }
+
+        private AiStateMachine CreateLowHpEnemyTeleportStateMachine(Entity entity)
+        {
+            List<IDisposable> disposables = new List<IDisposable>();
+            
+            CurrentEnergy currentEnergy = entity.Get<CurrentEnergy>();
+            MaxEnergy maxEnergy = entity.Get<MaxEnergy>();
+            CompositeCondition canTeleport = entity.Get<CanTeleport>();
+
+            const float MinEnergyPercent = 0.4f;
+            
+            EmptyState idleState = new EmptyState();
+            LowestHealthTargetSelector selector = new LowestHealthTargetSelector(entity);
+            TeleportToTargetState teleportState = new TeleportToTargetState(selector, _entityWorld, entity, 1.5f);
+
+            TimerService idleTimer = new TimerService(4f);
+            disposables.Add(idleTimer);
+            disposables.Add(idleState.Entered.Subscribe(idleTimer.Restart));
+
+            FuncCondition idleToTeleport = new FuncCondition(() =>
+                idleTimer.IsOver
+                && currentEnergy.Value >= maxEnergy.Value * MinEnergyPercent
+                && canTeleport.Evaluate());
+            FuncCondition teleportToIdle = new FuncCondition(() => true);
+
+            AiStateMachine stateMachine = new AiStateMachine(disposables);
+
+            stateMachine.AddState(idleState);
+            stateMachine.AddState(teleportState);
+
+            stateMachine.AddTransition(idleState, teleportState, idleToTeleport);
+            stateMachine.AddTransition(teleportState, idleState, teleportToIdle);
 
             return stateMachine;
         }

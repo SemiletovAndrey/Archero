@@ -40,7 +40,6 @@ namespace Gameplay.Features.EntityCore.Features.Energy
 
             _current.Value -= amount;
             _spendEvent.Invoke(amount);
-            Debug.Log($"Spend Energy Current Value: {_current.Value} Spend{amount}");
         }
     }
 }

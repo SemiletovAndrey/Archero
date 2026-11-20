@@ -12,7 +12,7 @@ namespace Gameplay.Features.MovementFeature
         private Rigidbody _rigidbody;
         private ReactiveVariable<float> _teleportRadius;
         private ICompositeCondition _canTeleport;
-        private ReactiveEvent _teleportRequest;
+        private ReactiveEvent<Vector3> _teleportRequest;
         private ReactiveEvent _teleportEvent;
         
         private IDisposable _teleportRequestDisposable;
@@ -33,19 +33,17 @@ namespace Gameplay.Features.MovementFeature
             _teleportRequestDisposable.Dispose();
         }
 
-        private void OnTeleportRequest()
+        private void OnTeleportRequest(Vector3 target)
         {
             if (!_canTeleport.Evaluate())
                 return;
-            
-            Vector3 targetPosition = GetRandomPointInRadius(Vector3.zero, _teleportRadius.Value);
 
             if (!_rigidbody.isKinematic)
                 _rigidbody.linearVelocity = Vector3.zero;
 
-            _rigidbody.position = targetPosition;
+            _rigidbody.position = target;
 
-            _rigidbody.transform.position = targetPosition;
+            _rigidbody.transform.position = target;
 
             _teleportEvent.Invoke();
         }

@@ -1,5 +1,5 @@
 ﻿using Gameplay.Features.ApplyDamage;
-using Gameplay.Features.ContactTakeDamage;
+using Gameplay.Features.EntityCore.Features.Attack;
 using Gameplay.Features.EntityCore.Features.Energy;
 using Gameplay.Features.LifeCycle;
 using Gameplay.Features.MovementFeature;
@@ -28,9 +28,7 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new TeleportRadius(5))
                 .Add(new TeleportRequest())
                 .Add(new TeleportEvent())
-                .AddSystem(new RigidbodyTeleportSystem())
-                .AddSystem(new BodyContactsDetectingSystem())
-                .AddSystem(new BodyContactsEntitiesFilterSystem(_colliderRegistryService));
+                .AddSystem(new RigidbodyTeleportSystem());
             
             //Energy
             entity
@@ -57,22 +55,46 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new DeathProcessCurrentTime())
                 .Add(new TakeDamageRequest())
                 .Add(new TakeDamageEvent())
-                .Add(new ContactDetectingMask(1 << LayerMask.NameToLayer("Characters")))
-                .Add(new ContactCollidersBuffer(64))
-                .Add(new ContactEntitiesBuffer(64))
-                .Add(new BodyContactDamage(50))
                 .AddSystem(new ApplyDamageSystem())
                 .AddSystem(new DeathSystem())
                 .AddSystem(new DeathProcessTimerSystem())
-                .AddSystem(new DealDamageContactSystem())
                 .AddSystem(new DisableCollidersOnDeathSystem())
                 .AddSystem(new SelfReleaseSystem());
-
+            
+            entity
+                .Add(new AttackProcessInitialTime(1))
+                .Add(new AttackProcessCurrentTime())
+                .Add(new InAttackProcess())
+                .Add(new AttackDelayTime(0.5f))
+                .Add(new StartAttackRequest())
+                .Add(new StartAttackEvent())
+                .Add(new EndAttackEvent())
+                .Add(new AttackDelayEndEvent())
+                .Add(new AttackCooldownInitialTime(1))
+                .Add(new AttackCooldownCurrentTime())
+                .Add(new InAttackCooldown())
+                .AddSystem(new StartAttackSystem())
+                .AddSystem(new AttackProcessTimerSystem())
+                .AddSystem(new EndAttackSystem())
+                .AddSystem(new AttackDelayEndTriggerSystem())
+                .AddSystem(new AttackCooldownTimerSystem())
+                .AddSystem(new TeleportStartAttackSystem());
+            
+            //Splash
+            entity
+                .Add(new SplashAttackRadius(4))
+                .Add(new SplashAttackDamage(50))
+                .Add(new SplashTargetMask(1 << LayerMask.NameToLayer("Characters")))
+                .Add(new SplashHitCollidersBuffer(64))
+                .AddSystem(new SplashAttackSystem(_colliderRegistryService));
+            
             CurrentEnergy currentEnergy = entity.Get<CurrentEnergy>();
             TeleportEnergyCost teleportCost = entity.Get<TeleportEnergyCost>();
             IsDead isDead = entity.Get<IsDead>();
             CurrentHealth currentHealth = entity.Get<CurrentHealth>();
             InDeathProcess inDeathProcess = entity.Get<InDeathProcess>();
+            InAttackProcess inAttackProcess = entity.Get<InAttackProcess>();
+            InAttackCooldown inAttackCooldown = entity.Get<InAttackCooldown>();
             
             CanSpendEnergy canSpendEnergy = new CanSpendEnergy();
             canSpendEnergy.Add(new FuncCondition(()=> !isDead.Value));
@@ -97,6 +119,11 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
             mustSelfReleaseTriggers.On(isDead);
             mustSelfReleaseTriggers.On(inDeathProcess);
             
+            CanStartAttack canStartAttack = new CanStartAttack();
+            canStartAttack.Add(new FuncCondition(() => !isDead.Value));
+            canStartAttack.Add(new FuncCondition(() => !inAttackProcess.Value));
+            canStartAttack.Add(new FuncCondition(() => !inAttackCooldown.Value));
+            
             entity
                 .Add(canTeleport)
                 .Add(canApplyDamage)
@@ -104,6 +131,7 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(mustDieTriggers)
                 .Add(mustSelfRelease)
                 .Add(mustSelfReleaseTriggers)
+                .Add(canStartAttack)
                 .Add(canSpendEnergy);
         }
     }

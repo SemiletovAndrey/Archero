@@ -53,7 +53,7 @@ namespace Gameplay.Features.MovementFeature
         public TeleportRadius(float value) : base(value) { }
     }
     
-    public class TeleportRequest : ReactiveEvent { }
+    public class TeleportRequest : ReactiveEvent<Vector3> { }
     public class TeleportEvent : ReactiveEvent { }
     
     public class CanTeleport : CompositeCondition

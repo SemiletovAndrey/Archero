@@ -1,6 +1,7 @@
 ﻿using System;
 using Contexts.Scripts.Utilities.Reactive;
 using Template.Scripts.Utils;
+using UnityEngine;
 
 namespace Gameplay.Features.EntityCore.Features.Attack
 {
@@ -73,4 +74,24 @@ namespace Gameplay.Features.EntityCore.Features.Attack
         public InAttackCooldown() { }
         public InAttackCooldown(bool value) : base(value) { }
     }
+
+    public class SplashAttackRadius: ReactiveVariable<float>
+    {
+        public SplashAttackRadius() { }
+        public SplashAttackRadius(float value) : base(value) { }
+    }
+    
+    public class SplashAttackDamage : ReactiveVariable<float>
+    {
+        public SplashAttackDamage() { }
+        public SplashAttackDamage(float value) : base(value) { }
+    }
+
+    public class SplashTargetMask
+    {
+        public readonly LayerMask Value;
+        public SplashTargetMask(LayerMask value) => Value = value;
+    }
+    
+    public class SplashAttackEvent : ReactiveEvent { }
 }

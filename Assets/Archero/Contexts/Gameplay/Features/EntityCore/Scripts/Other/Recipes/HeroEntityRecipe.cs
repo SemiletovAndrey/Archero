@@ -53,7 +53,7 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
                 .Add(new InAttackProcess())
                 .Add(new AttackDelayTime(1))
                 .Add(new StartAttackRequest())
-                .Add(new InstantAttackDamage(50))
+                .Add(new InstantAttackDamage(1))
                 .Add(new StartAttackEvent())
                 .Add(new EndAttackEvent())
                 .Add(new AttackDelayEndEvent())
