@@ -58,19 +58,19 @@ namespace Gameplay.Scripts
         [ContextMenu("AddBrainFor Ghost")]
         private void AddBrainForGhost()
         {
-            _brainsFactory.CreateGhostBrain(_ghost);
+            _brainsFactory.Create(_ghost, EntityType.Ghost);
         }
         
         [ContextMenu("AddBrainFor Teleportator")]
         private void AddBrainForTeleportator()
         {
-            _brainsFactory.CreateTeleportatorBrain(_teleportator);
+            _brainsFactory.Create(_teleportator, EntityType.Teleportator);
         }
         
         [ContextMenu("AddBrainFor Main hero")]
         private void AddBrainForMainHero()
         {
-            _brainsFactory.CreateMainHeroBrain(_testEntity, new NearestDamageableTargetSelector(_testEntity));
+            _brainsFactory.Create(_testEntity,EntityType.Hero);
         }
     }
 }

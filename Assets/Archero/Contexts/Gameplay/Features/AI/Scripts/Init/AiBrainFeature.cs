@@ -1,4 +1,6 @@
-﻿using Template.Features.ProjectInit;
+﻿using Gameplay.Features.AI.MainHero;
+using Gameplay.Features.Enemy;
+using Template.Features.ProjectInit;
 
 namespace Gameplay.Features.AI
 {
@@ -8,6 +10,11 @@ namespace Gameplay.Features.AI
         {
             BindAsSingle<IBrainsFactory, BrainsFactory>();
             BindAsSingle<IAiBrainContext, AiBrainContext>();
+            
+            Container.BindInterfacesAndSelfTo<HeroBrainBuilder>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GhostBrainBuilder>().AsSingle();
+            Container.BindInterfacesAndSelfTo<TeleportetBrainBuilder>().AsSingle();
+            
         }
     }
 }
