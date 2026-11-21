@@ -7,6 +7,8 @@ namespace Gameplay.Features.EntityCore
     {
         protected override void InstallBindings()
         {
+            BindAsSingle<IEntityConfigService, IEntityConfigService>();
+            
             Container.BindInterfacesTo<GhostEntityRecipe>().AsSingle();
             Container.BindInterfacesTo<HeroEntityRecipe>().AsSingle();
             Container.BindInterfacesTo<ProjectileEntityRecipe>().AsSingle();

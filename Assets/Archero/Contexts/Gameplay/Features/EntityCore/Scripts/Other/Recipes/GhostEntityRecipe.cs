@@ -14,16 +14,14 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
     public sealed class GhostEntityRecipe : IEntityRecipe
     {
         private IColliderRegistryService _colliderRegistryService;
-        private readonly ILocalConfigService _localConfigService;
 
         private GhostEntityConfig _ghostEntityConfig;
 
-        public GhostEntityRecipe(IColliderRegistryService colliderRegistryService, ILocalConfigService localConfigService)
+        public GhostEntityRecipe(IColliderRegistryService colliderRegistryService, IEntityConfigService entityConfigService)
         {
             _colliderRegistryService = colliderRegistryService;
-            _localConfigService = localConfigService;
             
-            _ghostEntityConfig = _localConfigService.GetConfig<EntityDataConfig>().GetConfig<GhostEntityConfig>(Type);
+            _ghostEntityConfig = entityConfigService.Get<GhostEntityConfig>(Type);
         }
 
         public EntityType Type => EntityType.Ghost;

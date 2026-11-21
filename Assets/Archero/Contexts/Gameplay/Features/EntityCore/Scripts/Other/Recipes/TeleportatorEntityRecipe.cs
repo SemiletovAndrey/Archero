@@ -14,18 +14,15 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
     public class TeleportatorEntityRecipe : IEntityRecipe
     {
         private readonly IColliderRegistryService _colliderRegistryService;
-        private readonly ILocalConfigService _localConfigService;
 
         private TeleportatorEntityConfig _teleportatorEntityConfig;
 
         public TeleportatorEntityRecipe(IColliderRegistryService colliderRegistryService,
-            ILocalConfigService localConfigService)
+            IEntityConfigService entityConfigService)
         {
             _colliderRegistryService = colliderRegistryService;
-            _localConfigService = localConfigService;
 
-            _teleportatorEntityConfig = _localConfigService.GetConfig<EntityDataConfig>()
-                .GetConfig<TeleportatorEntityConfig>(Type);
+            _teleportatorEntityConfig = entityConfigService.Get<TeleportatorEntityConfig>(Type);
         }
 
         public EntityType Type => EntityType.Teleportator;

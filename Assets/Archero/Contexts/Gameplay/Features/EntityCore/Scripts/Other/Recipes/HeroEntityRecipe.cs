@@ -11,16 +11,14 @@ namespace Gameplay.Features.EntityCore.Features.Scripts.Other.Recipes
     public class HeroEntityRecipe : IEntityRecipe
     {
         private readonly IEntityFactory _entityFactory;
-        private readonly ILocalConfigService _localConfigService;
 
         private HeroEntityConfig _heroEntityConfig;
         
-        public HeroEntityRecipe(IEntityFactory entityFactory, ILocalConfigService localConfigService)
+        public HeroEntityRecipe(IEntityFactory entityFactory, IEntityConfigService entityConfigService)
         {
             _entityFactory = entityFactory;
-            _localConfigService = localConfigService;
             
-            _heroEntityConfig = _localConfigService.GetConfig<EntityDataConfig>().GetConfig<HeroEntityConfig>(Type);
+            _heroEntityConfig = entityConfigService.Get<HeroEntityConfig>(Type);
         }
 
         public EntityType Type => EntityType.Hero;
